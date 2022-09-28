@@ -5,7 +5,9 @@ declare namespace API {
   };
 
   type postApiUserParams = {
+    /** 用户ID */
     ID?: string;
+    /** 用户名字 */
     UserName?: string;
   };
 
