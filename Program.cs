@@ -18,18 +18,16 @@ builder.Services.AddSwaggerGen(options =>
     //    Description = "An ASP.NET Core Web API for managing ToDo items",
     //});
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename),true);
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), true);
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
 
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
