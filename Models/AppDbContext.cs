@@ -12,16 +12,16 @@ namespace FaceTrain.Models
         /// <param name="optionsBuilder"></param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data source=" + AppContext.BaseDirectory + "face.db");
-            //  optionsBuilder.UseSqlite("Data source=D:\\codeup\\park\\api\\park.db");
+          //  optionsBuilder.UseSqlite("Data source=" + AppContext.BaseDirectory + "face.db");
+              optionsBuilder.UseSqlite("Data source=C:\\code\\FaceTrain\\face.db");
         }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="builder"></param>
-        //protected override void OnModelCreating(ModelBuilder builder)
-        //{
-        //    base.OnModelCreating(builder);
-        //}
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+        }
     }
 }
