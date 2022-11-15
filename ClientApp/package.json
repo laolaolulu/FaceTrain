@@ -2,12 +2,12 @@
   "private": true,
   "author": "LP <1570800510@qq.com>",
   "scripts": {
-    "dev": "max dev",
     "build": "max build",
+    "dev": "max dev",
     "format": "prettier --cache --write .",
-    "prepare": "husky install",
     "postinstall": "max setup",
     "openapi": "ts-node openapi.config.ts",
+    "prepare": "cd .. && husky install ClientApp/.husky",
     "setup": "max setup",
     "start": "npm run dev"
   },

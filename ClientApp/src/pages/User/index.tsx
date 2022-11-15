@@ -8,13 +8,13 @@ import {
 import { Button, Image } from 'antd';
 import React, { useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
+import EditImgForm from './components/EditImgForm';
 
-const TableList: React.FC<unknown> = () => {
+export default () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-
+  const [select, setSelect] = useState<API.User>();
   const actionRef = useRef<ActionType>();
-  //  const [row, setRow] = useState<API.UserInfo>();
-  //const [selectedRowsState, setSelectedRows] = useState<API.UserInfo[]>([]);
+
   const columns: ProDescriptionsItemProps<API.User>[] = [
     {
       title: 'ID',
@@ -60,10 +60,19 @@ const TableList: React.FC<unknown> = () => {
       editable: false,
       dataIndex: 'faces',
       formItemProps: { hidden: true },
-      render: (val: any) => {
-        let res = [<a key="editfaces">管理</a>];
-        if (val && val !== '-') {
-          res = val
+      render: (_, record) => {
+        let res = [
+          <a
+            key="editfaces"
+            onClick={() => {
+              setSelect(record);
+            }}
+          >
+            管理
+          </a>,
+        ];
+        if (record.faces) {
+          res = record.faces
             .map((m: string) => (
               <Image
                 key={m}
@@ -77,7 +86,7 @@ const TableList: React.FC<unknown> = () => {
             ))
             .concat(res);
         }
-        return <>{res}</>;
+        return res;
       },
     },
   ];
@@ -147,8 +156,7 @@ const TableList: React.FC<unknown> = () => {
           columns={columns}
         />
       </CreateForm>
+      <EditImgForm user={select} setUser={setSelect} />
     </PageContainer>
   );
 };
-
-export default TableList;

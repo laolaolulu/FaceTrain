@@ -1,26 +1,19 @@
 import { Modal } from 'antd';
 import React, { PropsWithChildren } from 'react';
 
-interface CreateFormProps {
-  modalVisible: boolean;
-  onCancel: () => void;
-}
-
-const CreateForm: React.FC<PropsWithChildren<CreateFormProps>> = (props) => {
-  const { modalVisible, onCancel } = props;
+export default (props: {
+  user?: API.User;
+  setUser: React.Dispatch<React.SetStateAction<API.User | undefined>>;
+}) => {
+  const { user, setUser } = props;
 
   return (
     <Modal
       destroyOnClose
       title="修改"
       width={420}
-      visible={modalVisible}
-      onCancel={() => onCancel()}
-      footer={null}
-    >
-      {props.children}
-    </Modal>
+      open={user ? true : false}
+      onCancel={() => setUser(undefined)}
+    ></Modal>
   );
 };
-
-export default CreateForm;
