@@ -10,30 +10,31 @@ export default defineConfig({
     title: '@umijs/max',
   },
   routes: [
-    {
-      path: '/',
-      redirect: '/user',
-    },
-    {
-      name: '首页',
-      path: '/home',
-      component: './Home',
-    },
-    {
-      name: '用户管理',
-      path: '/user',
-      component: './User',
-    },
+      {
+          path: '/',
+          redirect: '/user',
+      },
+      {
+          name: '首页',
+          path: '/home',
+          component: './Home',
+      },
+      {
+          name: '用户管理',
+          path: '/user',
+          component: './User',
+      },
     {
       name: '权限演示',
       path: '/access',
       component: './Access',
     },
     {
-      name: ' CRUD 示例',
-      path: '/table',
-      component: './Table',
+        name: ' CRUD 示例',
+        path: '/table',
+        component: './Table',
     },
   ],
-  npmClient: 'yarn',
+  npmClient: 'pnpm',
 });
+

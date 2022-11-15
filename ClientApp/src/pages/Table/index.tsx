@@ -12,131 +12,141 @@ import React, { useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm, { FormValueType } from './components/UpdateForm';
 
-// const { addUser, queryUserList, deleteUser, modifyUser } =
-//   services.UserController;
+const { addUser, queryUserList, deleteUser, modifyUser } =
+  services.UserController;
 
 /**
  * 添加节点
  * @param fields
  */
-// const handleAdd = async (fields: API.UserInfo) => {
-//   const hide = message.loading('正在添加');
-//   try {
-//     await addUser({ ...fields });
-//     hide();
-//     message.success('添加成功');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('添加失败请重试！');
-//     return false;
-//   }
-// };
+const handleAdd = async (fields: API.UserInfo) => {
+  const hide = message.loading('正在添加');
+  try {
+    await addUser({ ...fields });
+    hide();
+    message.success('添加成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('添加失败请重试！');
+    return false;
+  }
+};
 
 /**
  * 更新节点
  * @param fields
  */
-// const handleUpdate = async (fields: FormValueType) => {
-//   const hide = message.loading('正在配置');
-//   try {
-//     await modifyUser(
-//       {
-//         userId: fields.id || '',
-//       },
-//       {
-//         name: fields.name || '',
-//         nickName: fields.nickName || '',
-//         email: fields.email || '',
-//       },
-//     );
-//     hide();
+const handleUpdate = async (fields: FormValueType) => {
+  const hide = message.loading('正在配置');
+  try {
+    await modifyUser(
+      {
+        userId: fields.id || '',
+      },
+      {
+        name: fields.name || '',
+        nickName: fields.nickName || '',
+        email: fields.email || '',
+      },
+    );
+    hide();
 
-//     message.success('配置成功');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('配置失败请重试！');
-//     return false;
-//   }
-// };
+    message.success('配置成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('配置失败请重试！');
+    return false;
+  }
+};
 
 /**
  *  删除节点
  * @param selectedRows
  */
-// const handleRemove = async (selectedRows: API.UserInfo[]) => {
-//   const hide = message.loading('正在删除');
-//   if (!selectedRows) return true;
-//   try {
-//     await deleteUser({
-//       userId: selectedRows.find((row) => row.id)?.id || '',
-//     });
-//     hide();
-//     message.success('删除成功，即将刷新');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('删除失败，请重试');
-//     return false;
-//   }
-//};
+const handleRemove = async (selectedRows: API.UserInfo[]) => {
+  const hide = message.loading('正在删除');
+  if (!selectedRows) return true;
+  try {
+    await deleteUser({
+      userId: selectedRows.find((row) => row.id)?.id || '',
+    });
+    hide();
+    message.success('删除成功，即将刷新');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('删除失败，请重试');
+    return false;
+  }
+};
 
 const TableList: React.FC<unknown> = () => {
-  //const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  // const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-  //const [stepFormValues, setStepFormValues] = useState({});
+  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
+  const [updateModalVisible, handleUpdateModalVisible] =
+    useState<boolean>(false);
+  const [stepFormValues, setStepFormValues] = useState({});
   const actionRef = useRef<ActionType>();
-  //  const [row, setRow] = useState<API.UserInfo>();
-  //const [selectedRowsState, setSelectedRows] = useState<API.UserInfo[]>([]);
+  const [row, setRow] = useState<API.UserInfo>();
+  const [selectedRowsState, setSelectedRows] = useState<API.UserInfo[]>([]);
   const columns: ProDescriptionsItemProps<API.UserInfo>[] = [
     {
-      title: 'ID',
-      dataIndex: 'ID',
-      tip: 'ID是唯一的 key',
+      title: '名称',
+      dataIndex: 'name',
+      tip: '名称是唯一的 key',
       formItemProps: {
         rules: [
           {
             required: true,
-            message: 'ID为必填项',
+            message: '名称为必填项',
           },
         ],
       },
     },
     {
-      title: '姓名',
-      dataIndex: 'UserName',
+      title: '昵称',
+      dataIndex: 'nickName',
       valueType: 'text',
+    },
+    {
+      title: '性别',
+      dataIndex: 'gender',
+      hideInForm: true,
+      valueEnum: {
+        0: { text: '男', status: 'MALE' },
+        1: { text: '女', status: 'FEMALE' },
+      },
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      //   render: (_, record) => (
-      //     <>
-      //       {/* <a
-      //         onClick={() => {
-      //           handleUpdateModalVisible(true);
-      //           setStepFormValues(record);
-      //         }}
-      //       >
-      //         配置
-      //       </a>
-      //       <Divider type="vertical" /> */}
-      //       <a href="">订阅警报</a>
-      //     </>
-      //   ),
+      render: (_, record) => (
+        <>
+          <a
+            onClick={() => {
+              handleUpdateModalVisible(true);
+              setStepFormValues(record);
+            }}
+          >
+            配置
+          </a>
+          <Divider type="vertical" />
+          <a href="">订阅警报</a>
+        </>
+      ),
     },
   ];
 
   return (
     <PageContainer
       header={{
-        title: '人脸信息管理',
+        title: 'CRUD 示例',
       }}
     >
       <ProTable<API.UserInfo>
-        headerTitle="检索数据"
+        headerTitle="查询表格"
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -146,30 +156,30 @@ const TableList: React.FC<unknown> = () => {
           <Button
             key="1"
             type="primary"
-            // onClick={() => handleModalVisible(true)}
+            onClick={() => handleModalVisible(true)}
           >
-            新建用户
+            新建
           </Button>,
         ]}
-        // request={async (params, sorter, filter) => {
-        // //   const { data, success } = await queryUserList({
-        // //     ...params,
-        // //     // FIXME: remove @ts-ignore
-        // //     // @ts-ignore
-        // //     sorter,
-        // //     filter,
-        // //   });
-        // //   return {
-        // //     data: data?.list || [],
-        // //     success,
-        // //   };
-        // }}
+        request={async (params, sorter, filter) => {
+          const { data, success } = await queryUserList({
+            ...params,
+            // FIXME: remove @ts-ignore
+            // @ts-ignore
+            sorter,
+            filter,
+          });
+          return {
+            data: data?.list || [],
+            success,
+          };
+        }}
         columns={columns}
-        // rowSelection={{
-        //   onChange: (_, selectedRows) => setSelectedRows(selectedRows),
-        // }}
+        rowSelection={{
+          onChange: (_, selectedRows) => setSelectedRows(selectedRows),
+        }}
       />
-      {/* {selectedRowsState?.length > 0 && (
+      {selectedRowsState?.length > 0 && (
         <FooterToolbar
           extra={
             <div>
@@ -190,8 +200,8 @@ const TableList: React.FC<unknown> = () => {
           </Button>
           <Button type="primary">批量审批</Button>
         </FooterToolbar>
-      )} */}
-      {/* <CreateForm
+      )}
+      <CreateForm
         onCancel={() => handleModalVisible(false)}
         modalVisible={createModalVisible}
       >
@@ -252,7 +262,7 @@ const TableList: React.FC<unknown> = () => {
             columns={columns}
           />
         )}
-      </Drawer> */}
+      </Drawer>
     </PageContainer>
   );
 };
