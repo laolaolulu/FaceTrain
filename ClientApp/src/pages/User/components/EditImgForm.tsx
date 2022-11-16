@@ -2,6 +2,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Modal, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import React, { PropsWithChildren } from 'react';
+import { classifier } from '@/models/global';
 
 export default (props: {
   user?: API.User;
@@ -59,6 +60,27 @@ export default (props: {
           img.src = URL.createObjectURL(file);
           await img.decode();
           const matimg = cv.imread(img);
+
+          let gray = new cv.Mat();
+          let faces = new cv.RectVector();
+          cv.cvtColor(matimg, gray, cv.COLOR_RGBA2GRAY, 0);
+          try {
+            classifier.detectMultiScale(gray, faces, 1.1, 3, 0);
+            console.log(faces);
+          } catch (err) {
+            console.log(err);
+          }
+
+          for (let i = 0; i < faces.size(); ++i) {
+            let face = faces.get(i);
+            let point1 = new cv.Point(face.x, face.y);
+            let point2 = new cv.Point(
+              face.x + face.width,
+              face.y + face.height,
+            );
+            cv.rectangle(matimg, point1, point2, [255, 0, 0, 255]);
+          }
+
           let dsize = new cv.Size(300, (300 * matimg.rows) / matimg.cols);
           let dst = new cv.Mat();
           cv.resize(matimg, dst, dsize, 0, 0, cv.INTER_AREA);

@@ -39,12 +39,12 @@ export default defineConfig({
     },
   ],
   npmClient: 'pnpm',
-  headScripts: [
-    {
-      src: '/opencv.js',
-      async: true,
-    },
-  ],
+  //   headScripts: [
+  //     {
+  //       src: '/opencv.js',
+  //       async: true,
+  //     },
+  //   ],
   proxy: {
     '/api': {
       target: 'https://localhost:7048/',

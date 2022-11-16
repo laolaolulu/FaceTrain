@@ -95,34 +95,7 @@ export default () => {
     },
   ];
 
-  useEffect(() => {
-    const classifier = new cv.CascadeClassifier();
-
-    let request = new XMLHttpRequest();
-    request.open('GET', '/haarcascade_frontalface_default.xml', true);
-    request.responseType = 'arraybuffer';
-    request.onload = function (ev) {
-      if (request.readyState === 4) {
-        if (request.status === 200) {
-          let data = new Uint8Array(request.response);
-
-          cv.FS_createDataFile(
-            '/',
-            'haarcascade_frontalface_default.xml',
-            data,
-            true,
-            false,
-            false,
-          );
-          classifier.load('haarcascade_frontalface_default.xml');
-          // callback();
-        } else {
-          // self.printError('Failed to load ' + url + ' status: ' + request.status);
-        }
-      }
-    };
-    request.send();
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <PageContainer

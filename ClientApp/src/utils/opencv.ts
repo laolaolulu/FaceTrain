@@ -3,13 +3,14 @@ export const loadOpenCv = (OPENCV_URL: string, onloadCallback: () => void) => {
   script.setAttribute('async', '');
   script.setAttribute('type', 'text/javascript');
   script.addEventListener('load', () => {
+    console.log('opencv加载成功');
     if (cv.getBuildInformation) {
-      console.log(cv.getBuildInformation());
+      //  console.log(cv.getBuildInformation());
       onloadCallback();
     } else {
       // WASM
       cv['onRuntimeInitialized'] = () => {
-        console.log(cv.getBuildInformation());
+        // console.log(cv.getBuildInformation());
         onloadCallback();
       };
     }
