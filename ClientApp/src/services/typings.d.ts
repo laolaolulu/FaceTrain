@@ -10,3 +10,5 @@ declare namespace API {
     faces?: string[];
   };
 }
+
+declare const cv: any;

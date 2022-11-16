@@ -18,15 +18,18 @@ export default defineConfig({
       name: '首页',
       path: '/home',
       component: './Home',
+      icon: 'home',
     },
     {
       name: '用户管理',
       path: '/user',
       component: './User',
+      icon: 'user',
     },
     {
       name: '权限演示',
       path: '/access',
+      icon: 'setting',
       component: './Access',
     },
     {
@@ -36,6 +39,12 @@ export default defineConfig({
     },
   ],
   npmClient: 'pnpm',
+  headScripts: [
+    {
+      src: '/opencv.js',
+      async: true,
+    },
+  ],
   proxy: {
     '/api': {
       target: 'https://localhost:7048/',
