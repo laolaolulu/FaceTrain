@@ -13,7 +13,7 @@ namespace FaceTrain.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
           //  optionsBuilder.UseSqlite("Data source=" + AppContext.BaseDirectory + "face.db");
-              optionsBuilder.UseSqlite("Data source=C:\\code\\FaceTrain\\face.db");
+              optionsBuilder.UseSqlite("Data source=D:\\lpwork\\FaceTrain\\face.db");
         }
         /// <summary>
         /// 

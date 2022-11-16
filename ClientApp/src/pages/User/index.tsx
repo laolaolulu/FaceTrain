@@ -10,7 +10,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import EditImgForm from './components/EditImgForm';
 import styles from './index.less';
-export const classifier = new cv.CascadeClassifier();
 
 export default () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
@@ -97,8 +96,32 @@ export default () => {
   ];
 
   useEffect(() => {
-    // load pre-trained classifiers
-    classifier.load('../haarcascade_frontalface_alt2.xml');
+    const classifier = new cv.CascadeClassifier();
+
+    let request = new XMLHttpRequest();
+    request.open('GET', '/haarcascade_frontalface_default.xml', true);
+    request.responseType = 'arraybuffer';
+    request.onload = function (ev) {
+      if (request.readyState === 4) {
+        if (request.status === 200) {
+          let data = new Uint8Array(request.response);
+
+          cv.FS_createDataFile(
+            '/',
+            'haarcascade_frontalface_default.xml',
+            data,
+            true,
+            false,
+            false,
+          );
+          classifier.load('haarcascade_frontalface_default.xml');
+          // callback();
+        } else {
+          // self.printError('Failed to load ' + url + ' status: ' + request.status);
+        }
+      }
+    };
+    request.send();
   }, []);
 
   return (
