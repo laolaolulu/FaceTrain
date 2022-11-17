@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenCvSharp;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FaceTrain.Controllers
 {
@@ -103,7 +104,7 @@ namespace FaceTrain.Controllers
                 var src = string.Format("wwwroot/Faces/{0}/", ID);
                 if (Directory.Exists(src))
                 {
-                    Directory.Delete(src,true);
+                    Directory.Delete(src, true);
                 }
 
                 return new FormatRes(true, "修改成功！");
@@ -116,20 +117,24 @@ namespace FaceTrain.Controllers
         /// <param name="image">人脸</param>
         /// <returns></returns>
         [HttpPost]
-        public FormatRes AddImg(string ID, IFormFile image, bool update = false)
+        public FormatRes AddImg(string ID, IFormFile[] image, bool update = false)
         {
             using var ctx = new AppDbContext();
             if (ctx.UserInfos.Any(a => a.ID == ID))
             {
-                using var facemat = Mat.FromStream(image.OpenReadStream(), ImreadModes.Color);
                 var imgurl = string.Format("wwwroot/Faces/{0}", ID);
                 if (!Directory.Exists(imgurl))
                 {
                     Directory.CreateDirectory(imgurl);
                 }
-                imgurl += string.Format("/{0}.jpg", DateTime.Now.ToString("yyyyMMddHHmmssfff"));
-                Cv2.ImWrite(imgurl, facemat);
-                return new FormatRes(true);
+                foreach (var img in image)
+                {
+
+                    using var facemat = Mat.FromStream(img.OpenReadStream(), ImreadModes.Color);
+                    Cv2.ImWrite(imgurl + string.Format("/{0}", img.FileName), facemat);
+                }
+
+                return new FormatRes(true, "新增了(" + image.Length + ")张人脸照片");
             }
             else
             {
@@ -137,6 +142,24 @@ namespace FaceTrain.Controllers
             }
         }
 
-
+        /// <summary>
+        /// 删除用户脸图片
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="facesName"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        public FormatRes DelFace(string ID, string[] facesName)
+        {
+            foreach (var name in facesName)
+            {
+                var imgurl = string.Format("wwwroot/Faces/{0}/{1}", ID, name);
+                if (System.IO.File.Exists(imgurl))
+                {
+                    System.IO.File.Delete(imgurl);
+                }
+            }
+            return new FormatRes(true, "删除了(" + facesName.Length + ")张人脸照片");
+        }
     }
 }

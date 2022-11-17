@@ -45,6 +45,17 @@ export const createFileFromUrl = (
   request.send();
 };
 
+export const urltoFile = (url: string, filename: string) => {
+  const type = url.substring(url.indexOf('/') + 1, url.indexOf(';'));
+  return fetch(url)
+    .then(function (res) {
+      return res.arrayBuffer();
+    })
+    .then(function (buf) {
+      return new File([buf], filename + '.' + type, { type: 'image/' + type });
+    });
+};
+
 export const loadImageToCanvas = (url: string, cavansId: string) => {
   let canvas: any = document.getElementById(cavansId);
   let ctx = canvas?.getContext('2d');

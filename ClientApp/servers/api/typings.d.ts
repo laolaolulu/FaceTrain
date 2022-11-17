@@ -4,6 +4,10 @@ declare namespace API {
     ID?: string;
   };
 
+  type deleteUserDelFaceParams = {
+    ID?: string;
+  };
+
   type FormatRes = {
     /** 是否返回成功 */
     success?: boolean;

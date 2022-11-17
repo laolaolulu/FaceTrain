@@ -5,15 +5,19 @@ import {
   ProDescriptionsItemProps,
   ProTable,
 } from '@ant-design/pro-components';
-import { Button, Image } from 'antd';
+import { Button, Image, message, Modal } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import EditImgForm from './components/EditImgForm';
 import styles from './index.less';
+import { urltoFile } from '@/utils/opencv';
+import { CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+
+let upurls: API.UpFaceUrl[];
 
 export default () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  const [select, setSelect] = useState<API.User>();
+  const [select, setSelect] = useState<API.UpFace>();
   const actionRef = useRef<ActionType>();
 
   const columns: ProDescriptionsItemProps<API.User>[] = [
@@ -66,7 +70,18 @@ export default () => {
           <a
             key="editfaces"
             onClick={() => {
-              setSelect(record);
+              upurls = record.faces
+                ? record.faces.map((url) => {
+                    const us = url.split('/');
+                    const name = us[us.length - 1];
+                    return { name, url, uid: name.split('.')[0] };
+                  })
+                : [];
+              setSelect({
+                ID: record.id,
+                name: record.userName,
+                urls: upurls,
+              });
             }}
           >
             管理
@@ -163,7 +178,64 @@ export default () => {
           columns={columns}
         />
       </CreateForm>
-      <EditImgForm user={select} setUser={setSelect} />
+      <EditImgForm
+        user={select}
+        setUser={setSelect}
+        onOk={async () => {
+          const reqs: Promise<API.FormatRes>[] = [];
+          const modal = Modal.info({
+            title: '请求中...',
+            icon: <LoadingOutlined />,
+          });
+          //#region  处理新增
+          const addfilesasync = select?.urls
+            .filter((f) => f.url.startsWith('data:image'))
+            .map((m) => urltoFile(m.url, m.uid));
+          if (addfilesasync && addfilesasync.length > 0) {
+            reqs.push(
+              new Promise(async (resolve) => {
+                const addfiles = await Promise.all(addfilesasync);
+                return api.User.postUserAddImg(
+                  { ID: select?.ID },
+                  {},
+                  addfiles,
+                ).then((res) => {
+                  resolve(res);
+                });
+              }),
+            );
+          }
+          //#endregion
+
+          //#region 处理删除
+          var delfaces = upurls
+            .filter(
+              (item) => select?.urls.map((m) => m.uid).indexOf(item.uid) == -1,
+            )
+            .map((m) => m.name);
+          if (delfaces && delfaces.length > 0) {
+            reqs.push(api.User.deleteUserDelFace({ ID: select?.ID }, delfaces));
+          }
+          //#endregion
+
+          const res = (await Promise.all(reqs)).map((m) => m.msg);
+          //更新界面数据
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
+          setSelect(undefined);
+          if (res) {
+            modal.update((prevConfig) => ({
+              ...prevConfig,
+              title: `请求完成`,
+              content: res.map((m) => <p>{m}</p>),
+              icon: <CheckCircleOutlined />,
+            }));
+          } else {
+            modal.destroy();
+          }
+        }}
+      />
     </PageContainer>
   );
 };
