@@ -1,3 +1,4 @@
+import { TrademarkOutlined } from '@ant-design/icons';
 import { defineConfig } from '@umijs/max';
 
 export default defineConfig({
@@ -12,30 +13,31 @@ export default defineConfig({
   routes: [
     {
       path: '/',
-      redirect: '/user',
+      redirect: '/model',
     },
-    {
-      name: '首页',
-      path: '/home',
-      component: './Home',
-      icon: 'home',
-    },
+    // {
+    //   name: '首页',
+    //   path: '/home',
+    //   component: './Home',
+    //   icon: 'home',
+    // },
     {
       name: '用户管理',
       path: '/user',
       component: './User',
       icon: 'user',
     },
+    // {
+    //   name: '权限演示',
+    //   path: '/access',
+    //   icon: 'setting',
+    //   component: './Access',
+    // },
     {
-      name: '权限演示',
-      path: '/access',
+      name: '模型管理',
+      path: '/model',
       icon: 'setting',
-      component: './Access',
-    },
-    {
-      name: ' CRUD 示例',
-      path: '/table',
-      component: './Table',
+      component: './Model',
     },
   ],
   npmClient: 'pnpm',

@@ -8,6 +8,7 @@ import { Modal, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import React, { PropsWithChildren } from 'react';
 import { classifier } from '@/models/global';
+import { upurls } from '../index';
 
 export default (props: {
   user?: API.UpFace;
@@ -21,12 +22,20 @@ export default (props: {
       title={`上传或删除人脸照片（${user?.ID}-${user?.name}）`}
       open={user ? true : false}
       onCancel={() => {
-        Modal.confirm({
-          title: '未保存，放弃更改吗？',
-          onOk: () => {
-            setUser(undefined);
-          },
-        });
+        const add = user?.urls.filter((f) => f.url.startsWith('data:image'));
+        var del = upurls.filter(
+          (item) => user?.urls.map((m) => m.uid).indexOf(item.uid) == -1,
+        );
+        if ((add && add.length > 0) || (del && del.length > 0)) {
+          Modal.confirm({
+            title: '未保存，放弃更改吗？',
+            onOk: () => {
+              setUser(undefined);
+            },
+          });
+        } else {
+          setUser(undefined);
+        }
       }}
       onOk={onOk}
     >
@@ -34,7 +43,15 @@ export default (props: {
         // multiple={true}
         listType="picture-card"
         fileList={user?.urls}
-        // onPreview={handlePreview}
+        onPreview={(file) => {
+          Modal.info({
+            title: `${user?.ID}-${file.name}`,
+            closable: true,
+            maskClosable: true,
+            okButtonProps: { style: { display: 'none' } },
+            content: <img width={300} src={file.url} />,
+          });
+        }}
         beforeUpload={async (file) => {
           const addurls: string[] = [];
 
@@ -43,7 +60,14 @@ export default (props: {
             icon: <LoadingOutlined />,
             closable: true,
             width: 500,
-            content: <canvas id="canface" style={{ width: '100%' }} />,
+            centered: true,
+            okText: '确定',
+            content: (
+              <canvas
+                id="canface"
+                style={{ maxWidth: '100%', maxHeight: '400px' }}
+              />
+            ),
             onOk: () => {
               if (user && addurls.length > 0) {
                 const fileList = [...user.urls];
@@ -59,7 +83,7 @@ export default (props: {
               }
             },
           });
-
+          console.log(file);
           //#region 读取上传的图片转换为mat
           const img = new Image();
           img.src = URL.createObjectURL(file);
@@ -126,20 +150,16 @@ export default (props: {
           }
           faces.delete();
         }}
-        onChange={({ fileList }) =>
-          setUser(
-            user
-              ? {
-                  ...user,
-                  urls: fileList.map((m) => ({
-                    name: m.name,
-                    uid: m.uid,
-                    url: m.url || '',
-                  })),
-                }
-              : undefined,
-          )
-        }
+        onRemove={(file) => {
+          if (user) {
+            const index = user.urls.findIndex((f) => f.uid == file.uid);
+            if (index > -1) {
+              const urls = [...user.urls];
+              urls.splice(index, 1);
+              setUser({ ...user, urls });
+            }
+          }
+        }}
       >
         <div>
           <PlusOutlined />
