@@ -13,7 +13,7 @@ import styles from './index.less';
 import { urltoFile } from '@/utils/opencv';
 import { CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 
-let upurls: API.UpFaceUrl[];
+export let upurls: API.UpFaceUrl[];
 
 export default () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
@@ -163,7 +163,7 @@ export default () => {
         onCancel={() => handleModalVisible(false)}
         modalVisible={createModalVisible}
       >
-        <ProTable<API.UserInfo, API.postFaceTranParams>
+        <ProTable<API.UserInfo, API.postUserAddParams>
           onSubmit={async (value) => {
             const success = await api.User.postUserAdd(value);
             if (success) {
@@ -218,7 +218,7 @@ export default () => {
           }
           //#endregion
 
-          const res = (await Promise.all(reqs)).map((m) => m.msg);
+          const res = await Promise.all(reqs);
           //更新界面数据
           if (actionRef.current) {
             actionRef.current.reload();
@@ -228,7 +228,7 @@ export default () => {
             modal.update((prevConfig) => ({
               ...prevConfig,
               title: `请求完成`,
-              content: res.map((m) => <p>{m}</p>),
+              content: res.map((m, index) => <p key={index}>{m.msg}</p>),
               icon: <CheckCircleOutlined />,
             }));
           } else {

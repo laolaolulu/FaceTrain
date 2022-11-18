@@ -22,13 +22,8 @@ declare namespace API {
     pageSize?: number;
   };
 
-  type postFaceTranParams = {
-    /** 用户ID */
-    ID?: string;
-    /** 用户名字 */
-    UserName?: string;
-    /** 用户手机号 */
-    Phone?: string;
+  type postFaceTrainParams = {
+    type?: string;
   };
 
   type postUserAddImgParams = {
