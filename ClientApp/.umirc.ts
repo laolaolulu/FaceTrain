@@ -8,7 +8,7 @@ export default defineConfig({
   initialState: {},
   request: {},
   layout: {
-    title: '@umijs/max',
+    title: 'Opencv人脸识别',
   },
   routes: [
     {

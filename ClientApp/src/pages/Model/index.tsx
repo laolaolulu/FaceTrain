@@ -22,13 +22,14 @@ import {
   Row,
   Select,
   Upload,
+  UploadProps,
 } from 'antd';
 import React, { useMemo, useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm, { FormValueType } from './components/UpdateForm';
 import api from '@/services';
 import { UploadFile } from 'antd/es/upload';
-import type { RcFile, UploadProps } from 'antd/es/upload';
+import { classifier } from '@/models/global';
 
 export default () => {
   const { loading: training, run: Train } = useRequest(api.Face.postFaceTrain, {
@@ -132,66 +133,90 @@ export default () => {
                   values.model = models?.at(-1)?.name;
                 }
 
+                const facemsg: {
+                  uid: string;
+                  face: any;
+                  file: Promise<File | undefined>;
+                }[] = [];
                 testImg.forEach(async (element) => {
-                  //#region 读取上传的图片转换为mat
-                  // console.log(element);
-                  if (element.thumbUrl) {
+                  if (element.originFileObj) {
+                    //#region 读取上传的图片转换为mat
                     const img = new Image();
-                    img.onload = (re) => {
-                      console.log(img.width);
-                      //   const matimg = cv.imread(img);
-                      //   console.log(matimg);
-                    };
-                    img.src = element.thumbUrl;
+                    img.src = URL.createObjectURL(element.originFileObj);
+                    await img.decode();
+                    const matimg = cv.imread(img);
+                    //#endregion
 
-                    // await img.decode();
+                    //#region 人脸检测
+                    const faces = new cv.RectVector();
+                    try {
+                      //   const gray = new cv.Mat();
+                      //   cv.cvtColor(matimg, gray, cv.COLOR_RGBA2GRAY, 0); //灰度化
+                      classifier.detectMultiScale(matimg, faces, 1.1, 3, 0); //人脸检测
+                      // gray.delete();
+                    } catch (err) {
+                      console.log(err);
+                    }
+                    console.log(faces.size());
+                    //#endregion
+
+                    //#region 将人脸裁剪储存到待识别请求集合
+                    for (let i = 0; i < faces.size(); ++i) {
+                      const face = faces.get(i);
+                      //    const point1 = new cv.Point(face.x, face.y);
+                      //    const point2 = new cv.Point(
+                      //      face.x + face.width,
+                      //      face.y + face.height,
+                      //    );
+                      //    cv.rectangle(matimg, point1, point2, [0, 0, 255, 255]);
+
+                      const tnCanvas = document.createElement('canvas');
+                      const tnCanvasContext = tnCanvas.getContext('2d');
+                      tnCanvas.width = face.width;
+                      tnCanvas.height = face.height;
+                      //裁剪出人脸
+                      tnCanvasContext?.drawImage(
+                        img,
+                        face.x,
+                        face.y,
+                        face.width,
+                        face.height,
+                        0,
+                        0,
+                        face.width,
+                        face.height,
+                      );
+
+                      const getfile = new Promise<File | undefined>(
+                        (resolve) => {
+                          tnCanvas.toBlob((blob) => {
+                            let file: File | undefined = undefined;
+                            if (blob) {
+                              file = new File([blob], `${element.uid}-${i}`, {
+                                type: blob.type,
+                              });
+                            }
+                            resolve(file);
+                          });
+                        },
+                      );
+                      facemsg.push({ uid: element.uid, face, file: getfile });
+                    }
+                    //#endregion
+
+                    const files: any[] = (
+                      await Promise.all(facemsg.map((m) => m.file))
+                    ).filter(Boolean);
+
+                    api.Face.postFacePredict(
+                      { model: values.model },
+                      {},
+                      files,
+                    ).then((res) => {
+                      console.log(res);
+                    });
                   }
-                  //#endregion
                 });
-
-                //  //#region 人脸检测
-                //  const faces = new cv.RectVector();
-                //  try {
-                //    const gray = new cv.Mat();
-                //    cv.cvtColor(matimg, gray, cv.COLOR_RGBA2GRAY, 0); //灰度化
-                //    classifier.detectMultiScale(gray, faces, 1.1, 3, 0); //人脸检测
-                //    gray.delete();
-                //  } catch (err) {
-                //    console.log(err);
-                //  }
-                //  //#endregion
-
-                //  //#region 界面显示上传结果并画出识别到的人脸并将识别到的脸转换base64
-                //  for (let i = 0; i < faces.size(); ++i) {
-                //    const face = faces.get(i);
-                //    const point1 = new cv.Point(face.x, face.y);
-                //    const point2 = new cv.Point(
-                //      face.x + face.width,
-                //      face.y + face.height,
-                //    );
-                //    cv.rectangle(matimg, point1, point2, [0, 0, 255, 255]);
-
-                //    const tnCanvas = document.createElement('canvas');
-                //    const tnCanvasContext = tnCanvas.getContext('2d');
-                //    tnCanvas.width = face.width;
-                //    tnCanvas.height = face.height;
-
-                //    tnCanvasContext?.drawImage(
-                //      img,
-                //      face.x,
-                //      face.y,
-                //      face.width,
-                //      face.height,
-                //      0,
-                //      0,
-                //      face.width,
-                //      face.height,
-                //    );
-                //    addurls.push(tnCanvas.toDataURL());
-                //  }
-                //  cv.imshow('canface', matimg);
-                //  matimg.delete();
-                //  //#endregion
 
                 //  if (faces.size() > 0) {
                 //    modal.update((prevConfig) => ({
@@ -228,20 +253,9 @@ export default () => {
                   multiple={true}
                   defaultFileList={testImg}
                   className="upload-list-inline"
-                  onChange={({ fileList: newFileList }) => {
-                    console.log(newFileList);
-                    // if (newFileList.thumbUrl) {
-                    //   const img = new Image();
-                    //   img.src = newFileList.thumbUrl;
-                    //   img.onload = () => {
-                    //     console.log(img.width);
-                    //     //   const matimg = cv.imread(img);
-                    //     //   console.log(matimg);
-                    //   };
-                    // }
-
-                    setTestImg(newFileList);
-                  }}
+                  onChange={({ fileList: newFileList }) =>
+                    setTestImg(newFileList)
+                  }
                 >
                   <Button icon={<UploadOutlined />}>Upload</Button>
                 </Upload>

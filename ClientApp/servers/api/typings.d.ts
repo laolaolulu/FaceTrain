@@ -22,6 +22,10 @@ declare namespace API {
     pageSize?: number;
   };
 
+  type postFacePredictParams = {
+    model?: string;
+  };
+
   type postFaceTrainParams = {
     type?: string;
   };

@@ -77,7 +77,57 @@ namespace FaceTrain.Controllers
             }
 
         }
+        /// <summary>
+        /// 人脸识别
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public FormatRes Predict(IFormFile[] image, string? model = null)
+        {
+            var imgurl = "wwwroot/Model/";
+            if (model == null)
+            {
+                var namemodels =
+                  Directory.GetFiles(imgurl).LastOrDefault();
+                model = namemodels.Split("/").LastOrDefault();
+            }
+            if (System.IO.File.Exists(imgurl + model))
+            {
+                FaceRecognizer recognizer;
+                if (model.StartsWith("LBPH_"))
+                {
+                    recognizer = LBPHFaceRecognizer.Create();
+                }
+                else
+                {
+                    recognizer = LBPHFaceRecognizer.Create();
+                }
+                recognizer.Read(imgurl+model);
+                List<Task<(string, int, double, string)>> ts = new();
+                foreach (var item in image)
+                {
+                    var t = Task.Run<(string, int, double, string)>(() =>
+                      {
+                          using var facemat = Mat.FromStream(item.OpenReadStream(), ImreadModes.Grayscale);
+                          recognizer.Predict(facemat, out int label, out double confidence);
+                          string msg = recognizer.GetLabelInfo(label);
+                          return (item.FileName, label, confidence, msg);
+                      });
+                    ts.Add(t);
+                }
+                Task.WaitAll(ts.ToArray());
+                return new FormatRes(ts.Select(s => new { name = s.Result.Item1, label = s.Result.Item2, confidence = s.Result.Item3, msg = s.Result.Item4 }));
+            }
+            else
+            {
+                return new FormatRes("模型（" + model + "）不存在");
+            }
 
 
+
+
+        }
     }
 }

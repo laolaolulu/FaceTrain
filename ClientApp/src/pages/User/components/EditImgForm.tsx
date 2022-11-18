@@ -83,7 +83,6 @@ export default (props: {
               }
             },
           });
-          console.log(file);
           //#region 读取上传的图片转换为mat
           const img = new Image();
           img.src = URL.createObjectURL(file);
