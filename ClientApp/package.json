@@ -14,9 +14,11 @@
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-components": "^2.0.1",
+    "@types/react-slick": "^0.23.10",
     "@umijs/max": "^4.0.30",
     "@umijs/openapi": "^1.7.1",
     "antd": "^4.20.7",
+    "slick-carousel": "^1.8.1",
     "ts-node": "^10.9.1"
   },
   "devDependencies": {

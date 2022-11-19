@@ -1,0 +1,75 @@
+.ant-carousel .slick-dots {
+  position: absolute;
+  bottom: -25px;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  list-style: none;
+  li {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin: 0 5px;
+    padding: 0;
+    cursor: pointer;
+    button {
+      position: unset;
+      display: block;
+      width: 20px;
+      height: 20px;
+      padding: 5px;
+      color: transparent;
+      font-size: 0px;
+      line-height: 0px;
+      background: transparent;
+      border: 0;
+      border-radius: unset;
+      outline: none;
+      cursor: pointer;
+      transition: unset;
+      &:hover,
+      &:focus {
+        outline: none;
+        &:before {
+          opacity: 1;
+        }
+      }
+      &:after {
+        content: none;
+      }
+      &:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        height: 20px;
+        color: black;
+        font-size: 40px;
+        font-family: 'slick';
+        line-height: 20px;
+        text-align: center;
+        opacity: 5;
+        content: '•';
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    }
+    &.slick-active button {
+      background: none;
+      opacity: unset;
+    }
+    &.slick-active button:before {
+      color: black;
+      opacity: 0.75;
+    }
+  }
+}
+
+.ant-modal-confirm-content {
+  margin: 0 !important;
+  margin-top: 20px !important;
+  text-align: center;
+}
