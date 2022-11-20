@@ -56,7 +56,7 @@ export default () => {
     if (data?.list) {
       return data.list.map((m: string, index: number) => ({
         uid: index.toString(),
-        url: m,
+        src: m,
         name: m.split('/').at(-1),
         status: 'done',
       }));
@@ -88,7 +88,7 @@ export default () => {
                 </Checkbox.Group>
               </Form.Item>
               <Form.Item label="选择算法" name="type">
-                <Radio.Group>
+                <Radio.Group disabled={true}>
                   <Radio value="LBPH">LBPH</Radio>
                   <Radio value="Eigen">Eigen</Radio>
                   <Radio value="Fisher">Fisher</Radio>
@@ -116,22 +116,25 @@ export default () => {
                 showDownloadIcon: true,
                 downloadIcon: (file) => {
                   return (
-                    <DownloadOutlined
-                    //   onClick={() => {
-                    //     fetch(file.scr).then((res) => {
-                    //       console.log(res);
-                    //       return res.blob().then((blob) => {
-                    //         var a = document.createElement('a');
-                    //         var url = window.URL.createObjectURL(blob);
-                    //         //  var filename = name || 'qrcode.jpg';
-                    //         a.href = url;
-                    //         a.download = 'qrcode.jpg';
-                    //         a.click();
-                    //         window.URL.revokeObjectURL(url);
-                    //       });
-                    //     });
-                    //   }}
-                    />
+                    <a href={file.src} target="_blank" download={file.name}>
+                      <DownloadOutlined
+
+                      //   onClick={() => {
+                      //     fetch(file.scr).then((res) => {
+                      //       console.log(res);
+                      //       return res.blob().then((blob) => {
+                      //         var a = document.createElement('a');
+                      //         var url = window.URL.createObjectURL(blob);
+                      //         //  var filename = name || 'qrcode.jpg';
+                      //         a.href = url;
+                      //         a.download = 'qrcode.jpg';
+                      //         a.click();
+                      //         window.URL.revokeObjectURL(url);
+                      //       });
+                      //     });
+                      //   }}
+                      />
+                    </a>
                   );
                 },
               }}
