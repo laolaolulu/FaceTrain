@@ -1,4 +1,8 @@
 declare namespace API {
+  type deleteFaceDeleteParams = {
+    fileName?: string;
+  };
+
   type deleteUserDeleteParams = {
     /** 用户ID */
     ID?: string;

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using OpenCvSharp;
 using OpenCvSharp.Face;
 using System.Reflection.Emit;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace FaceTrain.Controllers
 {
@@ -29,7 +30,44 @@ namespace FaceTrain.Controllers
 
             return new FormatRes(new { list = models, total });
         }
+        /// <summary>
+        /// 上传模型
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public FormatRes Add(IFormFile file)
+        {
+            var imgurl = "wwwroot/Model/";
+            if (System.IO.File.Exists(imgurl + file.FileName))
+            {
+                imgurl += "0" + file.FileName;
+            }
+            else
+            {
+                imgurl += file.FileName;
+            }
+            System.IO.File.Create(imgurl);
+            return new FormatRes(true);
+        }
+        /// <summary>
+        /// 删除模型
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        public FormatRes Delete(string fileName)
+        {
+            var imgurl = "wwwroot/Model/";
+            if (System.IO.File.Exists(imgurl + fileName))
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                System.IO.File.Delete(imgurl + fileName);
+            }
 
+            return new FormatRes(true);
+        }
 
         /// <summary>
         /// 人脸模型训练
@@ -104,7 +142,7 @@ namespace FaceTrain.Controllers
                 {
                     recognizer = LBPHFaceRecognizer.Create();
                 }
-                recognizer.Read(imgurl+model);
+                recognizer.Read(imgurl + model);
                 List<Task<(string, int, double, string)>> ts = new();
                 foreach (var item in image)
                 {

@@ -1,5 +1,5 @@
 import services from '@/services/demo';
-import { UploadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import {
   ActionType,
   FooterToolbar,
@@ -35,48 +35,31 @@ export default () => {
     manual: true,
     onSuccess: (res) => {
       message.success(res.msg);
+      init();
     },
   });
 
-  const { data } = useRequest(api.Face.getFaceGet);
-
-  const props: UploadProps = {
-    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-    onChange({ file, fileList }) {
-      if (file.status !== 'uploading') {
-        console.log(file, fileList);
-      }
+  const { data, run: init } = useRequest(api.Face.getFaceGet);
+  const { run: Add } = useRequest(api.Face.postFaceAdd, {
+    manual: true,
+    onSuccess: () => {
+      init();
     },
-    defaultFileList: [
-      {
-        uid: '1',
-        name: 'xxx.png',
-        status: 'done',
-        response: 'Server Error 500', // custom error message to show
-        url: 'http://www.baidu.com/xxx.png',
-      },
-      {
-        uid: '2',
-        name: 'yyy.png',
-        status: 'done',
-        url: 'http://www.baidu.com/yyy.png',
-      },
-      {
-        uid: '3',
-        name: 'zzz.png',
-        status: 'error',
-        response: 'Server Error 500', // custom error message to show
-        url: 'http://www.baidu.com/zzz.png',
-      },
-    ],
-  };
+  });
 
+  const { run: Delete } = useRequest(api.Face.deleteFaceDelete, {
+    manual: true,
+    onSuccess: () => {
+      init();
+    },
+  });
   const models: API.UpFaceUrl[] | undefined = useMemo(() => {
     if (data?.list) {
       return data.list.map((m: string, index: number) => ({
         uid: index.toString(),
         url: m,
         name: m.split('/').at(-1),
+        status: 'done',
       }));
     }
     return undefined;
@@ -91,22 +74,22 @@ export default () => {
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
           <Card title="训练">
-            {/* <Form
+            <Form
               labelCol={{ span: 6 }}
               style={{ marginTop: 10 }}
+              initialValues={{ label: ['Name'], type: 'LBPH' }}
               onFinish={(values) => {
                 Train({ type: values.type }, values.label || []);
               }}
             >
               <Form.Item label="附加内容" name="label" valuePropName="checked">
-                <Checkbox.Group defaultValue={['ID']}>
-                  <Checkbox value="ID">ID</Checkbox>
+                <Checkbox.Group>
                   <Checkbox value="Name">姓名</Checkbox>
                   <Checkbox value="Phone">手机号</Checkbox>
                 </Checkbox.Group>
               </Form.Item>
               <Form.Item label="选择算法" name="type">
-                <Radio.Group defaultValue="LBPH">
+                <Radio.Group>
                   <Radio value="LBPH">LBPH</Radio>
                   <Radio value="Eigen">Eigen</Radio>
                   <Radio value="Fisher">Fisher</Radio>
@@ -117,7 +100,7 @@ export default () => {
                   启动训练
                 </Button>
               </Form.Item>
-            </Form> */}
+            </Form>
           </Card>
         </Col>
         <Col xs={24} md={12}>
@@ -126,13 +109,46 @@ export default () => {
           </Card>
         </Col>
         <Col xs={24} md={12}>
-          <Card size="small" title="管理">
-            {/* <Upload {...props}>
+          <Card title="管理">
+            <Upload
+              fileList={models}
+              onPreview={undefined}
+              showUploadList={{
+                showDownloadIcon: true,
+                downloadIcon: (file) => {
+                  return (
+                    <DownloadOutlined
+                    //   onClick={() => {
+                    //     fetch(file.scr).then((res) => {
+                    //       console.log(res);
+                    //       return res.blob().then((blob) => {
+                    //         var a = document.createElement('a');
+                    //         var url = window.URL.createObjectURL(blob);
+                    //         //  var filename = name || 'qrcode.jpg';
+                    //         a.href = url;
+                    //         a.download = 'qrcode.jpg';
+                    //         a.click();
+                    //         window.URL.revokeObjectURL(url);
+                    //       });
+                    //     });
+                    //   }}
+                    />
+                  );
+                },
+              }}
+              onRemove={(file) => {
+                Delete({ fileName: file.name });
+              }}
+              beforeUpload={(file) => {
+                Add({}, file);
+              }}
+            >
               <Button icon={<UploadOutlined />}>Upload</Button>
-            </Upload> */}
+            </Upload>
           </Card>
         </Col>
       </Row>
+      <iframe name="downmodel" style={{ display: 'none' }}></iframe>
     </PageContainer>
   );
 };

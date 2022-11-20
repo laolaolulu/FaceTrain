@@ -2,6 +2,48 @@
 /* eslint-disable */
 import { request } from 'umi';
 
+/** 上传模型 POST /api/Face/Add */
+export async function postFaceAdd(body: {}, file?: File, options?: { [key: string]: any }) {
+  const formData = new FormData();
+
+  if (file) {
+    formData.append('file', file);
+  }
+
+  Object.keys(body).forEach((ele) => {
+    const item = (body as any)[ele];
+
+    if (item !== undefined && item !== null) {
+      formData.append(
+        ele,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+      );
+    }
+  });
+
+  return request<API.FormatRes>('/api/Face/Add', {
+    method: 'POST',
+    data: formData,
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
+
+/** 删除模型 DELETE /api/Face/Delete */
+export async function deleteFaceDelete(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.deleteFaceDeleteParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.FormatRes>('/api/Face/Delete', {
+    method: 'DELETE',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** 获取模型列表以及用户数量 GET /api/Face/Get */
 export async function getFaceGet(options?: { [key: string]: any }) {
   return request<API.FormatRes>('/api/Face/Get', {
