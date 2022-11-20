@@ -80,14 +80,29 @@ namespace FaceTrain.Controllers
         {
             try
             {
-                if (label == null || label.Length == 0)
+                if (label == null)
                 {
-                    label = new string[1] { "ID" };
+                    label = Array.Empty<string>();
                 }
                 var ctx = new AppDbContext();
-                var labels = ctx.UserInfos.Select(s => new { ID = int.Parse(s.ID), labelinfo = string.Format("{0}-{1}-{2}", label.Contains("ID") ? s.ID : "", label.Contains("Name") ? s.UserName : "", label.Contains("Phone") ? s.Phone : "").Trim('-') }).ToArray();
+                var labels = ctx.UserInfos.Select(s => new { s.ID, labelinfo = string.Format("{0}-{1}", label.Contains("Name") ? s.UserName : "", label.Contains("Phone") ? s.Phone : "").Trim('-') }).ToArray();
 
-                using var recognizer = LBPHFaceRecognizer.Create();
+
+
+                FaceRecognizer recognizer;
+                if (type == "Eigen")
+                {
+                    recognizer = EigenFaceRecognizer.Create();
+                }
+                else if (type == "Fisher")
+                {
+                    recognizer = FisherFaceRecognizer.Create();
+                }
+                else
+                {
+                    recognizer = LBPHFaceRecognizer.Create();
+                }
+
                 List<Mat> imgs = new();
                 List<int> labs = new();
                 foreach (var item in labels)
@@ -106,6 +121,7 @@ namespace FaceTrain.Controllers
                 recognizer.Train(imgs, labs);
                 var modelname = string.Format("{0}_{1}_{2}.xml", type, labels.Length, DateTime.Now.ToString("yyyyMMddHHmmss"));
                 recognizer.Save("wwwroot/Model/" + modelname);
+                recognizer.Dispose();
                 return new FormatRes(true);
                 //  return new FormatRes("成功生成识别模型：" + modelname, true);
             }
@@ -134,14 +150,19 @@ namespace FaceTrain.Controllers
             if (System.IO.File.Exists(imgurl + model))
             {
                 FaceRecognizer recognizer;
-                if (model.StartsWith("LBPH_"))
+                if (model.StartsWith("Eigen_"))
                 {
-                    recognizer = LBPHFaceRecognizer.Create();
+                    recognizer = EigenFaceRecognizer.Create();
+                }
+                else if (model.StartsWith("Fisher_"))
+                {
+                    recognizer = FisherFaceRecognizer.Create();
                 }
                 else
                 {
                     recognizer = LBPHFaceRecognizer.Create();
                 }
+
                 recognizer.Read(imgurl + model);
                 List<Task<(string, int, double, string)>> ts = new();
                 foreach (var item in image)
@@ -156,6 +177,7 @@ namespace FaceTrain.Controllers
                     ts.Add(t);
                 }
                 Task.WaitAll(ts.ToArray());
+                recognizer.Dispose();
                 return new FormatRes(ts.Select(s => new { name = s.Result.Item1, label = s.Result.Item2, confidence = s.Result.Item3, msg = s.Result.Item4 }));
             }
             else

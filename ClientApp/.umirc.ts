@@ -13,7 +13,7 @@ export default defineConfig({
   routes: [
     {
       path: '/',
-      redirect: '/model',
+      redirect: '/user',
     },
     // {
     //   name: '首页',

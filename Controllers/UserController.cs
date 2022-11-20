@@ -87,7 +87,7 @@ namespace FaceTrain.Controllers
         /// <param name="ID">用户ID</param>
         /// <returns></returns>
         [HttpDelete]
-        public FormatRes Delete(string ID)
+        public FormatRes Delete(int ID)
         {
             using var ctx = new AppDbContext();
             var m = ctx.UserInfos.Find(ID);
@@ -117,7 +117,7 @@ namespace FaceTrain.Controllers
         /// <param name="image">人脸</param>
         /// <returns></returns>
         [HttpPost]
-        public FormatRes AddImg(string ID, IFormFile[] image, bool update = false)
+        public FormatRes AddImg(int ID, IFormFile[] image, bool update = false)
         {
             using var ctx = new AppDbContext();
             if (ctx.UserInfos.Any(a => a.ID == ID))
@@ -149,7 +149,7 @@ namespace FaceTrain.Controllers
         /// <param name="facesName"></param>
         /// <returns></returns>
         [HttpDelete]
-        public FormatRes DelFace(string ID, string[] facesName)
+        public FormatRes DelFace(int ID, string[] facesName)
         {
             foreach (var name in facesName)
             {

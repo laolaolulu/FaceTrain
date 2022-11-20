@@ -1,7 +1,7 @@
 declare namespace API {
   type UpFace = {
     /** 用户ID */
-    ID: string;
+    ID: number;
     /** 用户名 */
     name?: string;
     /** 人脸数据url */

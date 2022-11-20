@@ -163,7 +163,7 @@ export default () => {
         onCancel={() => handleModalVisible(false)}
         modalVisible={createModalVisible}
       >
-        <ProTable<API.UserInfo, API.postUserAddParams>
+        <ProTable<API.User, API.postUserAddParams>
           onSubmit={async (value) => {
             const success = await api.User.postUserAdd(value);
             if (success) {

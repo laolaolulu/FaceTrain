@@ -1,7 +1,7 @@
 declare namespace API {
   type User = {
     /** 用户ID */
-    id: string;
+    id: number;
     /** 用户名字 */
     userName?: string;
     /** 用户手机号 */

@@ -19671,23 +19671,23 @@
   <labelsInfo>
     <_>
       <label>1</label>
-      <value>"袁隆平-133"</value></_>
+      <value>"133"</value></_>
     <_>
       <label>2</label>
-      <value>"钱学森-321"</value></_>
+      <value>"321"</value></_>
     <_>
       <label>3</label>
-      <value>"于敏-123"</value></_>
+      <value>"123"</value></_>
     <_>
       <label>4</label>
-      <value>"邓稼先"</value></_>
+      <value>""</value></_>
     <_>
       <label>5</label>
-      <value>"孙家栋"</value></_>
+      <value>"2"</value></_>
     <_>
       <label>6</label>
-      <value>"黄旭华"</value></_>
+      <value>""</value></_>
     <_>
       <label>7</label>
-      <value>"彭士禄"</value></_></labelsInfo></opencv_lbphfaces>
+      <value>""</value></_></labelsInfo></opencv_lbphfaces>
 </opencv_storage>

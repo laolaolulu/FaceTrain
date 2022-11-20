@@ -1,4 +1,3 @@
-import services from '@/services/demo';
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import {
   ActionType,

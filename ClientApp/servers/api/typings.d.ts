@@ -5,11 +5,11 @@ declare namespace API {
 
   type deleteUserDeleteParams = {
     /** 用户ID */
-    ID?: string;
+    ID?: number;
   };
 
   type deleteUserDelFaceParams = {
-    ID?: string;
+    ID?: number;
   };
 
   type FormatRes = {
@@ -36,13 +36,13 @@ declare namespace API {
 
   type postUserAddImgParams = {
     /** 用户id */
-    ID?: string;
+    ID?: number;
     update?: boolean;
   };
 
   type postUserAddParams = {
     /** 用户ID */
-    ID?: string;
+    ID?: number;
     /** 用户名字 */
     UserName?: string;
     /** 用户手机号 */
@@ -51,7 +51,7 @@ declare namespace API {
 
   type putUserPutParams = {
     /** 用户ID */
-    ID?: string;
+    ID?: number;
     /** 用户名字 */
     UserName?: string;
     /** 用户手机号 */

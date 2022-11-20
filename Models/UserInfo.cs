@@ -13,7 +13,7 @@ namespace FaceTrain.Models
         /// </summary>
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string ID { get; set; }
+        public int ID { get; set; }
         /// <summary>
         /// 用户名字
         /// </summary>
