@@ -9,7 +9,7 @@ const useUser = () => {
 
   useEffect(() => {
     loadOpenCv('/opencv.js', () => {
-      const faceCascadeFile = 'haarcascade_frontalface_default.xml';
+      const faceCascadeFile = 'haarcascade_frontalface_alt2.xml';
       classifier = new cv.CascadeClassifier();
       createFileFromUrl(faceCascadeFile, faceCascadeFile, () => {
         classifier.load(faceCascadeFile);

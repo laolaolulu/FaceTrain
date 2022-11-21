@@ -26,7 +26,7 @@ import {
 import React, { useMemo, useRef, useState } from 'react';
 import api from '@/services';
 import { UploadFile } from 'antd/es/upload';
-
+import { downfile } from '@/utils';
 import TestForm from './components/TestForm';
 
 export default () => {
@@ -88,10 +88,12 @@ export default () => {
                 </Checkbox.Group>
               </Form.Item>
               <Form.Item label="选择算法" name="type">
-                <Radio.Group disabled={true}>
+                <Radio.Group>
                   <Radio value="LBPH">LBPH</Radio>
                   <Radio value="Eigen">Eigen</Radio>
-                  <Radio value="Fisher">Fisher</Radio>
+                  <Radio value="Fisher" disabled={true}>
+                    Fisher
+                  </Radio>
                 </Radio.Group>
               </Form.Item>
               <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
@@ -114,27 +116,22 @@ export default () => {
               onPreview={undefined}
               showUploadList={{
                 showDownloadIcon: true,
-                downloadIcon: (file) => {
+                downloadIcon: (file: any) => {
                   return (
-                    <a href={file.src} target="_blank" download={file.name}>
-                      <DownloadOutlined
-
-                      //   onClick={() => {
-                      //     fetch(file.scr).then((res) => {
-                      //       console.log(res);
-                      //       return res.blob().then((blob) => {
-                      //         var a = document.createElement('a');
-                      //         var url = window.URL.createObjectURL(blob);
-                      //         //  var filename = name || 'qrcode.jpg';
-                      //         a.href = url;
-                      //         a.download = 'qrcode.jpg';
-                      //         a.click();
-                      //         window.URL.revokeObjectURL(url);
-                      //       });
-                      //     });
-                      //   }}
-                      />
-                    </a>
+                    <DownloadOutlined
+                      onClick={() => {
+                        fetch(file.src).then((res) => {
+                          return res.blob().then((blob) => {
+                            var a = document.createElement('a');
+                            var url = window.URL.createObjectURL(blob);
+                            a.href = url;
+                            a.download = file.src.split('/').at(-1);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                          });
+                        });
+                      }}
+                    />
                   );
                 },
               }}
@@ -143,6 +140,7 @@ export default () => {
               }}
               beforeUpload={(file) => {
                 Add({}, file);
+                return false;
               }}
             >
               <Button icon={<UploadOutlined />}>Upload</Button>

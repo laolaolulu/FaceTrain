@@ -55,4 +55,5 @@ export default defineConfig({
       pathRewrite: { '^': '' },
     },
   },
+  outputPath: '../wwwroot/dist',
 });

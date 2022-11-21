@@ -148,6 +148,7 @@ export default (props: {
             }));
           }
           faces.delete();
+          return false;
         }}
         onRemove={(file) => {
           if (user) {

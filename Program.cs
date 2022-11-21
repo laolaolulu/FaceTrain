@@ -21,6 +21,11 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), true);
 });
 
+builder.Services.AddSpaStaticFiles(configuration =>
+{
+    configuration.RootPath = "wwwroot/dist";
+});
+
 var app = builder.Build();
 
 
@@ -28,6 +33,11 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseStaticFiles();
+app.UseSpaStaticFiles();
+app.UseSpa(spa =>
+{
+    spa.Options.SourcePath = "ClientApp";
+});
 
 app.UseHttpsRedirection();
 

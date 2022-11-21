@@ -1,0 +1,14 @@
+{
+  "name": "FaceTrain",
+  "version": "1.0.0",
+  "description": "人脸识别模型训练",
+  "main": "main.ts",
+  "author": "lipeng",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^21.3.0"
+  }
+}

@@ -34,14 +34,15 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
           content: (
             <Carousel infinite={false} draggable={true}>
               {files.map((m) => (
-                <canvas
-                  key={m.uid}
-                  id={m.name}
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '400px',
-                  }}
-                />
+                <div key={m.uid}>
+                  <canvas
+                    id={m.name}
+                    style={{
+                      maxHeight: 400,
+                      maxWidth: '100%',
+                    }}
+                  />
+                </div>
               ))}
             </Carousel>
           ),
@@ -49,7 +50,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
         //#endregion
 
         const facemsgasync: Promise<{
-          mat: any;
+          ctx: CanvasRenderingContext2D;
           name: string;
           msg: { x: number; y: number; faceFile?: File }[];
         }>[] = files.map(async (m: any) => {
@@ -57,6 +58,9 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
           img.src = URL.createObjectURL(m.originFileObj);
           await img.decode();
           const mat = cv.imread(img);
+          cv.imshow(m.name, mat);
+          const imgcanvas: any = document.getElementById(m.name);
+          const ctx: CanvasRenderingContext2D = imgcanvas.getContext('2d');
 
           //#region 人脸检测
           const faces = new cv.RectVector();
@@ -64,6 +68,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
             //   const gray = new cv.Mat();
             //   cv.cvtColor(matimg, gray, cv.COLOR_RGBA2GRAY, 0); //灰度化
             classifier.detectMultiScale(mat, faces, 1.1, 3, 0); //人脸检测
+            mat.delete();
             // gray.delete();
           } catch (err) {
             console.log(err);
@@ -74,12 +79,8 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
           const msgasync = new Array(faces.size()).fill(0).map(async (_, i) => {
             const face = faces.get(i);
             //画出人脸框
-            const point1 = new cv.Point(face.x, face.y);
-            const point2 = new cv.Point(
-              face.x + face.width,
-              face.y + face.height,
-            );
-            cv.rectangle(mat, point1, point2, [0, 0, 255, 255]);
+            ctx.strokeRect(face.x, face.y, face.width, face.height);
+
             //创建canvas来进行裁剪
             const tnCanvas = document.createElement('canvas');
             const tnCanvasContext = tnCanvas.getContext('2d');
@@ -121,7 +122,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
           const msg = await Promise.all(msgasync);
           faces.delete();
           return {
-            mat,
+            ctx,
             name: m.name,
             msg,
           };
@@ -149,30 +150,24 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
 
                   const fmm = facemsg.find((f) => f.name == name);
                   if (fmm) {
-                    cv.putText(
-                      fmm.mat,
+                    fmm.ctx.font = '20px "微软雅黑"';
+                    fmm.ctx.fillStyle = 'red';
+                    fmm.ctx.textBaseline = 'top';
+                    fmm.ctx.fillText(
                       `id:${element.label} c:${element.confidence.toFixed(0)}`,
-                      new cv.Point(fmm.msg[faceid].x, fmm.msg[faceid].y + 20),
-                      2,
-                      0.6,
-                      new cv.Scalar(0, 0, 0, 255),
+                      fmm.msg[faceid].x,
+                      fmm.msg[faceid].y,
                     );
-                    cv.putText(
-                      fmm.mat,
-                      `msg:${element.msg}`,
-                      new cv.Point(fmm.msg[faceid].x, fmm.msg[faceid].y + 40),
-                      2,
-                      0.6,
-                      new cv.Scalar(0, 0, 0, 255),
+                    fmm.ctx.fillText(
+                      element.msg,
+                      fmm.msg[faceid].x,
+                      fmm.msg[faceid].y + 20,
                     );
                   }
                 }
               },
             );
 
-            facemsg.forEach((element) => {
-              cv.imshow(element.name, element.mat);
-            });
             modal.update((prevConfig) => ({
               ...prevConfig,
               title: `识别完成`,
@@ -195,6 +190,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
         <Upload
           listType="picture"
           multiple={true}
+          beforeUpload={() => false}
           className="upload-list-inline"
         >
           <Button icon={<UploadOutlined />}>Upload</Button>

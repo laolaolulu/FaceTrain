@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using OpenCvSharp;
 using OpenCvSharp.Face;
+using System;
+using System.Buffers.Text;
 using System.Reflection.Emit;
+using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace FaceTrain.Controllers
@@ -110,10 +113,15 @@ namespace FaceTrain.Controllers
                     var imgurl = string.Format("wwwroot/Faces/{0}/", item.ID);
                     if (Directory.Exists(imgurl))
                     {
-                        recognizer.SetLabelInfo(item.ID, item.labelinfo);
+                        recognizer.SetLabelInfo(item.ID, Convert.ToBase64String(Encoding.Default.GetBytes(item.labelinfo)));
                         foreach (var name in Directory.GetFiles(imgurl))
                         {
-                            imgs.Add(new Mat(name, ImreadModes.Grayscale));
+                            var mat = new Mat(name, ImreadModes.Grayscale);
+                            if (type == "Eigen" || type == "Fisher")
+                            {
+                                mat = mat.Resize(new Size(200, 200));
+                            }
+                            imgs.Add(mat);
                             labs.Add(item.ID);
                         }
                     }
@@ -169,9 +177,15 @@ namespace FaceTrain.Controllers
                 {
                     var t = Task.Run<(string, int, double, string)>(() =>
                       {
-                          using var facemat = Mat.FromStream(item.OpenReadStream(), ImreadModes.Grayscale);
+                          var facemat = Mat.FromStream(item.OpenReadStream(), ImreadModes.Grayscale);
+                          if (model.StartsWith("Eigen_") || model.StartsWith("Fisher_"))
+                          {
+                              facemat = facemat.Resize(new Size(200, 200));
+                          }
                           recognizer.Predict(facemat, out int label, out double confidence);
-                          string msg = recognizer.GetLabelInfo(label);
+                          facemat.Dispose();
+                          string msg = Encoding.Default.GetString(Convert.FromBase64String(recognizer.GetLabelInfo(label)));
+
                           return (item.FileName, label, confidence, msg);
                       });
                     ts.Add(t);
