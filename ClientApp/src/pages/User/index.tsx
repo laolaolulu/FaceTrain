@@ -11,7 +11,11 @@ import CreateForm from './components/CreateForm';
 import EditImgForm from './components/EditImgForm';
 import styles from './index.less';
 import { urltoFile } from '@/utils/opencv';
-import { CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import {
+  CalculatorFilled,
+  CheckCircleOutlined,
+  LoadingOutlined,
+} from '@ant-design/icons';
 
 export let upurls: API.UpFaceUrl[];
 
@@ -123,6 +127,7 @@ export default () => {
         headerTitle="检索数据"
         actionRef={actionRef}
         rowKey="id"
+        scroll={{ y: 'calc(100vh - 290px)' }}
         search={false}
         options={{ setting: false, density: false }}
         toolBarRender={() => [

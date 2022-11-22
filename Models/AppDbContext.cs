@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace FaceTrain.Models
 {
@@ -12,8 +14,12 @@ namespace FaceTrain.Models
         /// <param name="optionsBuilder"></param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-          //  optionsBuilder.UseSqlite("Data source=" + AppContext.BaseDirectory + "face.db");
-              optionsBuilder.UseSqlite("Data source=C:\\code\\FaceTrain\\face.db");
+            //  string baseDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+         //   var se1 = "Data source=" + Directory.GetCurrentDirectory() + "\\face.db";
+            optionsBuilder.UseSqlite("Data source="+ Directory.GetCurrentDirectory() + "\\face.db");
+           
+            // optionsBuilder.UseSqlite("Data source=" + AppContext.BaseDirectory + "face.db");
+            //   optionsBuilder.UseSqlite("Data source=C:\\code\\FaceTrain\\face.db");
         }
         /// <summary>
         /// 
