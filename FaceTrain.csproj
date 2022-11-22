@@ -30,4 +30,10 @@
 		<Folder Include="wwwroot\Model\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="face.db">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>

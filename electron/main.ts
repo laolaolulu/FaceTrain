@@ -15,13 +15,15 @@ const createWindow = () => {
   });
 
   execFile('FaceTrain.exe', {
-    cwd: './publish',
+    cwd: `${__dirname}/publish`,
   });
-  win.loadURL('https://localhost:5001');
+  win.loadURL('http://localhost:5000');
 };
 
 app.whenReady().then(() => {
   createWindow();
 });
 
-app.on('ready', function () {});
+app.on('ready', function () {
+  console.log(__dirname);
+});

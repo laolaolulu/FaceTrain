@@ -19,7 +19,7 @@ import '../index.less';
 import { useRequest } from '@umijs/max';
 import { useState } from 'react';
 export default (props: { models: API.UpFaceUrl[] | undefined }) => {
-  const [form, setForm] = useState('Video');
+  const [form, setForm] = useState('Photo');
 
   const { models } = props;
 
@@ -204,7 +204,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
           Predict({ model: values.model }, {}, facefiles, { modal, facemsg });
         }
       }}
-      initialValues={{ from: 'Video' }}
+      initialValues={{ from: 'Photo' }}
     >
       <Form.Item label="选择模型" name="model">
         <Select placeholder="默认使用最新的模型">
@@ -221,7 +221,9 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
             setForm(e.target.value);
           }}
         >
-          <Radio value="Video">视频</Radio>
+          <Radio value="Video" disabled={true}>
+            视频
+          </Radio>
           <Radio value="Photo">照片</Radio>
         </Radio.Group>
       </Form.Item>

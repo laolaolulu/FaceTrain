@@ -42,7 +42,7 @@ app.UseSpa(spa =>
     spa.Options.SourcePath = "ClientApp";
 });
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
