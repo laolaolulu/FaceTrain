@@ -165,6 +165,10 @@ export default (props: {
           <PlusOutlined />
           <div style={{ marginTop: 8 }}>Upload</div>
         </div>
+        <div>
+          <PlusOutlined />
+          <div style={{ marginTop: 8 }}>Upload</div>
+        </div>
       </Upload>
     </Modal>
   );

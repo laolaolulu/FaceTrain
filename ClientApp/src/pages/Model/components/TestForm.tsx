@@ -1,6 +1,7 @@
 import {
   CheckCircleOutlined,
   LoadingOutlined,
+  ScanOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
 import {
@@ -17,11 +18,12 @@ import { classifier } from '@/models/global';
 import api from '@/services';
 import '../index.less';
 import { useRequest } from '@umijs/max';
-import { useState } from 'react';
-export default (props: { models: API.UpFaceUrl[] | undefined }) => {
-  const [form, setForm] = useState('Photo');
+import { useEffect, useState } from 'react';
+import SelectCamera from './SelectCamera';
 
+export default (props: { models: API.UpFaceUrl[] | undefined }) => {
   const { models } = props;
+  const [form, setForm] = useState('Video');
 
   const { loading: predicting, run: Predict } = useRequest(
     api.Face.postFacePredict,
@@ -74,9 +76,140 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
     <Form
       labelCol={{ span: 6 }}
       style={{ marginTop: 10 }}
+      initialValues={{ from: 'Video' }}
       onFinish={async (values) => {
         if (values.from == 'Video') {
-          console.log(values);
+          Modal.info({
+            title: '识别中...',
+            icon: <ScanOutlined />,
+            closable: true,
+            centered: true,
+            content: (
+              <div style={{ position: 'relative' }}>
+                <video
+                  id="video"
+                  style={{
+                    maxWidth: '100%',
+                    height: '100%',
+                  }}
+                ></video>
+                <canvas
+                  id="canvas"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    left: 0,
+                    position: 'absolute',
+                  }}
+                ></canvas>
+              </div>
+            ),
+            afterClose: () => {
+              stream.then((res) => {
+                clearInterval(res.inte);
+                res.stream.getVideoTracks().forEach((element) => {
+                  element.stop();
+                });
+              });
+            },
+          });
+
+          const stream = navigator.mediaDevices
+            .getUserMedia({
+              video: {
+                deviceId: values.camera,
+              },
+            })
+            .then(async (stream) => {
+              const video: any = document.getElementById('video');
+              video.srcObject = stream;
+              const inte = await new Promise<NodeJS.Timer>((resolve) => {
+                video.addEventListener('canplay', () => {
+                  video.height = video.videoHeight;
+                  video.width = video.videoWidth;
+                  const faces = new cv.RectVector();
+                  const src = new cv.Mat(
+                    video.videoHeight,
+                    video.videoWidth,
+                    cv.CV_8UC4,
+                  );
+                  const imgcanvas: any = document.getElementById('canvas');
+                  imgcanvas.width = video.videoWidth;
+                  imgcanvas.height = video.videoHeight;
+                  const ctx: CanvasRenderingContext2D =
+                    imgcanvas.getContext('2d');
+                  const cap = new cv.VideoCapture(video);
+
+                  const inte = setInterval(() => {
+                    //清除画的人脸框
+                    ctx.clearRect(0, 0, video.videoWidth, video.videoHeight);
+                    //将视频当前帧读取到src
+                    cap.read(src);
+                    //监测人脸
+                    classifier.detectMultiScale(src, faces, 1.1, 3, 0);
+                    //遍历人脸
+                    for (let i = 0; i < faces.size(); ++i) {
+                      let face = faces.get(i);
+
+                      //定义canvas来接收人脸区域
+                      const tnCanvas = document.createElement('canvas');
+                      tnCanvas.width = face.width;
+                      tnCanvas.height = face.height;
+                      //裁剪人脸区域
+                      const roi = src.roi(
+                        new cv.Rect(face.x, face.y, face.width, face.height),
+                      );
+
+                      cv.imshow(tnCanvas, roi);
+
+                      //将裁剪出的图片转换为文件
+                      tnCanvas.toBlob((blob) => {
+                        if (blob) {
+                          const file = new File(
+                            [blob],
+                            `video.${blob.type.split('/')[1]}`,
+                            {
+                              type: blob.type,
+                            },
+                          );
+
+                          //请求后端识别
+                          api.Face.postFacePredict(
+                            { model: values.model },
+                            {},
+                            [file],
+                          ).then((res) => {
+                            if (res.success) {
+                              ctx.font = '20px "微软雅黑"';
+                              ctx.fillStyle = 'red';
+                              ctx.textBaseline = 'top';
+                              ctx.fillText(
+                                `id:${
+                                  res.data[0].label
+                                } c:${res.data[0].confidence.toFixed(0)}`,
+                                face.x,
+                                face.y,
+                              );
+                              ctx.fillText(
+                                res.data[0].msg,
+                                face.x,
+                                face.y + 20,
+                              );
+                            }
+                          });
+                        }
+                      });
+                      //画出人脸框
+                      ctx.strokeRect(face.x, face.y, face.width, face.height);
+                    }
+                  }, 500);
+                  resolve(inte);
+                });
+              });
+              video.play();
+
+              return { stream, inte };
+            });
         } else {
           if (!values.imgs) {
             message.warning('请上传照片后再操作');
@@ -204,7 +337,6 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
           Predict({ model: values.model }, {}, facefiles, { modal, facemsg });
         }
       }}
-      initialValues={{ from: 'Photo' }}
     >
       <Form.Item label="选择模型" name="model">
         <Select placeholder="默认使用最新的模型">
@@ -221,9 +353,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
             setForm(e.target.value);
           }}
         >
-          <Radio value="Video" disabled={true}>
-            视频
-          </Radio>
+          <Radio value="Video">摄像头</Radio>
           <Radio value="Photo">照片</Radio>
         </Radio.Group>
       </Form.Item>
@@ -238,7 +368,11 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
             <Button icon={<UploadOutlined />}>Upload</Button>
           </Upload>
         </Form.Item>
-      ) : null}
+      ) : (
+        <Form.Item label="摄像头" name="camera">
+          <SelectCamera />
+        </Form.Item>
+      )}
       <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
         <Button loading={predicting} type="primary" htmlType="submit">
           识别

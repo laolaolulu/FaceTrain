@@ -78,7 +78,7 @@ export default () => {
                 <Form
                   labelCol={{ span: 6 }}
                   style={{ marginTop: 10 }}
-                  initialValues={{ label: ['Name'], type: 'LBPH' }}
+                  initialValues={{ type: 'LBPH' }}
                   onFinish={(values) => {
                     Train({ type: values.type }, values.label || []);
                   }}
