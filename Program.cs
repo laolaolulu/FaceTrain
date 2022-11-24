@@ -3,7 +3,11 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.WebHost.UseKestrel(options =>
+{
+    options.ListenAnyIP(54321, l =>
+        l.UseHttps(builder.Configuration["Certificates:Path"], builder.Configuration["Certificates:Password"]));
+});
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -29,7 +33,7 @@ builder.Services.AddSpaStaticFiles(configuration =>
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
-    
+
 }
 
 app.UseSwagger();
