@@ -254,6 +254,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
             img.src = URL.createObjectURL(m.originFileObj);
             await img.decode();
             const mat = cv.imread(img);
+
             cv.imshow(m.name, mat);
             const imgcanvas: any = document.getElementById(m.name);
             const ctx: CanvasRenderingContext2D = imgcanvas.getContext('2d');
@@ -264,7 +265,6 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
               //   const gray = new cv.Mat();
               //   cv.cvtColor(matimg, gray, cv.COLOR_RGBA2GRAY, 0); //灰度化
               classifier.detectMultiScale(mat, faces, 1.1, 3, 0); //人脸检测
-              mat.delete();
               // gray.delete();
             } catch (err) {
               console.log(err);
@@ -281,25 +281,20 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
 
                 //创建canvas来进行裁剪
                 const tnCanvas = document.createElement('canvas');
-                const tnCanvasContext = tnCanvas.getContext('2d');
                 tnCanvas.width = face.width;
                 tnCanvas.height = face.height;
                 //裁剪出人脸传入后端请求识别
-                tnCanvasContext?.drawImage(
-                  img,
-                  face.x,
-                  face.y,
-                  face.width,
-                  face.height,
-                  0,
-                  0,
-                  face.width,
-                  face.height,
+                //裁剪人脸区域
+                const roi = mat.roi(
+                  new cv.Rect(face.x, face.y, face.width, face.height),
                 );
+                mat.delete();
+                cv.imshow(tnCanvas, roi);
                 //将裁剪出的图片转换为文件
                 const faceFile = await new Promise<File | undefined>(
                   (resolve) => {
                     tnCanvas.toBlob((blob) => {
+                      roi.delete();
                       let file: File | undefined = undefined;
                       if (blob) {
                         file = new File([blob], `${i}_${m.name}`, {

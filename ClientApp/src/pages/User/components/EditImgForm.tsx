@@ -3,12 +3,16 @@ import {
   CloseCircleOutlined,
   LoadingOutlined,
   PlusOutlined,
+  ScanOutlined,
+  UploadOutlined,
+  VideoCameraAddOutlined,
 } from '@ant-design/icons';
-import { Modal, Upload } from 'antd';
+import { Divider, Modal, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import React, { PropsWithChildren } from 'react';
 import { classifier } from '@/models/global';
 import { upurls } from '../index';
+import styles from '../index.less';
 
 export default (props: {
   user?: API.UpFace;
@@ -161,13 +165,109 @@ export default (props: {
           }
         }}
       >
-        <div>
-          <PlusOutlined />
-          <div style={{ marginTop: 8 }}>Upload</div>
-        </div>
-        <div>
-          <PlusOutlined />
-          <div style={{ marginTop: 8 }}>Upload</div>
+        <div className={styles.upimgvideo}>
+          <UploadOutlined />
+          <Divider type="vertical" style={{ margin: 0 }} />
+          <VideoCameraAddOutlined
+            onClick={(e) => {
+              e.stopPropagation();
+              const modal = Modal.info({
+                title: '识别中...',
+                icon: <ScanOutlined />,
+                closable: true,
+                centered: true,
+                content: (
+                  <video
+                    id="video"
+                    style={{
+                      maxWidth: '100%',
+                      height: '100%',
+                    }}
+                  ></video>
+                ),
+                afterClose: () => {
+                  stream.then((res) => {
+                    clearInterval(res.inte);
+                    res.stream.getVideoTracks().forEach((element) => {
+                      element.stop();
+                    });
+                  });
+                },
+              });
+
+              const stream = navigator.mediaDevices
+                .getUserMedia({
+                  video: true,
+                  audio: false,
+                })
+                .then(async (stream) => {
+                  const video: any = document.getElementById('video');
+                  video.srcObject = stream;
+                  const inte = await new Promise<NodeJS.Timer>((resolve) => {
+                    video.addEventListener('canplay', () => {
+                      video.height = video.videoHeight;
+                      video.width = video.videoWidth;
+                      const faces = new cv.RectVector();
+                      const src = new cv.Mat(
+                        video.videoHeight,
+                        video.videoWidth,
+                        cv.CV_8UC4,
+                      );
+
+                      const cap = new cv.VideoCapture(video);
+
+                      const inte = setInterval(() => {
+                        //将视频当前帧读取到src
+                        cap.read(src);
+                        //监测人脸
+                        classifier.detectMultiScale(src, faces, 1.1, 3, 0);
+
+                        //遍历人脸
+                        for (let i = 0; i < faces.size(); ++i) {
+                          modal?.destroy();
+                          let face = faces.get(i);
+
+                          //定义canvas来接收人脸区域
+                          const tnCanvas = document.createElement('canvas');
+                          tnCanvas.width = face.width;
+                          tnCanvas.height = face.height;
+                          //裁剪人脸区域
+                          const roi = src.roi(
+                            new cv.Rect(
+                              face.x,
+                              face.y,
+                              face.width,
+                              face.height,
+                            ),
+                          );
+
+                          cv.imshow(tnCanvas, roi);
+
+                          setUser((user) => {
+                            let fileList: API.UpFaceUrl[] = [];
+                            if (user?.urls) {
+                              fileList = [...user.urls];
+                            }
+                            fileList.push({
+                              name: `${video}_${i}`,
+                              uid: (Date.now() + i).toString(),
+                              url: tnCanvas.toDataURL(),
+                            });
+                            return user
+                              ? { ...user, urls: fileList }
+                              : undefined;
+                          });
+                        }
+                      }, 1000);
+                      resolve(inte);
+                    });
+                  });
+                  video.play();
+
+                  return { stream, inte };
+                });
+            }}
+          />
         </div>
       </Upload>
     </Modal>
