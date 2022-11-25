@@ -28,6 +28,7 @@
 
 	<ItemGroup>
 		<Folder Include="wwwroot\Model\" />
+		<Folder Include="Resource\" />
 	</ItemGroup>
 
 	<ItemGroup>
