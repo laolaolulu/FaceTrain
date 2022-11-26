@@ -10,9 +10,7 @@
 - 更多的是祝你能学到更多的新姿势
 
 ## 废话不多上预览图
-<video height="100%" width="100%" autoPlay loop muted>
-      <source  src="Resource/preview.mp4" type="video/mp4">
-</video>
+![image](Resource/preview.webm)
 
 ## 我要去下载尝试
 [给你打包好了，来伸手接住 https://github.com/laolaolulu/FaceTrain/releases](https://github.com/laolaolulu/FaceTrain/releases)
