@@ -10,7 +10,7 @@
 - 更多的是祝你能学到更多的新姿势
 
 ## 废话不多上预览图
-![image](Resource/preview.webm)
+![image](Resource/preview.webp)
 
 ## 我要去下载尝试
 [给你打包好了，来伸手接住 https://github.com/laolaolulu/FaceTrain/releases](https://github.com/laolaolulu/FaceTrain/releases)
