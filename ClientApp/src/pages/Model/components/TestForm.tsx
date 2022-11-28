@@ -20,11 +20,12 @@ import '../index.less';
 import { useRequest } from '@umijs/max';
 import { useEffect, useState } from 'react';
 import SelectCamera from './SelectCamera';
+import { useIntl } from 'umi';
 
 export default (props: { models: API.UpFaceUrl[] | undefined }) => {
   const { models } = props;
   const [form, setForm] = useState('Video');
-
+  const intl = useIntl();
   const { loading: predicting, run: Predict } = useRequest(
     api.Face.postFacePredict,
     {
@@ -65,7 +66,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
 
         resc.modal.update((prevConfig: any) => ({
           ...prevConfig,
-          title: `识别完成`,
+          title: intl.formatMessage({ id: 'model.tested' }),
           icon: <CheckCircleOutlined />,
         }));
       },
@@ -80,7 +81,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
       onFinish={async (values) => {
         if (values.from == 'Video') {
           Modal.info({
-            title: '识别中...',
+            title: intl.formatMessage({ id: 'user.Testing' }),
             icon: <ScanOutlined />,
             closable: true,
             centered: true,
@@ -212,7 +213,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
             });
         } else {
           if (!values.imgs) {
-            message.warning('请上传照片后再操作');
+            message.warning(intl.formatMessage({ id: 'model.notUpMsg' }));
             return;
           }
 
@@ -222,7 +223,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
 
           //#region 创建界面canvas显示识别结果
           const modal = Modal.info({
-            title: '识别中...',
+            title: intl.formatMessage({ id: 'user.Testing' }),
             icon: <LoadingOutlined />,
             closable: true,
             width: 500,
@@ -333,8 +334,13 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
         }
       }}
     >
-      <Form.Item label="选择模型" name="model">
-        <Select placeholder="默认使用最新的模型">
+      <Form.Item
+        label={intl.formatMessage({ id: 'model.selectLabel' })}
+        name="model"
+      >
+        <Select
+          placeholder={intl.formatMessage({ id: 'model.model.placeholder' })}
+        >
           {models?.map((m) => (
             <Select.Option key={m.uid} value={m.name}>
               {m.name}
@@ -342,18 +348,29 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
           ))}
         </Select>
       </Form.Item>
-      <Form.Item label="图片来源" name="from">
+      <Form.Item
+        label={intl.formatMessage({ id: 'model.fromLabel' })}
+        name="from"
+      >
         <Radio.Group
           onChange={(e) => {
             setForm(e.target.value);
           }}
         >
-          <Radio value="Video">摄像头</Radio>
-          <Radio value="Photo">照片</Radio>
+          <Radio value="Video">
+            {intl.formatMessage({ id: 'model.videoValue' })}
+          </Radio>
+          <Radio value="Photo">
+            {intl.formatMessage({ id: 'model.photoValue' })}
+          </Radio>
         </Radio.Group>
       </Form.Item>
       {form == 'Photo' ? (
-        <Form.Item label="选择图片" name="imgs" valuePropName="img">
+        <Form.Item
+          label={intl.formatMessage({ id: 'model.selectImgLabel' })}
+          name="imgs"
+          valuePropName="img"
+        >
           <Upload
             listType="picture"
             multiple={true}
@@ -364,13 +381,16 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
           </Upload>
         </Form.Item>
       ) : (
-        <Form.Item label="摄像头" name="camera">
+        <Form.Item
+          label={intl.formatMessage({ id: 'model.videoValue' })}
+          name="camera"
+        >
           <SelectCamera />
         </Form.Item>
       )}
       <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
         <Button loading={predicting} type="primary" htmlType="submit">
-          识别
+          {intl.formatMessage({ id: 'model.test' })}
         </Button>
       </Form.Item>
     </Form>

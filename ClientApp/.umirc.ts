@@ -7,9 +7,8 @@ export default defineConfig({
   model: {},
   initialState: {},
   request: {},
-  layout: {
-    title: 'Opencv人脸识别',
-  },
+  layout: {},
+  locale: { title: true, default: 'en-US' },
   routes: [
     {
       path: '/',
@@ -22,7 +21,8 @@ export default defineConfig({
     //   icon: 'home',
     // },
     {
-      name: '用户管理',
+      // name: '用户管理',
+      title: 'user.title',
       path: '/user',
       component: './User',
       icon: 'user',
@@ -34,7 +34,8 @@ export default defineConfig({
     //   component: './Access',
     // },
     {
-      name: '模型管理',
+      // name: '模型管理',
+      title: 'model.title',
       path: '/model',
       icon: 'setting',
       component: './Model',
@@ -49,7 +50,7 @@ export default defineConfig({
   //   ],
   proxy: {
     '/api': {
-      target: 'http://localhost:5048/',
+      target: 'https://localhost:54321/',
       changeOrigin: true,
       secure: false,
       pathRewrite: { '^': '' },

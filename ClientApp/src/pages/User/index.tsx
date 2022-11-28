@@ -16,6 +16,7 @@ import {
   CheckCircleOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
+import { useIntl } from 'umi';
 
 export let upurls: API.UpFaceUrl[];
 
@@ -23,6 +24,7 @@ export default () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [select, setSelect] = useState<API.UpFace>();
   const actionRef = useRef<ActionType>();
+  const intl = useIntl();
 
   const columns: ProDescriptionsItemProps<API.User>[] = [
     {
@@ -33,23 +35,23 @@ export default () => {
         rules: [
           {
             required: true,
-            message: 'ID为必填项',
+            message: intl.formatMessage({ id: 'user.idmsg' }),
           },
         ],
       },
     },
     {
-      title: '姓名',
+      title: intl.formatMessage({ id: 'user.name' }),
       dataIndex: 'userName',
       valueType: 'text',
     },
     {
-      title: '手机号',
+      title: intl.formatMessage({ id: 'user.phone' }),
       dataIndex: 'phone',
       valueType: 'text',
     },
     {
-      title: '操作',
+      title: intl.formatMessage({ id: 'user.handle' }),
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record, __, action) => (
@@ -59,13 +61,13 @@ export default () => {
               action?.startEditable?.(record.id);
             }}
           >
-            编辑
+            {intl.formatMessage({ id: 'user.edit' })}
           </a>
         </>
       ),
     },
     {
-      title: '人脸图片',
+      title: intl.formatMessage({ id: 'user.faceimg' }),
       editable: false,
       dataIndex: 'faces',
       formItemProps: { hidden: true },
@@ -88,7 +90,7 @@ export default () => {
               });
             }}
           >
-            管理
+            {intl.formatMessage({ id: 'user.edit' })}
           </a>,
         ];
         if (record.faces) {
@@ -120,11 +122,11 @@ export default () => {
     <PageContainer
       className={styles.root}
       header={{
-        title: '人脸信息管理',
+        title: intl.formatMessage({ id: 'user.header' }),
       }}
     >
       <ProTable<API.User>
-        headerTitle="检索数据"
+        // headerTitle="检索数据"
         actionRef={actionRef}
         rowKey="id"
         scroll={{ y: 'calc(100vh - 290px)' }}
@@ -136,7 +138,7 @@ export default () => {
             type="primary"
             onClick={() => handleModalVisible(true)}
           >
-            新建用户
+            {intl.formatMessage({ id: 'user.adduser' })}
           </Button>,
         ]}
         editable={{
@@ -189,7 +191,7 @@ export default () => {
         onOk={async () => {
           const reqs: Promise<API.FormatRes>[] = [];
           const modal = Modal.info({
-            title: '请求中...',
+            title: intl.formatMessage({ id: 'user.requesting' }),
             icon: <LoadingOutlined />,
           });
           //#region  处理新增
@@ -232,7 +234,7 @@ export default () => {
           if (res) {
             modal.update((prevConfig) => ({
               ...prevConfig,
-              title: `请求完成`,
+              title: intl.formatMessage({ id: 'user.requested' }),
               content: res.map((m, index) => <p key={index}>{m.msg}</p>),
               icon: <CheckCircleOutlined />,
             }));
