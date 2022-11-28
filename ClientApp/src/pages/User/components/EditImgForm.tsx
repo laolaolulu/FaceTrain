@@ -13,17 +13,22 @@ import React, { PropsWithChildren } from 'react';
 import { classifier } from '@/models/global';
 import { upurls } from '../index';
 import styles from '../index.less';
+import { useIntl } from 'umi';
 
 export default (props: {
   user?: API.UpFace;
   setUser: React.Dispatch<React.SetStateAction<API.UpFace | undefined>>;
   onOk: () => void;
 }) => {
+  const intl = useIntl();
   const { user, setUser, onOk } = props;
   return (
     <Modal
       maskClosable={false}
-      title={`上传或删除人脸照片（${user?.ID}-${user?.name}）`}
+      title={intl.formatMessage(
+        { id: 'user.faceTitle' },
+        { msg: `${user?.ID}-${user?.name}` },
+      )}
       open={user ? true : false}
       onCancel={() => {
         const add = user?.urls.filter((f) => f.url.startsWith('data:image'));
@@ -32,7 +37,7 @@ export default (props: {
         );
         if ((add && add.length > 0) || (del && del.length > 0)) {
           Modal.confirm({
-            title: '未保存，放弃更改吗？',
+            title: intl.formatMessage({ id: 'user.facePrompt' }),
             onOk: () => {
               setUser(undefined);
             },
@@ -60,12 +65,11 @@ export default (props: {
           const addurls: string[] = [];
 
           const modal = Modal.info({
-            title: '检测中...',
+            title: intl.formatMessage({ id: 'user.Testing' }),
             icon: <LoadingOutlined />,
             closable: true,
             width: 500,
             centered: true,
-            okText: '确定',
             content: (
               <canvas
                 id="canface"
@@ -141,13 +145,16 @@ export default (props: {
           if (faces.size() > 0) {
             modal.update((prevConfig) => ({
               ...prevConfig,
-              title: `检测到（${faces.size()}）张人脸`,
+              title: intl.formatMessage(
+                { id: 'user.testResult' },
+                { count: faces.size() },
+              ),
               icon: <CheckCircleOutlined />,
             }));
           } else {
             modal.update((prevConfig) => ({
               ...prevConfig,
-              title: `未检测到人脸`,
+              title: intl.formatMessage({ id: 'user.notTest' }),
               icon: <CloseCircleOutlined />,
             }));
           }
@@ -172,7 +179,7 @@ export default (props: {
             onClick={(e) => {
               e.stopPropagation();
               const modal = Modal.info({
-                title: '识别中...',
+                title: intl.formatMessage({ id: 'user.Testing' }),
                 icon: <ScanOutlined />,
                 closable: true,
                 centered: true,

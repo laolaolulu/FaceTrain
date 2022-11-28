@@ -28,8 +28,10 @@ import api from '@/services';
 import { UploadFile } from 'antd/es/upload';
 import { downfile } from '@/utils';
 import TestForm from './components/TestForm';
+import { useIntl } from 'umi';
 
 export default () => {
+  const intl = useIntl();
   const { loading: training, run: Train } = useRequest(api.Face.postFaceTrain, {
     manual: true,
     onSuccess: (res) => {
@@ -67,14 +69,14 @@ export default () => {
   return (
     <PageContainer
       header={{
-        title: '模型管理',
+        title: intl.formatMessage({ id: 'model.title' }),
       }}
     >
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12} xxl={16}>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={24} xxl={12}>
-              <Card title="训练">
+              <Card title={intl.formatMessage({ id: 'model.train' })}>
                 <Form
                   labelCol={{ span: 6 }}
                   style={{ marginTop: 10 }}
@@ -84,16 +86,23 @@ export default () => {
                   }}
                 >
                   <Form.Item
-                    label="附加内容"
+                    label={intl.formatMessage({ id: 'model.additional' })}
                     name="label"
                     valuePropName="checked"
                   >
                     <Checkbox.Group>
-                      <Checkbox value="Name">姓名</Checkbox>
-                      <Checkbox value="Phone">手机号</Checkbox>
+                      <Checkbox value="Name">
+                        {intl.formatMessage({ id: 'user.name' })}
+                      </Checkbox>
+                      <Checkbox value="Phone">
+                        {intl.formatMessage({ id: 'user.phone' })}
+                      </Checkbox>
                     </Checkbox.Group>
                   </Form.Item>
-                  <Form.Item label="选择算法" name="type">
+                  <Form.Item
+                    label={intl.formatMessage({ id: 'model.labeltype' })}
+                    name="type"
+                  >
                     <Radio.Group>
                       <Radio value="LBPH">LBPH</Radio>
                       <Radio value="Eigen">Eigen</Radio>
@@ -104,14 +113,14 @@ export default () => {
                   </Form.Item>
                   <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                     <Button loading={training} type="primary" htmlType="submit">
-                      启动训练
+                      {intl.formatMessage({ id: 'model.runTrain' })}
                     </Button>
                   </Form.Item>
                 </Form>
               </Card>
             </Col>
             <Col xs={24} md={24} xxl={12}>
-              <Card title="管理">
+              <Card title={intl.formatMessage({ id: 'model.administration' })}>
                 <Upload
                   fileList={models}
                   onPreview={undefined}
@@ -151,12 +160,11 @@ export default () => {
           </Row>
         </Col>
         <Col xs={24} md={12} xxl={8}>
-          <Card title="测试">
+          <Card title={intl.formatMessage({ id: 'model.test' })}>
             <TestForm models={models} />
           </Card>
         </Col>
       </Row>
-      <iframe name="downmodel" style={{ display: 'none' }}></iframe>
     </PageContainer>
   );
 };
