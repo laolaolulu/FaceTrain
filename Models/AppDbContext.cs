@@ -14,12 +14,7 @@ namespace FaceTrain.Models
         /// <param name="optionsBuilder"></param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-         string baseDir = Path.Combine(Directory.GetCurrentDirectory(), "face.db");
-           var se1 = "Data source=" + Directory.GetCurrentDirectory() + "\\face.db";
-            optionsBuilder.UseSqlite("Data source="+ Path.Combine(Directory.GetCurrentDirectory(), "face.db"));
-           
-            // optionsBuilder.UseSqlite("Data source=" + AppContext.BaseDirectory + "face.db");
-            //   optionsBuilder.UseSqlite("Data source=C:\\code\\FaceTrain\\face.db");
+            optionsBuilder.UseSqlite("Data source=" + Path.Combine(Directory.GetCurrentDirectory(), "face.db"));
         }
         /// <summary>
         /// 
