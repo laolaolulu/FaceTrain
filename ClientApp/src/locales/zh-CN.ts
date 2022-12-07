@@ -33,4 +33,5 @@ export default {
   'model.videoValue': '摄像头',
   'model.photoValue': '照片',
   'model.selectImgLabel': '选择图片',
+  'model.trainsuccess': '训练完成',
 };

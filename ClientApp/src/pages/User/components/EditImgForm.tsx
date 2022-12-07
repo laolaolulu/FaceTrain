@@ -14,6 +14,9 @@ import { classifier } from '@/models/global';
 import { upurls } from '../index';
 import styles from '../index.less';
 import { useIntl } from 'umi';
+import { sleep } from '@/utils';
+
+let readVideo = false;
 
 export default (props: {
   user?: API.UpFace;
@@ -194,7 +197,7 @@ export default (props: {
                 ),
                 afterClose: () => {
                   stream.then((res) => {
-                    clearInterval(res.inte);
+                    readVideo = false;
                     res.stream.getVideoTracks().forEach((element) => {
                       element.stop();
                     });
@@ -210,20 +213,22 @@ export default (props: {
                 .then(async (stream) => {
                   const video: any = document.getElementById('video');
                   video.srcObject = stream;
-                  const inte = await new Promise<NodeJS.Timer>((resolve) => {
-                    video.addEventListener('canplay', () => {
-                      video.height = video.videoHeight;
-                      video.width = video.videoWidth;
-                      const faces = new cv.RectVector();
-                      const src = new cv.Mat(
-                        video.videoHeight,
-                        video.videoWidth,
-                        cv.CV_8UC4,
-                      );
+                  video.addEventListener('canplay', () => {
+                    video.height = video.videoHeight;
+                    video.width = video.videoWidth;
+                    const faces = new cv.RectVector();
+                    const src = new cv.Mat(
+                      video.videoHeight,
+                      video.videoWidth,
+                      cv.CV_8UC4,
+                    );
 
-                      const cap = new cv.VideoCapture(video);
+                    const cap = new cv.VideoCapture(video);
 
-                      const inte = setInterval(() => {
+                    new Promise(async () => {
+                      readVideo = true;
+                      while (readVideo) {
+                        await sleep(100);
                         //将视频当前帧读取到src
                         cap.read(src);
                         //监测人脸
@@ -231,6 +236,7 @@ export default (props: {
 
                         //遍历人脸
                         for (let i = 0; i < faces.size(); ++i) {
+                          readVideo = false;
                           modal?.destroy();
                           let face = faces.get(i);
 
@@ -265,13 +271,12 @@ export default (props: {
                               : undefined;
                           });
                         }
-                      }, 1000);
-                      resolve(inte);
+                      }
                     });
                   });
-                  video.play();
 
-                  return { stream, inte };
+                  video.play();
+                  return { stream };
                 });
             }}
           />

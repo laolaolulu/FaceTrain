@@ -33,4 +33,5 @@ export default {
   'model.videoValue': 'Camera',
   'model.photoValue': 'Photo',
   'model.selectImgLabel': 'Select photos',
+  'model.trainsuccess': 'Train Success',
 };

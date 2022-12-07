@@ -38,7 +38,7 @@ export const layout = () => {
           />
         </Col>
         <Col xs={8} md={24}>
-          <SelectLang />
+          <SelectLang reload={false} />
         </Col>
       </Row>
     ),

@@ -18,3 +18,7 @@ export const downfile = (url: string) => {
   };
   request.send();
 };
+
+export const sleep = (time: number) => {
+  return new Promise((resolve) => setTimeout(resolve, time));
+};

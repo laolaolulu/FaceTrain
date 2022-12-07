@@ -35,7 +35,7 @@ export default () => {
   const { loading: training, run: Train } = useRequest(api.Face.postFaceTrain, {
     manual: true,
     onSuccess: (res) => {
-      message.success(res.msg);
+      message.success(intl.formatMessage({ id: 'model.trainsuccess' }));
       init();
     },
   });

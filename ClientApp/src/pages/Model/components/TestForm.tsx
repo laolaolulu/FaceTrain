@@ -21,6 +21,8 @@ import { useRequest } from '@umijs/max';
 import { useEffect, useState } from 'react';
 import SelectCamera from './SelectCamera';
 import { useIntl } from 'umi';
+import { sleep } from '@/utils';
+let readVideo = false;
 
 export default (props: { models: API.UpFaceUrl[] | undefined }) => {
   const { models } = props;
@@ -107,7 +109,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
             ),
             afterClose: () => {
               stream.then((res) => {
-                clearInterval(res.inte);
+                readVideo = false;
                 res.stream.getVideoTracks().forEach((element) => {
                   element.stop();
                 });
@@ -124,24 +126,27 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
             .then(async (stream) => {
               const video: any = document.getElementById('video');
               video.srcObject = stream;
-              const inte = await new Promise<NodeJS.Timer>((resolve) => {
-                video.addEventListener('canplay', () => {
-                  video.height = video.videoHeight;
-                  video.width = video.videoWidth;
-                  const faces = new cv.RectVector();
-                  const src = new cv.Mat(
-                    video.videoHeight,
-                    video.videoWidth,
-                    cv.CV_8UC4,
-                  );
-                  const imgcanvas: any = document.getElementById('canvas');
-                  imgcanvas.width = video.videoWidth;
-                  imgcanvas.height = video.videoHeight;
-                  const ctx: CanvasRenderingContext2D =
-                    imgcanvas.getContext('2d');
-                  const cap = new cv.VideoCapture(video);
 
-                  const inte = setInterval(() => {
+              video.addEventListener('canplay', () => {
+                video.height = video.videoHeight;
+                video.width = video.videoWidth;
+                const faces = new cv.RectVector();
+                const src = new cv.Mat(
+                  video.videoHeight,
+                  video.videoWidth,
+                  cv.CV_8UC4,
+                );
+                const imgcanvas: any = document.getElementById('canvas');
+                imgcanvas.width = video.videoWidth;
+                imgcanvas.height = video.videoHeight;
+                const ctx: CanvasRenderingContext2D =
+                  imgcanvas.getContext('2d');
+                const cap = new cv.VideoCapture(video);
+
+                new Promise(async () => {
+                  readVideo = true;
+                  while (readVideo) {
+                    await sleep(100);
                     //清除画的人脸框
                     ctx.clearRect(0, 0, video.videoWidth, video.videoHeight);
                     //将视频当前帧读取到src
@@ -203,13 +208,13 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
                       //画出人脸框
                       ctx.strokeRect(face.x, face.y, face.width, face.height);
                     }
-                  }, 500);
-                  resolve(inte);
+                  }
                 });
               });
+
               video.play();
 
-              return { stream, inte };
+              return { stream };
             });
         } else {
           if (!values.imgs) {
