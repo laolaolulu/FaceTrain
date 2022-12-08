@@ -12,9 +12,6 @@
 ## 废话不多上预览图
 ![image](Resource/preview.webp)
 
-
-<div><video controls src="Resource/preview.MP4" muted="false"></video></div>
-
 ## 我要去下载尝试
 [给你打包好了，来伸手接住 https://github.com/laolaolulu/FaceTrain/releases](https://github.com/laolaolulu/FaceTrain/releases)
 
