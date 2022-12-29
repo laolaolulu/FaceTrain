@@ -21,22 +21,20 @@ namespace FaceTrain.Controllers
         /// <param name="pageSize"></param>
         /// <returns></returns>
         [HttpGet]
-        public FormatRes Get(int current = 1, int pageSize = 20)
+        public Res<(IEnumerable<UserInfo> list, int total)> Get(int current = 1, int pageSize = 20)
         {
             using var ctx = new AppDbContext();
             var users = ctx.UserInfos;
             int total = users.Count();
-            var data = users.Skip((current - 1) * pageSize).Take(pageSize).ToArray();
+            var data = users.Skip((current - 1) * pageSize).Take(pageSize);
 
-            var list = data.Select(s => new
+            foreach (var item in data)
             {
-                s.ID,
-                s.Phone,
-                s.UserName,
-                Faces = Directory.Exists(string.Format("wwwroot/Faces/{0}", s.ID)) ?
-                Directory.GetFiles(string.Format("wwwroot/Faces/{0}/", s.ID)).Select(s => Request.Scheme + "://" + Request.Host.Value + s.TrimStart("wwwroot".ToArray())) : null
-            });
-            return new FormatRes(new { list, total });
+                item.Faces = Directory.Exists(string.Format("wwwroot/Faces/{0}", item.ID)) ?
+                   Directory.GetFiles(string.Format("wwwroot/Faces/{0}/", item.ID))
+                   .Select(s => Request.Scheme + "://" + Request.Host.Value + s.TrimStart("wwwroot".ToArray())) : null;
+            }
+            return new Res().Page(data, total);
         }
 
         /// <summary>
@@ -45,18 +43,18 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public FormatRes Add([FromQuery] UserInfo user)
+        public Res Add(UserInfo user)
         {
             using var ctx = new AppDbContext();
             if (ctx.UserInfos.Any(a => a.ID == user.ID))
             {
-                return new FormatRes(false, "用户ID重复");
+                return new Res(false, "用户ID重复");
             }
             else
             {
                 ctx.UserInfos.Add(user);
                 ctx.SaveChanges();
-                return new FormatRes(true);
+                return new Res();
             }
         }
         /// <summary>
@@ -65,20 +63,20 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPut]
-        public FormatRes Put([FromQuery] UserInfo user)
+        public Res Put(UserInfo user)
         {
             using var ctx = new AppDbContext();
             var m = ctx.UserInfos.Find(user.ID);
             if (m == null)
             {
-                return new FormatRes(false, "用户不存在");
+                return new Res(false, "用户不存在");
             }
             else
             {
                 m.Phone = user.Phone;
                 m.UserName = user.UserName;
                 ctx.SaveChanges();
-                return new FormatRes(true, "修改成功！");
+                return new Res(true, "修改成功！");
             }
         }
         /// <summary>
@@ -87,13 +85,13 @@ namespace FaceTrain.Controllers
         /// <param name="ID">用户ID</param>
         /// <returns></returns>
         [HttpDelete]
-        public FormatRes Delete(int ID)
+        public Res Delete(int ID)
         {
             using var ctx = new AppDbContext();
             var m = ctx.UserInfos.Find(ID);
             if (m == null)
             {
-                return new FormatRes(false, "用户不存在");
+                return new Res(false, "用户不存在");
             }
             else
             {
@@ -107,7 +105,7 @@ namespace FaceTrain.Controllers
                     Directory.Delete(src, true);
                 }
 
-                return new FormatRes(true, "修改成功！");
+                return new Res(true, "修改成功！");
             }
         }
         /// <summary>
@@ -117,7 +115,7 @@ namespace FaceTrain.Controllers
         /// <param name="image">人脸</param>
         /// <returns></returns>
         [HttpPost]
-        public FormatRes AddImg(int ID, IFormFile[] image, bool update = false)
+        public Res AddImg(int ID, IFormFile[] image, bool update = false)
         {
             using var ctx = new AppDbContext();
             if (ctx.UserInfos.Any(a => a.ID == ID))
@@ -134,11 +132,11 @@ namespace FaceTrain.Controllers
                     Cv2.ImWrite(imgurl + string.Format("/{0}", img.FileName), facemat);
                 }
 
-                return new FormatRes(true, "新增了(" + image.Length + ")张人脸照片");
+                return new Res(true, "新增了(" + image.Length + ")张人脸照片");
             }
             else
             {
-                return new FormatRes(false, "未找到此用户:" + ID);
+                return new Res(false, "未找到此用户:" + ID);
             }
         }
 
@@ -149,7 +147,7 @@ namespace FaceTrain.Controllers
         /// <param name="facesName"></param>
         /// <returns></returns>
         [HttpDelete]
-        public FormatRes DelFace(int ID, string[] facesName)
+        public Res DelFace(int ID, string[] facesName)
         {
             foreach (var name in facesName)
             {
@@ -159,7 +157,7 @@ namespace FaceTrain.Controllers
                     System.IO.File.Delete(imgurl);
                 }
             }
-            return new FormatRes(true, "删除了(" + facesName.Length + ")张人脸照片");
+            return new Res(true, "删除了(" + facesName.Length + ")张人脸照片");
         }
     }
 }

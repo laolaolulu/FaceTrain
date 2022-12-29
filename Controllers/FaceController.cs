@@ -8,6 +8,8 @@ using System;
 using System.Buffers.Text;
 using System.Reflection.Emit;
 using System.Text;
+using System.Web.Helpers;
+using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace FaceTrain.Controllers
@@ -24,14 +26,14 @@ namespace FaceTrain.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public FormatRes Get()
+        public Res<(IEnumerable<string> list, int total)> Get()
         {
             using var ctx = new AppDbContext();
             int total = ctx.UserInfos.Count();
             var models =
                   Directory.GetFiles("wwwroot/Model/").Select(s => Request.Scheme + "://" + Request.Host.Value + s.TrimStart("wwwroot".ToArray()));
 
-            return new FormatRes(new { list = models, total });
+            return new Res().Page(models, total);
         }
         /// <summary>
         /// 上传模型
@@ -39,7 +41,7 @@ namespace FaceTrain.Controllers
         /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost]
-        public FormatRes Add(IFormFile file)
+        public Res Add(IFormFile file)
         {
             var imgurl = "wwwroot/Model/";
             if (System.IO.File.Exists(imgurl + file.FileName))
@@ -51,7 +53,7 @@ namespace FaceTrain.Controllers
                 imgurl += file.FileName;
             }
             System.IO.File.Create(imgurl);
-            return new FormatRes(true);
+            return new Res();
         }
         /// <summary>
         /// 删除模型
@@ -59,7 +61,7 @@ namespace FaceTrain.Controllers
         /// <param name="fileName"></param>
         /// <returns></returns>
         [HttpDelete]
-        public FormatRes Delete(string fileName)
+        public Res Delete(string fileName)
         {
             var imgurl = "wwwroot/Model/";
             if (System.IO.File.Exists(imgurl + fileName))
@@ -69,7 +71,7 @@ namespace FaceTrain.Controllers
                 System.IO.File.Delete(imgurl + fileName);
             }
 
-            return new FormatRes(true);
+            return new Res();
         }
 
         /// <summary>
@@ -79,7 +81,7 @@ namespace FaceTrain.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpPost]
-        public FormatRes Train(string[]? label = null, string? type = "LBPH")
+        public Res Train(string[]? label = null, string? type = "LBPH")
         {
             try
             {
@@ -130,12 +132,12 @@ namespace FaceTrain.Controllers
                 var modelname = string.Format("{0}_{1}_{2}.xml", type, labels.Length, DateTime.Now.ToString("yyyyMMddHHmmss"));
                 recognizer.Save("wwwroot/Model/" + modelname);
                 recognizer.Dispose();
-                return new FormatRes(true);
+                return new Res();
                 //  return new FormatRes("成功生成识别模型：" + modelname, true);
             }
             catch (Exception e)
             {
-                return new FormatRes("模型生成失败：" + e.Message);
+                return new Res(false, "模型生成失败：" + e.Message);
             }
 
         }
@@ -146,8 +148,11 @@ namespace FaceTrain.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public FormatRes Predict(IFormFile[] image, string? model = null)
+        [ProducesResponseType(typeof(ResponseT<(int id, string name)>), 400)]
+        public JsonResult Predict(IFormFile[] image, string? model = null)
         {
+            
+               // Res<IEnumerable<(string name, int label, double confidence, string msg)>?>
             var imgurl = "wwwroot/Model/";
             if (model == null)
             {
@@ -192,16 +197,13 @@ namespace FaceTrain.Controllers
                 }
                 Task.WaitAll(ts.ToArray());
                 recognizer.Dispose();
-                return new FormatRes(ts.Select(s => new { name = s.Result.Item1, label = s.Result.Item2, confidence = s.Result.Item3, msg = s.Result.Item4 }));
+                return Ok( new Res().Data(ts.Select(s => (name: s.Result.Item1, label: s.Result.Item2, confidence: s.Result.Item3, msg: s.Result.Item4))));
             }
             else
             {
-                return new FormatRes("模型（" + model + "）不存在");
+              
+                return Json ( new Res(false, "模型（" + model + "）不存在"));
             }
-
-
-
-
         }
     }
 }

@@ -21,7 +21,7 @@ export async function postFaceAdd(body: {}, file?: File, options?: { [key: strin
     }
   });
 
-  return request<API.FormatRes>('/api/Face/Add', {
+  return request<API.Res>('/api/Face/Add', {
     method: 'POST',
     data: formData,
     requestType: 'form',
@@ -35,7 +35,7 @@ export async function deleteFaceDelete(
   params: API.deleteFaceDeleteParams,
   options?: { [key: string]: any },
 ) {
-  return request<API.FormatRes>('/api/Face/Delete', {
+  return request<API.Res>('/api/Face/Delete', {
     method: 'DELETE',
     params: {
       ...params,
@@ -46,7 +46,7 @@ export async function deleteFaceDelete(
 
 /** 获取模型列表以及用户数量 GET /api/Face/Get */
 export async function getFaceGet(options?: { [key: string]: any }) {
-  return request<API.FormatRes>('/api/Face/Get', {
+  return request<API.StringIEnumerableInt32ValueTupleRes>('/api/Face/Get', {
     method: 'GET',
     ...(options || {}),
   });
@@ -77,7 +77,7 @@ export async function postFacePredict(
     }
   });
 
-  return request<API.FormatRes>('/api/Face/Predict', {
+  return request<any>('/api/Face/Predict', {
     method: 'POST',
     params: {
       ...params,
@@ -95,7 +95,7 @@ export async function postFaceTrain(
   body: string[],
   options?: { [key: string]: any },
 ) {
-  return request<API.FormatRes>('/api/Face/Train', {
+  return request<API.Res>('/api/Face/Train', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

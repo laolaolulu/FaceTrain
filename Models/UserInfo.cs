@@ -11,7 +11,7 @@ namespace FaceTrain.Models
         /// <summary>
         /// 用户ID
         /// </summary>
-        [Key]
+        [Key, Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ID { get; set; }
         /// <summary>
@@ -22,5 +22,11 @@ namespace FaceTrain.Models
         /// 用户手机号
         /// </summary>
         public string? Phone { get; set; }
+
+        /// <summary>
+        /// 人脸图片url
+        /// </summary>
+        [NotMapped, Required]
+        public IEnumerable<string>? Faces { get; set; }
     }
 }

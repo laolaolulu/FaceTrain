@@ -3,16 +3,13 @@
 import { request } from 'umi';
 
 /** 添加用户 POST /api/User/Add */
-export async function postUserAdd(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.postUserAddParams,
-  options?: { [key: string]: any },
-) {
-  return request<API.FormatRes>('/api/User/Add', {
+export async function postUserAdd(body: API.UserInfo, options?: { [key: string]: any }) {
+  return request<API.Res>('/api/User/Add', {
     method: 'POST',
-    params: {
-      ...params,
+    headers: {
+      'Content-Type': 'application/json',
     },
+    data: body,
     ...(options || {}),
   });
 }
@@ -42,7 +39,7 @@ export async function postUserAddImg(
     }
   });
 
-  return request<API.FormatRes>('/api/User/AddImg', {
+  return request<API.Res>('/api/User/AddImg', {
     method: 'POST',
     params: {
       ...params,
@@ -59,7 +56,7 @@ export async function deleteUserDelete(
   params: API.deleteUserDeleteParams,
   options?: { [key: string]: any },
 ) {
-  return request<API.FormatRes>('/api/User/Delete', {
+  return request<API.Res>('/api/User/Delete', {
     method: 'DELETE',
     params: {
       ...params,
@@ -75,7 +72,7 @@ export async function deleteUserDelFace(
   body: string[],
   options?: { [key: string]: any },
 ) {
-  return request<API.FormatRes>('/api/User/DelFace', {
+  return request<API.Res>('/api/User/DelFace', {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -94,7 +91,7 @@ export async function getUserGet(
   params: API.getUserGetParams,
   options?: { [key: string]: any },
 ) {
-  return request<API.FormatRes>('/api/User/Get', {
+  return request<API.UserInfoIEnumerableInt32ValueTupleRes>('/api/User/Get', {
     method: 'GET',
     params: {
       // current has a default value: 1
@@ -108,16 +105,13 @@ export async function getUserGet(
 }
 
 /** 修改用户 PUT /api/User/Put */
-export async function putUserPut(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.putUserPutParams,
-  options?: { [key: string]: any },
-) {
-  return request<API.FormatRes>('/api/User/Put', {
+export async function putUserPut(body: API.UserInfo, options?: { [key: string]: any }) {
+  return request<API.Res>('/api/User/Put', {
     method: 'PUT',
-    params: {
-      ...params,
+    headers: {
+      'Content-Type': 'application/json',
     },
+    data: body,
     ...(options || {}),
   });
 }
