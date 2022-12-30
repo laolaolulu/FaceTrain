@@ -17,11 +17,11 @@ import {
 import { classifier } from '@/models/global';
 import api from '@/services';
 import '../index.less';
-import { useRequest } from 'ahooks';
 import { useEffect, useState } from 'react';
 import SelectCamera from './SelectCamera';
 import { useIntl } from 'umi';
 import { sleep } from '@/utils';
+import { useRequest } from '@umijs/max';
 
 let readVideo = false;
 
