@@ -2,40 +2,93 @@
 /* eslint-disable */
 import { request } from 'umi';
 
-/** 人脸模型训练 POST /api/Face/Train */
-export async function postFaceTrain(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.postFaceTrainParams,
-  body: string[],
-  options?: { [key: string]: any },
-) {
-  return request<API.FormatRes>('/api/Face/Train', {
+/** 上传模型 POST /api/Face/AddModel */
+export async function postFaceAddModel(body: {}, file?: File, options?: { [key: string]: any }) {
+  const formData = new FormData();
+
+  if (file) {
+    formData.append('file', file);
+  }
+
+  Object.keys(body).forEach((ele) => {
+    const item = (body as any)[ele];
+
+    if (item !== undefined && item !== null) {
+      formData.append(
+        ele,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+      );
+    }
+  });
+
+  return request<any>('/api/Face/AddModel', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    params: {
-      // type has a default value: LBPH
-      type: 'LBPH',
-      ...params,
-    },
-    data: body,
+    data: formData,
+    requestType: 'form',
     ...(options || {}),
   });
 }
 
-/** 获取模型列表以及用户数量 GET /api/Face/Get */
-export async function getFaceGet(options?: { [key: string]: any }) {
-  return request<API.FormatRes>('/api/Face/Get', {
+/** 删除用户脸图片 DELETE /api/Face/Del */
+export async function deleteFaceDel(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.deleteFaceDelParams,
+  body: {
+    facesName?: string[];
+  },
+  options?: { [key: string]: any },
+) {
+  const formData = new FormData();
+
+  Object.keys(body).forEach((ele) => {
+    const item = (body as any)[ele];
+
+    if (item !== undefined && item !== null) {
+      formData.append(
+        ele,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+      );
+    }
+  });
+
+  return request<any>('/api/Face/Del', {
+    method: 'DELETE',
+    params: {
+      ...params,
+    },
+    data: formData,
+    requestType: 'form',
+    ...(options || {}),
+  });
+}
+
+/** 删除模型 DELETE /api/Face/DelModel */
+export async function deleteFaceDelModel(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.deleteFaceDelModelParams,
+  options?: { [key: string]: any },
+) {
+  return request<any>('/api/Face/DelModel', {
+    method: 'DELETE',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 获取模型列表 GET /api/Face/GetModel */
+export async function getFaceGetModel(options?: { [key: string]: any }) {
+  return request<string[]>('/api/Face/GetModel', {
     method: 'GET',
     ...(options || {}),
   });
 }
 
-/** 人脸识别 POST /api/Face/Predict */
-export async function postFacePredict(
+/** 人脸识别 PUT /api/Face/Predict */
+export async function putFacePredict(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.postFacePredictParams,
+  params: API.putFacePredictParams,
   body: {},
   image?: File[],
   options?: { [key: string]: any },
@@ -52,15 +105,13 @@ export async function postFacePredict(
     if (item !== undefined && item !== null) {
       formData.append(
         ele,
-        typeof item === 'object' && !(item instanceof File)
-          ? JSON.stringify(item)
-          : item,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
       );
     }
   });
 
-  return request<API.FormatRes>('/api/Face/Predict', {
-    method: 'POST',
+  return request<API.StringInt32DoubleStringValueTuple>('/api/Face/Predict', {
+    method: 'PUT',
     params: {
       ...params,
     },
@@ -70,17 +121,16 @@ export async function postFacePredict(
   });
 }
 
-/** 上传模型 POST /api/Face/Add */
-export async function postFaceAdd(
-  body: {},
-  file?: File,
+/** 人脸模型训练 PUT /api/Face/Train */
+export async function putFaceTrain(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.putFaceTrainParams,
+  body: {
+    label?: string[];
+  },
   options?: { [key: string]: any },
 ) {
   const formData = new FormData();
-
-  if (file) {
-    formData.append('file', file);
-  }
 
   Object.keys(body).forEach((ele) => {
     const item = (body as any)[ele];
@@ -88,32 +138,20 @@ export async function postFaceAdd(
     if (item !== undefined && item !== null) {
       formData.append(
         ele,
-        typeof item === 'object' && !(item instanceof File)
-          ? JSON.stringify(item)
-          : item,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
       );
     }
   });
 
-  return request<API.FormatRes>('/api/Face/Add', {
-    method: 'POST',
-    data: formData,
-    requestType: 'form',
-    ...(options || {}),
-  });
-}
-
-/** 删除模型 DELETE /api/Face/Delete */
-export async function deleteFaceDelete(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.deleteFaceDeleteParams,
-  options?: { [key: string]: any },
-) {
-  return request<API.FormatRes>('/api/Face/Delete', {
-    method: 'DELETE',
+  return request<any>('/api/Face/Train', {
+    method: 'PUT',
     params: {
+      // type has a default value: LBPH
+      type: 'LBPH',
       ...params,
     },
+    data: formData,
+    requestType: 'form',
     ...(options || {}),
   });
 }

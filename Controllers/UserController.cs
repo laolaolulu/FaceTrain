@@ -1,9 +1,12 @@
 ﻿using FaceTrain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OpenCvSharp;
+using OpenCvSharp.Face;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace FaceTrain.Controllers
 {
@@ -14,6 +17,16 @@ namespace FaceTrain.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly AppDbContext ctx;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_ctx"></param>
+        public UserController(AppDbContext _ctx)
+        {
+            ctx = _ctx;
+        }
+
         /// <summary>
         /// 获取用户数据
         /// </summary>
@@ -21,20 +34,18 @@ namespace FaceTrain.Controllers
         /// <param name="pageSize"></param>
         /// <returns></returns>
         [HttpGet]
-        public Res<(IEnumerable<UserInfo> list, int total)> Get(int current = 1, int pageSize = 20)
+        public ResPage<UserInfo> Get(int current = 1, int pageSize = 20)
         {
-            using var ctx = new AppDbContext();
             var users = ctx.UserInfos;
             int total = users.Count();
             var data = users.Skip((current - 1) * pageSize).Take(pageSize);
-
             foreach (var item in data)
             {
                 item.Faces = Directory.Exists(string.Format("wwwroot/Faces/{0}", item.ID)) ?
                    Directory.GetFiles(string.Format("wwwroot/Faces/{0}/", item.ID))
                    .Select(s => Request.Scheme + "://" + Request.Host.Value + s.TrimStart("wwwroot".ToArray())) : null;
             }
-            return new Res().Page(data, total);
+            return new ResPage<UserInfo>(data, total);
         }
 
         /// <summary>
@@ -43,19 +54,26 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public Res Add(UserInfo user)
+        public async Task<ActionResult<UserInfo>> Add(UserInfo user)
         {
-            using var ctx = new AppDbContext();
-            if (ctx.UserInfos.Any(a => a.ID == user.ID))
+            ctx.UserInfos.Add(user);
+            try
             {
-                return new Res(false, "用户ID重复");
+                await ctx.SaveChangesAsync();
             }
-            else
+            catch (DbUpdateException)
             {
-                ctx.UserInfos.Add(user);
-                ctx.SaveChanges();
-                return new Res();
+                if (UserInfoExists(user.ID))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
             }
+
+            return CreatedAtAction("GetUserInfoxx", new { id = user.ID }, user);
         }
         /// <summary>
         /// 修改用户
@@ -63,21 +81,28 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPut]
-        public Res Put(UserInfo user)
+        public async Task<IActionResult> Put(UserInfo user)
         {
-            using var ctx = new AppDbContext();
-            var m = ctx.UserInfos.Find(user.ID);
-            if (m == null)
+            ctx.Entry(user).State = EntityState.Modified;
+
+            try
             {
-                return new Res(false, "用户不存在");
+                await ctx.SaveChangesAsync();
             }
-            else
+            catch (DbUpdateConcurrencyException)
             {
-                m.Phone = user.Phone;
-                m.UserName = user.UserName;
-                ctx.SaveChanges();
-                return new Res(true, "修改成功！");
+                if (!UserInfoExists(user.ID))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
             }
+
+            return NoContent();
+
         }
         /// <summary>
         /// 删除用户
@@ -85,28 +110,18 @@ namespace FaceTrain.Controllers
         /// <param name="ID">用户ID</param>
         /// <returns></returns>
         [HttpDelete]
-        public Res Delete(int ID)
+        public async Task<IActionResult> Del(int ID)
         {
-            using var ctx = new AppDbContext();
-            var m = ctx.UserInfos.Find(ID);
-            if (m == null)
+            var userInfo = await ctx.UserInfos.FindAsync(ID);
+            if (userInfo == null)
             {
-                return new Res(false, "用户不存在");
+                return NotFound();
             }
-            else
-            {
-                ctx.UserInfos.Remove(m);
-                ctx.SaveChanges();
 
-                //清除用户照片目录
-                var src = string.Format("wwwroot/Faces/{0}/", ID);
-                if (Directory.Exists(src))
-                {
-                    Directory.Delete(src, true);
-                }
+            ctx.UserInfos.Remove(userInfo);
+            await ctx.SaveChangesAsync();
 
-                return new Res(true, "修改成功！");
-            }
+            return NoContent();
         }
         /// <summary>
         /// 添加用户人脸
@@ -115,10 +130,9 @@ namespace FaceTrain.Controllers
         /// <param name="image">人脸</param>
         /// <returns></returns>
         [HttpPost]
-        public Res AddImg(int ID, IFormFile[] image, bool update = false)
+        public IActionResult AddImg(int ID, IFormFile[] image, bool update = false)
         {
-            using var ctx = new AppDbContext();
-            if (ctx.UserInfos.Any(a => a.ID == ID))
+            if (UserInfoExists(ID))
             {
                 var imgurl = string.Format("wwwroot/Faces/{0}", ID);
                 if (!Directory.Exists(imgurl))
@@ -127,37 +141,26 @@ namespace FaceTrain.Controllers
                 }
                 foreach (var img in image)
                 {
-
                     using var facemat = Mat.FromStream(img.OpenReadStream(), ImreadModes.Color);
                     Cv2.ImWrite(imgurl + string.Format("/{0}", img.FileName), facemat);
                 }
-
-                return new Res(true, "新增了(" + image.Length + ")张人脸照片");
+                return Ok(image.Length);
             }
             else
             {
-                return new Res(false, "未找到此用户:" + ID);
+                return NotFound();
             }
         }
 
-        /// <summary>
-        /// 删除用户脸图片
-        /// </summary>
-        /// <param name="ID"></param>
-        /// <param name="facesName"></param>
-        /// <returns></returns>
-        [HttpDelete]
-        public Res DelFace(int ID, string[] facesName)
+     
+
+
+        private bool UserInfoExists(int id)
         {
-            foreach (var name in facesName)
-            {
-                var imgurl = string.Format("wwwroot/Faces/{0}/{1}", ID, name);
-                if (System.IO.File.Exists(imgurl))
-                {
-                    System.IO.File.Delete(imgurl);
-                }
-            }
-            return new Res(true, "删除了(" + facesName.Length + ")张人脸照片");
+            return ctx.UserInfos.Any(e => e.ID == id);
         }
     }
+
+
+
 }

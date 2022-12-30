@@ -20,102 +20,108 @@ namespace FaceTrain.Controllers
             _context = context;
         }
 
-        // GET: api/UserInfoes
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserInfo>>> GetUserInfos()
-        {
-            return await _context.UserInfos.ToListAsync();
-        }
+        //// GET: api/UserInfoes
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<UserInfo>>> GetUserInfos()
+        //{
+        //    return await _context.UserInfos.ToListAsync();
+        //}
 
-        // GET: api/UserInfoes/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserInfo>> GetUserInfo(int id)
-        {
-            var userInfo = await _context.UserInfos.FindAsync(id);
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<UserInfo>>> Page()
+        //{
+        //    return await _context.UserInfos.ToListAsync();
+        //}
 
-            if (userInfo == null)
-            {
-                return NotFound();
-            }
+        //// GET: api/UserInfoes/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<UserInfo>> GetUserInfo(int id)
+        //{
+        //    var userInfo = await _context.UserInfos.FindAsync(id);
 
-            return userInfo;
-        }
+        //    if (userInfo == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-        // PUT: api/UserInfoes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUserInfo(int id, UserInfo userInfo)
-        {
-            if (id != userInfo.ID)
-            {
-                return BadRequest();
-            }
+        //    return userInfo;
+        //}
 
-            _context.Entry(userInfo).State = EntityState.Modified;
+        //// PUT: api/UserInfoes/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutUserInfo(int id, UserInfo userInfo)
+        //{
+        //    if (id != userInfo.ID)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserInfoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    _context.Entry(userInfo).State = EntityState.Modified;
 
-            return NoContent();
-        }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!UserInfoExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-        // POST: api/UserInfoes
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<UserInfo>> PostUserInfo(UserInfo userInfo)
-        {
-            _context.UserInfos.Add(userInfo);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (UserInfoExists(userInfo.ID))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    return NoContent();
+        //}
 
-            return CreatedAtAction("GetUserInfo", new { id = userInfo.ID }, userInfo);
-        }
+        //// POST: api/UserInfoes
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //public async Task<ActionResult<UserInfo>> PostUserInfo(UserInfo userInfo)
+        //{
+        //    _context.UserInfos.Add(userInfo);
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateException)
+        //    {
+        //        if (UserInfoExists(userInfo.ID))
+        //        {
+        //            return Conflict();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-        // DELETE: api/UserInfoes/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUserInfo(int id)
-        {
-            var userInfo = await _context.UserInfos.FindAsync(id);
-            if (userInfo == null)
-            {
-                return NotFound();
-            }
+        //    return CreatedAtAction("GetUserInfo", new { id = userInfo.ID }, userInfo);
+        //}
 
-            _context.UserInfos.Remove(userInfo);
-            await _context.SaveChangesAsync();
+        //// DELETE: api/UserInfoes/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteUserInfo(int id)
+        //{
+        //    var userInfo = await _context.UserInfos.FindAsync(id);
+        //    if (userInfo == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return NoContent();
-        }
+        //    _context.UserInfos.Remove(userInfo);
+        //    await _context.SaveChangesAsync();
 
-        private bool UserInfoExists(int id)
-        {
-            return _context.UserInfos.Any(e => e.ID == id);
-        }
+        //    return NoContent();
+        //}
+
+        //private bool UserInfoExists(int id)
+        //{
+        //    return _context.UserInfos.Any(e => e.ID == id);
+        //}
     }
 }

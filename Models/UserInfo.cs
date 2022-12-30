@@ -26,7 +26,7 @@ namespace FaceTrain.Models
         /// <summary>
         /// 人脸图片url
         /// </summary>
-        [NotMapped, Required]
+        [NotMapped]
         public IEnumerable<string>? Faces { get; set; }
     }
 }

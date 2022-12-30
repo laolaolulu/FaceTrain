@@ -26,7 +26,7 @@ export default () => {
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
 
-  const columns: ProDescriptionsItemProps<API.User>[] = [
+  const columns: ProDescriptionsItemProps<API.UserInfo>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -125,7 +125,7 @@ export default () => {
         title: intl.formatMessage({ id: 'user.header' }),
       }}
     >
-      <ProTable<API.User>
+      <ProTable<API.UserInfo>
         // headerTitle="检索数据"
         actionRef={actionRef}
         rowKey="id"
@@ -147,20 +147,17 @@ export default () => {
             return api.User.putUserPut(record);
           },
           onDelete: (_, record) => {
-            return api.User.deleteUserDelete({ ID: record.id });
+            return api.User.deleteUserDel({ ID: record.id });
           },
         }}
         request={async (params) => {
-          const { data, success } = await api.User.getUserGet({
+          const data = await api.User.getUserGet({
             ...params,
-            // sorter,
-            // filter,
           });
 
           return {
-            data: data?.list || [],
-            total: data?.total,
-            success,
+            data: data.list,
+            total: data.total,
           };
         }}
         columns={columns}
@@ -170,15 +167,14 @@ export default () => {
         onCancel={() => handleModalVisible(false)}
         modalVisible={createModalVisible}
       >
-        <ProTable<API.User, API.postUserAddParams>
+        <ProTable<API.UserInfo, API.UserInfo>
           onSubmit={async (value) => {
-            const success = await api.User.postUserAdd(value);
-            if (success) {
+            await api.User.postUserAdd(value).then(() => {
               handleModalVisible(false);
               if (actionRef.current) {
                 actionRef.current.reload();
               }
-            }
+            });
           }}
           rowKey="id"
           type="form"
@@ -189,7 +185,7 @@ export default () => {
         user={select}
         setUser={setSelect}
         onOk={async () => {
-          const reqs: Promise<API.FormatRes>[] = [];
+          const reqs: Promise<number>[] = [];
           const modal = Modal.info({
             title: intl.formatMessage({ id: 'user.requesting' }),
             icon: <LoadingOutlined />,
@@ -200,15 +196,15 @@ export default () => {
             .map((m) => urltoFile(m.url, m.uid));
           if (addfilesasync && addfilesasync.length > 0) {
             reqs.push(
-              new Promise(async (resolve) => {
+              new Promise(async (resolve, reject) => {
                 const addfiles = await Promise.all(addfilesasync);
-                return api.User.postUserAddImg(
-                  { ID: select?.ID },
-                  {},
-                  addfiles,
-                ).then((res) => {
-                  resolve(res);
-                });
+                return api.User.postUserAddImg({ ID: select?.ID }, {}, addfiles)
+                  .then((res) => {
+                    resolve(res);
+                  })
+                  .catch(() => {
+                    reject(0);
+                  });
               }),
             );
           }
@@ -221,7 +217,7 @@ export default () => {
             )
             .map((m) => m.name);
           if (delfaces && delfaces.length > 0) {
-            reqs.push(api.User.deleteUserDelFace({ ID: select?.ID }, delfaces));
+            reqs.push(api.Face.deleteFaceDel({ ID: select?.ID }, delfaces));
           }
           //#endregion
 

@@ -3,16 +3,13 @@
 import { request } from 'umi';
 
 /** 添加用户 POST /api/User/Add */
-export async function postUserAdd(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.postUserAddParams,
-  options?: { [key: string]: any },
-) {
-  return request<API.FormatRes>('/api/User/Add', {
+export async function postUserAdd(body: API.UserInfo, options?: { [key: string]: any }) {
+  return request<API.UserInfo>('/api/User/Add', {
     method: 'POST',
-    params: {
-      ...params,
+    headers: {
+      'Content-Type': 'application/json',
     },
+    data: body,
     ...(options || {}),
   });
 }
@@ -37,14 +34,12 @@ export async function postUserAddImg(
     if (item !== undefined && item !== null) {
       formData.append(
         ele,
-        typeof item === 'object' && !(item instanceof File)
-          ? JSON.stringify(item)
-          : item,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
       );
     }
   });
 
-  return request<API.FormatRes>('/api/User/AddImg', {
+  return request<any>('/api/User/AddImg', {
     method: 'POST',
     params: {
       ...params,
@@ -55,13 +50,13 @@ export async function postUserAddImg(
   });
 }
 
-/** 删除用户 DELETE /api/User/Delete */
-export async function deleteUserDelete(
+/** 删除用户 DELETE /api/User/Del */
+export async function deleteUserDel(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.deleteUserDeleteParams,
+  params: API.deleteUserDelParams,
   options?: { [key: string]: any },
 ) {
-  return request<API.FormatRes>('/api/User/Delete', {
+  return request<any>('/api/User/Del', {
     method: 'DELETE',
     params: {
       ...params,
@@ -76,7 +71,7 @@ export async function getUserGet(
   params: API.getUserGetParams,
   options?: { [key: string]: any },
 ) {
-  return request<API.FormatRes>('/api/User/Get', {
+  return request<API.UserInfoResPage>('/api/User/Get', {
     method: 'GET',
     params: {
       // current has a default value: 1
@@ -90,34 +85,11 @@ export async function getUserGet(
 }
 
 /** 修改用户 PUT /api/User/Put */
-export async function putUserPut(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.putUserPutParams,
-  options?: { [key: string]: any },
-) {
-  return request<API.FormatRes>('/api/User/Put', {
+export async function putUserPut(body: API.UserInfo, options?: { [key: string]: any }) {
+  return request<any>('/api/User/Put', {
     method: 'PUT',
-    params: {
-      ...params,
-    },
-    ...(options || {}),
-  });
-}
-
-/** 删除用户脸图片 DELETE /api/User/DelFace */
-export async function deleteUserDelFace(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.deleteUserDelFaceParams,
-  body: string[],
-  options?: { [key: string]: any },
-) {
-  return request<API.FormatRes>('/api/User/DelFace', {
-    method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-    },
-    params: {
-      ...params,
     },
     data: body,
     ...(options || {}),
