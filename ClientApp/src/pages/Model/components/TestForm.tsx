@@ -17,11 +17,12 @@ import {
 import { classifier } from '@/models/global';
 import api from '@/services';
 import '../index.less';
-import { useRequest } from '@umijs/max';
+import { useRequest } from 'ahooks';
 import { useEffect, useState } from 'react';
 import SelectCamera from './SelectCamera';
 import { useIntl } from 'umi';
 import { sleep } from '@/utils';
+
 let readVideo = false;
 
 export default (props: { models: API.UpFaceUrl[] | undefined }) => {
@@ -29,7 +30,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
   const [form, setForm] = useState('Video');
   const intl = useIntl();
   const { loading: predicting, run: Predict } = useRequest(
-    api.Face.postFacePredict,
+    api.Face.putFacePredict,
     {
       manual: true,
       onSuccess: (res, par) => {
@@ -180,28 +181,20 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
                           );
 
                           //请求后端识别
-                          api.Face.postFacePredict(
-                            { model: values.model },
-                            {},
-                            [file],
-                          ).then((res) => {
-                            if (res.success) {
-                              ctx.font = '20px "微软雅黑"';
-                              ctx.fillStyle = 'red';
-                              ctx.textBaseline = 'top';
-                              ctx.fillText(
-                                `id:${
-                                  res.data[0].label
-                                } c:${res.data[0].confidence.toFixed(0)}`,
-                                face.x,
-                                face.y,
-                              );
-                              ctx.fillText(
-                                res.data[0].msg,
-                                face.x,
-                                face.y + 20,
-                              );
-                            }
+                          api.Face.putFacePredict({ model: values.model }, {}, [
+                            file,
+                          ]).then((res) => {
+                            ctx.font = '20px "微软雅黑"';
+                            ctx.fillStyle = 'red';
+                            ctx.textBaseline = 'top';
+                            ctx.fillText(
+                              `id:${res[0].label} c:${res[0].confidence.toFixed(
+                                0,
+                              )}`,
+                              face.x,
+                              face.y,
+                            );
+                            ctx.fillText(res[0].msg, face.x, face.y + 20);
                           });
                         }
                       });

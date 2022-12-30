@@ -11,7 +11,7 @@ using System.Text;
 namespace FaceTrain.Controllers
 {
     /// <summary>
-    /// 人脸检测
+    /// 用户信息
     /// </summary>
     [Route("api/[controller]/[action]")]
     [ApiController]

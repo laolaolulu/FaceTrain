@@ -2,12 +2,16 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore.Internal;
 using OpenCvSharp;
 using OpenCvSharp.Face;
 using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Net.Mime;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
@@ -15,7 +19,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace FaceTrain.Controllers
 {
     /// <summary>
-    /// 人脸模型
+    /// 人脸管理
     /// </summary>
     [Route("api/[controller]/[action]")]
     [ApiController]
@@ -94,6 +98,8 @@ namespace FaceTrain.Controllers
             return NoContent();
         }
 
+
+
         /// <summary>
         /// 人脸识别
         /// </summary>
@@ -101,8 +107,9 @@ namespace FaceTrain.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPut]
-        [ProducesResponseType(typeof((string name, int label, double confidence, string msg)), 200)]
-        public IActionResult Predict(IFormFile[] image, string model = "")
+        // [ProducesResponseType(typeof(IEnumerable<(string name, int label, double confidence, string msg)>), 200)]
+      //  [ProducesResponseType(typeof(IEnumerable<A>), 200)]
+        public ActionResult<IEnumerable<object>> Predict(IFormFile[] image, string model = "")
         {
             var imgurl = "wwwroot/Model/";
             if (model == "")
@@ -156,6 +163,7 @@ namespace FaceTrain.Controllers
                 Task.WaitAll(ts.ToArray());
                 recognizer.Dispose();
                 return Ok(ts.Select(s => (name: s.Result.Item1, label: s.Result.Item2, confidence: s.Result.Item3, msg: s.Result.Item4)));
+
             }
             else
             {
@@ -221,4 +229,5 @@ namespace FaceTrain.Controllers
             return Ok(facesName.Length);
         }
     }
+
 }

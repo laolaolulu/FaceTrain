@@ -16,6 +16,8 @@ export default {
   'user.Testing': 'Testing...',
   'user.testResult': '（{count}）face detected',
   'user.notTest': 'No face detected',
+  'user.facedelres': '（{num}）faces deleted',
+  'user.faceaddres': '（{num}）faces added',
 
   'model.title': 'Model management',
   'model.train': 'Train',

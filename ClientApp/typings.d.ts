@@ -1,3 +1,4 @@
 import '@umijs/max/typings';
-
-declare const cv: any;
+declare global {
+  const cv: any;
+}

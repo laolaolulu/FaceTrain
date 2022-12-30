@@ -16,6 +16,8 @@ export default {
   'user.Testing': '检测中...',
   'user.testResult': '检测到（{count}）张人脸',
   'user.notTest': '未检测到人脸',
+  'user.facedelres': '删除了（{num}）张人脸',
+  'user.faceaddres': '新增了（{num}）张人脸',
 
   'model.title': '模型管理',
   'model.train': '训练',

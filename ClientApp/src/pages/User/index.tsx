@@ -185,7 +185,7 @@ export default () => {
         user={select}
         setUser={setSelect}
         onOk={async () => {
-          const reqs: Promise<number>[] = [];
+          const reqs: Promise<{ type: string; num: number }>[] = [];
           const modal = Modal.info({
             title: intl.formatMessage({ id: 'user.requesting' }),
             icon: <LoadingOutlined />,
@@ -200,7 +200,7 @@ export default () => {
                 const addfiles = await Promise.all(addfilesasync);
                 return api.User.postUserAddImg({ ID: select?.ID }, {}, addfiles)
                   .then((res) => {
-                    resolve(res);
+                    resolve({ type: 'add', num: res });
                   })
                   .catch(() => {
                     reject(0);
@@ -217,7 +217,12 @@ export default () => {
             )
             .map((m) => m.name);
           if (delfaces && delfaces.length > 0) {
-            reqs.push(api.Face.deleteFaceDel({ ID: select?.ID }, delfaces));
+            reqs.push(
+              api.Face.deleteFaceDel(
+                { ID: select?.ID },
+                { facesName: delfaces },
+              ).then((res) => ({ type: 'del', num: res })),
+            );
           }
           //#endregion
 
@@ -231,7 +236,14 @@ export default () => {
             modal.update((prevConfig) => ({
               ...prevConfig,
               title: intl.formatMessage({ id: 'user.requested' }),
-              content: res.map((m, index) => <p key={index}>{m.msg}</p>),
+              content: res.map((m, index) => (
+                <p key={index}>
+                  {intl.formatMessage(
+                    { id: `user.face${m.type}res` },
+                    { num: m.num },
+                  )}
+                </p>
+              )),
               icon: <CheckCircleOutlined />,
             }));
           } else {

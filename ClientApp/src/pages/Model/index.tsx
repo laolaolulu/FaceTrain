@@ -7,7 +7,7 @@ import {
   ProDescriptionsItemProps,
   ProTable,
 } from '@ant-design/pro-components';
-import { useRequest } from '@umijs/max';
+import { useRequest } from 'ahooks';
 import {
   Button,
   Card,
@@ -32,7 +32,7 @@ import { useIntl } from 'umi';
 
 export default () => {
   const intl = useIntl();
-  const { loading: training, run: Train } = useRequest(api.Face.postFaceTrain, {
+  const { loading: training, run: Train } = useRequest(api.Face.putFaceTrain, {
     manual: true,
     onSuccess: (res) => {
       message.success(intl.formatMessage({ id: 'model.trainsuccess' }));
@@ -40,23 +40,23 @@ export default () => {
     },
   });
 
-  const { data, run: init } = useRequest(api.Face.getFaceGet);
-  const { run: Add } = useRequest(api.Face.postFaceAdd, {
+  const { data, run: init } = useRequest(api.Face.getFaceGetModel);
+  const { run: Add } = useRequest(api.Face.postFaceAddModel, {
     manual: true,
     onSuccess: () => {
       init();
     },
   });
 
-  const { run: Delete } = useRequest(api.Face.deleteFaceDelete, {
+  const { run: Delete } = useRequest(api.Face.deleteFaceDelModel, {
     manual: true,
     onSuccess: () => {
       init();
     },
   });
   const models: API.UpFaceUrl[] | undefined = useMemo(() => {
-    if (data?.list) {
-      return data.list.map((m: string, index: number) => ({
+    if (data) {
+      return data.map((m: string, index: number) => ({
         uid: index.toString(),
         src: m,
         name: m.split('/').at(-1),

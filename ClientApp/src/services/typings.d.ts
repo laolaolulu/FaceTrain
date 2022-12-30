@@ -31,8 +31,6 @@ declare namespace API {
     type?: string;
   };
 
-  type StringInt32DoubleStringValueTuple = true;
-
   type UserInfo = {
     /** 用户ID */
     id: number;

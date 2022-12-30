@@ -110,7 +110,7 @@ export async function putFacePredict(
     }
   });
 
-  return request<API.StringInt32DoubleStringValueTuple>('/api/Face/Predict', {
+  return request<any[]>('/api/Face/Predict', {
     method: 'PUT',
     params: {
       ...params,
