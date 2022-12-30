@@ -1,12 +1,8 @@
 ﻿using FaceTrain.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OpenCvSharp;
-using OpenCvSharp.Face;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace FaceTrain.Controllers
 {
@@ -54,7 +50,7 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<UserInfo>> Add(UserInfo user)
+        public async Task<ActionResult<UserInfo>> Add([FromForm, Required] UserInfo user)
         {
             ctx.UserInfos.Add(user);
             try
@@ -81,7 +77,7 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<IActionResult> Put(UserInfo user)
+        public async Task<IActionResult> Put([FromForm, Required] UserInfo user)
         {
             ctx.Entry(user).State = EntityState.Modified;
 
@@ -110,7 +106,7 @@ namespace FaceTrain.Controllers
         /// <param name="ID">用户ID</param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<IActionResult> Del(int ID)
+        public async Task<IActionResult> Del([Required] int ID)
         {
             var userInfo = await ctx.UserInfos.FindAsync(ID);
             if (userInfo == null)
@@ -130,7 +126,7 @@ namespace FaceTrain.Controllers
         /// <param name="image">人脸</param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult AddImg(int ID, IFormFile[] image, bool update = false)
+        public IActionResult AddImg([Required] int ID, [Required] IFormFile[] image, bool update = false)
         {
             if (UserInfoExists(ID))
             {
@@ -152,7 +148,7 @@ namespace FaceTrain.Controllers
             }
         }
 
-     
+
 
 
         private bool UserInfoExists(int id)

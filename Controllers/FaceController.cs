@@ -1,20 +1,9 @@
 ﻿using FaceTrain.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore.Internal;
 using OpenCvSharp;
 using OpenCvSharp.Face;
-using System;
-using System.Buffers.Text;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Net.Mime;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace FaceTrain.Controllers
 {
@@ -108,8 +97,8 @@ namespace FaceTrain.Controllers
         /// <returns></returns>
         [HttpPut]
         // [ProducesResponseType(typeof(IEnumerable<(string name, int label, double confidence, string msg)>), 200)]
-      //  [ProducesResponseType(typeof(IEnumerable<A>), 200)]
-        public ActionResult<IEnumerable<object>> Predict(IFormFile[] image, string model = "")
+        //  [ProducesResponseType(typeof(IEnumerable<A>), 200)]
+        public ActionResult<IEnumerable<PredictRes>> Predict([Required] IFormFile[] image, string model = "")
         {
             var imgurl = "wwwroot/Model/";
             if (model == "")
@@ -142,10 +131,10 @@ namespace FaceTrain.Controllers
                 }
 
                 recognizer.Read(imgurl + model);
-                List<Task<(string, int, double, string)>> ts = new();
+                List<Task<PredictRes>> ts = new();
                 foreach (var item in image)
                 {
-                    var t = Task.Run<(string, int, double, string)>(() =>
+                    var t = Task.Run<PredictRes>(() =>
                       {
                           var facemat = Mat.FromStream(item.OpenReadStream(), ImreadModes.Grayscale);
                           if (model.StartsWith("Eigen_") || model.StartsWith("Fisher_"))
@@ -156,14 +145,13 @@ namespace FaceTrain.Controllers
                           facemat.Dispose();
                           string msg = Encoding.Default.GetString(Convert.FromBase64String(recognizer.GetLabelInfo(label)));
 
-                          return (item.FileName, label, confidence, msg);
+                          return new PredictRes() { Name = item.FileName, Label = label, Confidence = confidence, Msg = msg };
                       });
                     ts.Add(t);
                 }
                 Task.WaitAll(ts.ToArray());
                 recognizer.Dispose();
-                return Ok(ts.Select(s => (name: s.Result.Item1, label: s.Result.Item2, confidence: s.Result.Item3, msg: s.Result.Item4)));
-
+                return Ok(ts.Select(s => s.Result));
             }
             else
             {
@@ -177,7 +165,7 @@ namespace FaceTrain.Controllers
         /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult AddModel(IFormFile file)
+        public IActionResult AddModel([Required] IFormFile file)
         {
             var imgurl = "wwwroot/Model/";
             if (System.IO.File.Exists(imgurl + file.FileName))
@@ -197,7 +185,7 @@ namespace FaceTrain.Controllers
         /// <param name="fileName"></param>
         /// <returns></returns>
         [HttpDelete]
-        public IActionResult DelModel(string fileName)
+        public IActionResult DelModel([Required] string fileName)
         {
             var imgurl = "wwwroot/Model/";
             if (System.IO.File.Exists(imgurl + fileName))
@@ -216,18 +204,34 @@ namespace FaceTrain.Controllers
         /// <param name="facesName"></param>
         /// <returns></returns>
         [HttpDelete]
-        public IActionResult Del([FromForm] string[] facesName, int ID)
+        public ActionResult<int> Del([FromForm] string[] facesName, int ID)
         {
+            var res = 0;
             foreach (var name in facesName)
             {
                 var imgurl = string.Format("wwwroot/Faces/{0}/{1}", ID, name);
                 if (System.IO.File.Exists(imgurl))
                 {
                     System.IO.File.Delete(imgurl);
+                    res++;
                 }
             }
-            return Ok(facesName.Length);
+            return Ok(res);
         }
+
+
     }
 
+
+    public class PredictRes
+    {
+        [Required]
+        public string Name { get; set; } = "";
+        [Required]
+        public int Label { get; set; }
+        [Required]
+        public double Confidence { get; set; }
+        [Required]
+        public string Msg { get; set; } = "";
+    }
 }

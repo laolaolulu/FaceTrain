@@ -3,6 +3,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
+var es = typeof(int);
+var e1 = typeof(UserInfo);
+var e2 = typeof((int a,string ));
+
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel(options =>
 {
@@ -24,6 +28,7 @@ builder.Services.AddSwaggerGen(options =>
     });
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), true);
+    options.EnableAnnotations();
 });
 
 builder.Services.AddSpaStaticFiles(configuration =>
@@ -49,7 +54,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
