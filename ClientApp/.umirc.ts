@@ -2,6 +2,7 @@ import { TrademarkOutlined } from '@ant-design/icons';
 import { defineConfig } from '@umijs/max';
 
 export default defineConfig({
+  plugins: ['@umijs/plugin-openapi'],
   antd: {},
   access: {},
   model: {},
@@ -42,12 +43,6 @@ export default defineConfig({
     },
   ],
   npmClient: 'pnpm',
-  //   headScripts: [
-  //     {
-  //       src: '/opencv.js',
-  //       async: true,
-  //     },
-  //   ],
   proxy: {
     '/api': {
       target: 'https://localhost:54321/',
@@ -56,5 +51,11 @@ export default defineConfig({
       pathRewrite: { '^': '' },
     },
   },
+
   outputPath: '../wwwroot/dist',
+  openAPI: {
+    // requestLibPath: "import { request } from '@umijs/max'",
+    // schemaPath: 'https://localhost:54321/swagger/v1/swagger.json',
+    // mock: false,
+  },
 });

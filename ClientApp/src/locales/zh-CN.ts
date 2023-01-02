@@ -1,5 +1,7 @@
 export default {
   title: 'OpenCV人脸识别',
+  success: '操作完成',
+  error: '请求错误',
   'user.title': '用户管理',
   'user.idmsg': 'ID为必填项',
   'user.name': '姓名',

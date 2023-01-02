@@ -1,8 +1,9 @@
 // 运行时配置
 
 import { ApiOutlined, GithubOutlined } from '@ant-design/icons';
-import { Col, Row, Button } from 'antd';
-import { SelectLang, useIntl } from 'umi';
+import { RequestConfig } from '@umijs/max';
+import { Col, Row, Button, message, Modal } from 'antd';
+import { SelectLang, getIntl } from 'umi';
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
 // 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
@@ -16,7 +17,7 @@ export const layout = () => {
     menu: {
       locale: true,
     },
-    title: useIntl().formatMessage({ id: 'title' }),
+    title: getIntl().formatMessage({ id: 'title' }),
     rightContentRender: () => (
       <Row gutter={[16, 16]}>
         <Col xs={8} md={24}>
@@ -43,4 +44,33 @@ export const layout = () => {
       </Row>
     ),
   };
+};
+
+// https://umijs.org/zh-CN/plugins/plugin-request
+export const request: RequestConfig = {
+  responseInterceptors: [
+    (response) => {
+      if (response.status > 200 && response.status < 300) {
+        message.success(getIntl().formatMessage({ id: 'success' }));
+      } else if (response.status >= 400) {
+        Modal.error({
+          title: response.status,
+          content: getIntl().formatMessage({ id: 'error' }),
+        });
+        throw new Error('Error:' + response.status);
+      }
+
+      return response;
+    },
+  ],
+  // requestInterceptors: [(url: string, options: any) => {
+  //   return {
+  //     url,
+  //     options: {
+  //       ...options, headers: {
+  //         Authorization: `Bearer ${localStorage.getItem('token')}`
+  //       }
+  //     },
+  //   };
+  // }]
 };

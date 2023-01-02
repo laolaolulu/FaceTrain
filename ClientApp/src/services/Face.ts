@@ -3,7 +3,11 @@
 import { request } from 'umi';
 
 /** 上传模型 POST /api/Face/AddModel */
-export async function postFaceAddModel(body: {}, file?: File, options?: { [key: string]: any }) {
+export async function postFaceAddModel(
+  body: {},
+  file?: File,
+  options?: { [key: string]: any },
+) {
   const formData = new FormData();
 
   if (file) {
@@ -16,7 +20,9 @@ export async function postFaceAddModel(body: {}, file?: File, options?: { [key: 
     if (item !== undefined && item !== null) {
       formData.append(
         ele,
-        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+        typeof item === 'object' && !(item instanceof File)
+          ? JSON.stringify(item)
+          : item,
       );
     }
   });
@@ -46,12 +52,14 @@ export async function deleteFaceDel(
     if (item !== undefined && item !== null) {
       formData.append(
         ele,
-        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+        typeof item === 'object' && !(item instanceof File)
+          ? JSON.stringify(item)
+          : item,
       );
     }
   });
 
-  return request<any>('/api/Face/Del', {
+  return request<number>('/api/Face/Del', {
     method: 'DELETE',
     params: {
       ...params,
@@ -105,12 +113,14 @@ export async function putFacePredict(
     if (item !== undefined && item !== null) {
       formData.append(
         ele,
-        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+        typeof item === 'object' && !(item instanceof File)
+          ? JSON.stringify(item)
+          : item,
       );
     }
   });
 
-  return request<any[]>('/api/Face/Predict', {
+  return request<API.PredictRes[]>('/api/Face/Predict', {
     method: 'PUT',
     params: {
       ...params,
@@ -138,7 +148,9 @@ export async function putFaceTrain(
     if (item !== undefined && item !== null) {
       formData.append(
         ele,
-        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+        typeof item === 'object' && !(item instanceof File)
+          ? JSON.stringify(item)
+          : item,
       );
     }
   });

@@ -1,5 +1,7 @@
 export default {
   title: 'OpenCV Face recognition',
+  success: 'Success',
+  error: 'Error',
   'user.title': 'User management',
   'user.idmsg': 'ID cannot be empty',
   'user.name': 'Name',

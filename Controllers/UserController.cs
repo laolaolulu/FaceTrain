@@ -77,7 +77,7 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<IActionResult> Put([FromForm, Required] UserInfo user)
+        public async Task<IActionResult> Put([Required] UserInfo user)
         {
             ctx.Entry(user).State = EntityState.Modified;
 

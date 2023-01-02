@@ -204,7 +204,7 @@ namespace FaceTrain.Controllers
         /// <param name="facesName"></param>
         /// <returns></returns>
         [HttpDelete]
-        public ActionResult<int> Del([FromForm] string[] facesName, int ID)
+        public ActionResult<int> Del([FromForm] List<string> facesName, [Required] int ID)
         {
             var res = 0;
             foreach (var name in facesName)

@@ -1,6 +1,6 @@
 declare namespace API {
   type deleteFaceDelModelParams = {
-    fileName?: string;
+    fileName: string;
   };
 
   type deleteFaceDelParams = {
@@ -9,7 +9,7 @@ declare namespace API {
 
   type deleteUserDelParams = {
     /** 用户ID */
-    ID?: number;
+    ID: number;
   };
 
   type getUserGetParams = {
@@ -19,8 +19,15 @@ declare namespace API {
 
   type postUserAddImgParams = {
     /** 用户id */
-    ID?: number;
+    ID: number;
     update?: boolean;
+  };
+
+  type PredictRes = {
+    name: string;
+    label: number;
+    confidence: number;
+    msg: string;
   };
 
   type putFacePredictParams = {

@@ -3,13 +3,36 @@
 import { request } from 'umi';
 
 /** 添加用户 POST /api/User/Add */
-export async function postUserAdd(body: API.UserInfo, options?: { [key: string]: any }) {
+export async function postUserAdd(
+  body: {
+    /** 用户ID */
+    ID: number;
+    /** 用户名字 */
+    UserName?: string;
+    /** 用户手机号 */
+    Phone?: string;
+    /** 人脸图片url */
+    Faces?: string[];
+  },
+  options?: { [key: string]: any },
+) {
+  const formData = new FormData();
+
+  Object.keys(body).forEach((ele) => {
+    const item = (body as any)[ele];
+
+    if (item !== undefined && item !== null) {
+      formData.append(
+        ele,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+      );
+    }
+  });
+
   return request<API.UserInfo>('/api/User/Add', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
+    data: formData,
+    requestType: 'form',
     ...(options || {}),
   });
 }
@@ -85,13 +108,36 @@ export async function getUserGet(
 }
 
 /** 修改用户 PUT /api/User/Put */
-export async function putUserPut(body: API.UserInfo, options?: { [key: string]: any }) {
+export async function putUserPut(
+  body: {
+    /** 用户ID */
+    ID: number;
+    /** 用户名字 */
+    UserName?: string;
+    /** 用户手机号 */
+    Phone?: string;
+    /** 人脸图片url */
+    Faces?: string[];
+  },
+  options?: { [key: string]: any },
+) {
+  const formData = new FormData();
+
+  Object.keys(body).forEach((ele) => {
+    const item = (body as any)[ele];
+
+    if (item !== undefined && item !== null) {
+      formData.append(
+        ele,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+      );
+    }
+  });
+
   return request<any>('/api/User/Put', {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
+    data: formData,
+    requestType: 'form',
     ...(options || {}),
   });
 }

@@ -98,7 +98,6 @@ export default () => {
             <Image.PreviewGroup key="facesimg">
               {record.faces.map((m: string) => (
                 <Image
-                  //  className={styles[':global(ant-image-mask-info)']}
                   key={m}
                   width={30}
                   height={30}
@@ -119,17 +118,12 @@ export default () => {
   useEffect(() => {}, []);
 
   return (
-    <PageContainer
-      className={styles.root}
-      header={{
-        title: intl.formatMessage({ id: 'user.header' }),
-      }}
-    >
+    <>
       <ProTable<API.UserInfo>
-        // headerTitle="检索数据"
+        headerTitle={intl.formatMessage({ id: 'user.header' })}
         actionRef={actionRef}
         rowKey="id"
-        scroll={{ y: 'calc(100vh - 290px)' }}
+        scroll={{ y: 'calc(100vh - 260px)' }}
         search={false}
         options={{ setting: false, density: false }}
         toolBarRender={() => [
@@ -185,72 +179,79 @@ export default () => {
         user={select}
         setUser={setSelect}
         onOk={async () => {
-          const reqs: Promise<{ type: string; num: number }>[] = [];
-          const modal = Modal.info({
-            title: intl.formatMessage({ id: 'user.requesting' }),
-            icon: <LoadingOutlined />,
-          });
-          //#region  处理新增
-          const addfilesasync = select?.urls
-            .filter((f) => f.url.startsWith('data:image'))
-            .map((m) => urltoFile(m.url, m.uid));
-          if (addfilesasync && addfilesasync.length > 0) {
-            reqs.push(
-              new Promise(async (resolve, reject) => {
-                const addfiles = await Promise.all(addfilesasync);
-                return api.User.postUserAddImg({ ID: select?.ID }, {}, addfiles)
-                  .then((res) => {
-                    resolve({ type: 'add', num: res });
-                  })
-                  .catch(() => {
-                    reject(0);
-                  });
-              }),
-            );
-          }
-          //#endregion
+          if (select) {
+            const reqs: Promise<{ type: string; num: number }>[] = [];
+            const modal = Modal.info({
+              title: intl.formatMessage({ id: 'user.requesting' }),
+              icon: <LoadingOutlined />,
+            });
+            //#region  处理新增
+            const addfilesasync = select?.urls
+              .filter((f) => f.url.startsWith('data:image'))
+              .map((m) => urltoFile(m.url, m.uid));
+            if (addfilesasync && addfilesasync.length > 0) {
+              reqs.push(
+                new Promise(async (resolve, reject) => {
+                  const addfiles = await Promise.all(addfilesasync);
+                  return api.User.postUserAddImg(
+                    { ID: select.ID },
+                    {},
+                    addfiles,
+                  )
+                    .then((res) => {
+                      resolve({ type: 'add', num: res });
+                    })
+                    .catch(() => {
+                      reject(0);
+                    });
+                }),
+              );
+            }
+            //#endregion
 
-          //#region 处理删除
-          var delfaces = upurls
-            .filter(
-              (item) => select?.urls.map((m) => m.uid).indexOf(item.uid) == -1,
-            )
-            .map((m) => m.name);
-          if (delfaces && delfaces.length > 0) {
-            reqs.push(
-              api.Face.deleteFaceDel(
-                { ID: select?.ID },
-                { facesName: delfaces },
-              ).then((res) => ({ type: 'del', num: res })),
-            );
-          }
-          //#endregion
+            //#region 处理删除
+            var delfaces = upurls
+              .filter(
+                (item) =>
+                  select?.urls.map((m) => m.uid).indexOf(item.uid) == -1,
+              )
+              .map((m) => m.name);
+            if (delfaces && delfaces.length > 0) {
+              reqs.push(
+                api.Face.deleteFaceDel(
+                  { ID: select?.ID },
+                  { facesName: delfaces },
+                ).then((res) => ({ type: 'del', num: res })),
+              );
+            }
+            //#endregion
 
-          const res = await Promise.all(reqs);
-          //更新界面数据
-          if (actionRef.current) {
-            actionRef.current.reload();
-          }
-          setSelect(undefined);
-          if (res) {
-            modal.update((prevConfig) => ({
-              ...prevConfig,
-              title: intl.formatMessage({ id: 'user.requested' }),
-              content: res.map((m, index) => (
-                <p key={index}>
-                  {intl.formatMessage(
-                    { id: `user.face${m.type}res` },
-                    { num: m.num },
-                  )}
-                </p>
-              )),
-              icon: <CheckCircleOutlined />,
-            }));
-          } else {
-            modal.destroy();
+            const res = await Promise.all(reqs);
+            //更新界面数据
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+            setSelect(undefined);
+            if (res) {
+              modal.update((prevConfig) => ({
+                ...prevConfig,
+                title: intl.formatMessage({ id: 'user.requested' }),
+                content: res.map((m, index) => (
+                  <p key={index}>
+                    {intl.formatMessage(
+                      { id: `user.face${m.type}res` },
+                      { num: m.num },
+                    )}
+                  </p>
+                )),
+                icon: <CheckCircleOutlined />,
+              }));
+            } else {
+              modal.destroy();
+            }
           }
         }}
       />
-    </PageContainer>
+    </>
   );
 };
