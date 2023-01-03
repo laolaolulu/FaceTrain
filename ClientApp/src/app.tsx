@@ -1,6 +1,6 @@
 // 运行时配置
 
-import { ApiOutlined, GithubOutlined } from '@ant-design/icons';
+import { ApiOutlined, GithubFilled, GithubOutlined } from '@ant-design/icons';
 import { RequestConfig } from '@umijs/max';
 import { Col, Row, Button, message, Modal } from 'antd';
 import { SelectLang, getIntl } from 'umi';
@@ -18,46 +18,48 @@ export const layout = () => {
       locale: true,
     },
     title: getIntl().formatMessage({ id: 'title' }),
-    rightContentRender: () => (
-      <Row gutter={[16, 16]}>
-        <Col xs={8} md={24}>
-          <Button
-            type="link"
-            icon={<ApiOutlined style={{ fontSize: 18 }} />}
-            href={`${window.location.origin}/swagger`}
-            style={{ padding: '12px' }}
-            target="_blank"
-          />
-        </Col>
-        <Col xs={8} md={24}>
-          <Button
-            type="link"
-            style={{ padding: '12px' }}
-            icon={<GithubOutlined style={{ fontSize: 18 }} />}
-            href={`https://github.com/laolaolulu/FaceTrain`}
-            target="_blank"
-          />
-        </Col>
-        <Col xs={8} md={24}>
-          <SelectLang reload={false} />
-        </Col>
-      </Row>
-    ),
+    fixedHeader: true,
+    actionsRender: () => {
+      return [
+        <Button
+          type="link"
+          icon={<ApiOutlined />}
+          href={`${window.location.origin}/swagger`}
+          target="_blank"
+        />,
+        <Button
+          type="link"
+          icon={<GithubOutlined />}
+          href={`https://github.com/laolaolulu/FaceTrain`}
+          target="_blank"
+        />,
+        <SelectLang reload={false} />,
+      ];
+    },
+    rightContentRender: false,
   };
 };
 
 // https://umijs.org/zh-CN/plugins/plugin-request
 export const request: RequestConfig = {
+  errorConfig: {
+    errorHandler: (error: any) => {
+      Modal.error({
+        title: `${getIntl().formatMessage({ id: 'error' })}:${
+          error.response.status
+        }`,
+        content: error.message,
+      });
+    },
+    errorThrower: () => {
+      alert('error');
+    },
+  },
   responseInterceptors: [
     (response) => {
+      console.log(response);
       if (response.status > 200 && response.status < 300) {
         message.success(getIntl().formatMessage({ id: 'success' }));
-      } else if (response.status >= 400) {
-        Modal.error({
-          title: response.status,
-          content: getIntl().formatMessage({ id: 'error' }),
-        });
-        throw new Error('Error:' + response.status);
       }
 
       return response;

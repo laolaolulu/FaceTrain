@@ -50,7 +50,7 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<UserInfo>> Add([FromForm, Required] UserInfo user)
+        public async Task<ActionResult<int>> Add([FromForm, Required] UserInfo user)
         {
             ctx.UserInfos.Add(user);
             try
@@ -67,9 +67,9 @@ namespace FaceTrain.Controllers
                 {
                     throw;
                 }
-            }
+            }           
 
-            return CreatedAtAction("GetUserInfoxx", new { id = user.ID }, user);
+            return Created("", user.ID);
         }
         /// <summary>
         /// 修改用户
@@ -77,7 +77,7 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<IActionResult> Put([Required] UserInfo user)
+        public async Task<IActionResult> Put([FromForm, Required] UserInfo user)
         {
             ctx.Entry(user).State = EntityState.Modified;
 

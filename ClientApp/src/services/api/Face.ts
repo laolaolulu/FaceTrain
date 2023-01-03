@@ -3,11 +3,7 @@
 import { request } from 'umi';
 
 /** 上传模型 POST /api/Face/AddModel */
-export async function postFaceAddModel(
-  body: {},
-  file?: File,
-  options?: { [key: string]: any },
-) {
+export async function postFaceAddModel(body: {}, file?: File, options?: { [key: string]: any }) {
   const formData = new FormData();
 
   if (file) {

@@ -1,14 +1,13 @@
-import { TrademarkOutlined } from '@ant-design/icons';
 import { defineConfig } from '@umijs/max';
 
 export default defineConfig({
-  plugins: ['@umijs/plugin-openapi'],
   antd: {},
+
   access: {},
   model: {},
   initialState: {},
   request: {},
-  layout: {},
+  layout: { headerRender: true },
   locale: { title: true, default: 'en-US' },
   routes: [
     {
@@ -53,9 +52,13 @@ export default defineConfig({
   },
 
   outputPath: '../wwwroot/dist',
+  plugins: ['@umijs/max-plugin-openapi'],
   openAPI: {
-    // requestLibPath: "import { request } from '@umijs/max'",
-    // schemaPath: 'https://localhost:54321/swagger/v1/swagger.json',
-    // mock: false,
+    projectName: 'api',
+    namespace: 'API1',
+    requestLibPath: "import { request } from 'umi'",
+    schemaPath: 'https://localhost:54321/swagger/v1/swagger.json',
+    mock: false,
+    // serversPath: '',
   },
 });

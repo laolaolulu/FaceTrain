@@ -1,21 +1,11 @@
 import api from '@/services';
-import {
-  ActionType,
-  PageContainer,
-  ProDescriptionsItemProps,
-  ProTable,
-} from '@ant-design/pro-components';
-import { Button, Image, message, Modal } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
+import { Button, Image, Modal } from 'antd';
+import { useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import EditImgForm from './components/EditImgForm';
-import styles from './index.less';
 import { urltoFile } from '@/utils/opencv';
-import {
-  CalculatorFilled,
-  CheckCircleOutlined,
-  LoadingOutlined,
-} from '@ant-design/icons';
+import { CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useIntl } from 'umi';
 
 export let upurls: API.UpFaceUrl[];
@@ -26,11 +16,14 @@ export default () => {
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
 
-  const columns: ProDescriptionsItemProps<API.UserInfo>[] = [
+  const columns: ProColumns<API.UserInfo>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
       editable: false,
+      valueType: 'digit',
+      proFieldProps: { width: '100%' },
+      fieldProps: { min: 1, precision: 0, width: '100%' },
       formItemProps: {
         rules: [
           {
@@ -54,6 +47,7 @@ export default () => {
       title: intl.formatMessage({ id: 'user.handle' }),
       dataIndex: 'option',
       valueType: 'option',
+      width: 160,
       render: (_, record, __, action) => (
         <>
           <a
@@ -115,8 +109,6 @@ export default () => {
     },
   ];
 
-  useEffect(() => {}, []);
-
   return (
     <>
       <ProTable<API.UserInfo>
@@ -162,7 +154,7 @@ export default () => {
         modalVisible={createModalVisible}
       >
         <ProTable<API.UserInfo, API.UserInfo>
-          onSubmit={async (value) => {
+          onSubmit={async (value: any) => {
             await api.User.postUserAdd(value).then(() => {
               handleModalVisible(false);
               if (actionRef.current) {
