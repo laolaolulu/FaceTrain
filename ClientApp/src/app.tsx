@@ -57,7 +57,6 @@ export const request: RequestConfig = {
   },
   responseInterceptors: [
     (response) => {
-      console.log(response);
       if (response.status > 200 && response.status < 300) {
         message.success(getIntl().formatMessage({ id: 'success' }));
       }

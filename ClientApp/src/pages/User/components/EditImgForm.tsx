@@ -10,7 +10,7 @@ import {
 import { Divider, Modal, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import React, { PropsWithChildren } from 'react';
-import { classifier } from '@/models/global';
+import { faceWorker } from '@/constants';
 import { upurls } from '../index';
 import styles from '../index.less';
 import { useIntl } from 'umi';
@@ -98,19 +98,21 @@ export default (props: {
           const img = new Image();
           img.src = URL.createObjectURL(file);
           await img.decode();
+          console.log((file as File).arrayBuffer);
+          console.log(img);
           const matimg = cv.imread(img);
           //#endregion
 
           //#region 人脸检测
           const faces = new cv.RectVector();
-          try {
-            const gray = new cv.Mat();
-            cv.cvtColor(matimg, gray, cv.COLOR_RGBA2GRAY, 0); //灰度化
-            classifier.detectMultiScale(gray, faces, 1.1, 3, 0); //人脸检测
-            gray.delete();
-          } catch (err) {
-            console.log(err);
-          }
+          //   try {
+          //     const gray = new cv.Mat();
+          //     cv.cvtColor(matimg, gray, cv.COLOR_RGBA2GRAY, 0); //灰度化
+          //     classifier.detectMultiScale(gray, faces, 1.1, 3, 0); //人脸检测
+          //     gray.delete();
+          //   } catch (err) {
+          //     console.log(err);
+          //   }
           //#endregion
 
           //#region 界面显示上传结果并画出识别到的人脸并将识别到的脸转换base64
@@ -142,6 +144,11 @@ export default (props: {
             addurls.push(tnCanvas.toDataURL());
           }
           cv.imshow('canface', matimg);
+
+          const cav: any = document.getElementById('canface');
+
+          faceWorker.postMessage({ action: 'start', src: file });
+
           matimg.delete();
           //#endregion
 
