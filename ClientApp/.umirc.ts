@@ -2,7 +2,6 @@ import { defineConfig } from '@umijs/max';
 
 export default defineConfig({
   antd: {},
-
   access: {},
   model: {},
   initialState: {},
@@ -50,8 +49,14 @@ export default defineConfig({
       pathRewrite: { '^': '' },
     },
   },
-
   outputPath: '../wwwroot/dist',
+  headScripts: [
+    {
+      src: './opencv.js',
+      async: true,
+      // onload: 'opencvload();',
+    },
+  ],
   plugins: ['@umijs/max-plugin-openapi'],
   openAPI: {
     projectName: 'api',

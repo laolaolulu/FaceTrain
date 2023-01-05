@@ -20,6 +20,7 @@ export default {
   'user.notTest': 'No face detected',
   'user.facedelres': '（{num}）faces deleted',
   'user.faceaddres': '（{num}）faces added',
+  'user.facetimeout': 'Face detection timeout',
 
   'model.title': 'Model management',
   'model.train': 'Train',

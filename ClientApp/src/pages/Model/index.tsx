@@ -34,8 +34,7 @@ export default () => {
   const intl = useIntl();
   const { loading: training, run: Train } = useRequest(api.Face.putFaceTrain, {
     manual: true,
-    onSuccess: (res) => {
-      message.success(intl.formatMessage({ id: 'model.trainsuccess' }));
+    onSuccess: () => {
       init();
     },
   });

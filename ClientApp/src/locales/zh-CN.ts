@@ -20,6 +20,7 @@ export default {
   'user.notTest': '未检测到人脸',
   'user.facedelres': '删除了（{num}）张人脸',
   'user.faceaddres': '新增了（{num}）张人脸',
+  'user.facetimeout': '人脸检测超时',
 
   'model.title': '模型管理',
   'model.train': '训练',

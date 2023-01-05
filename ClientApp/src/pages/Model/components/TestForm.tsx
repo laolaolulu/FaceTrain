@@ -14,7 +14,7 @@ import {
   Select,
   Upload,
 } from 'antd';
-import { classifier } from '@/models/global';
+import { faceWorker } from '@/constants';
 import api from '@/services';
 import '../index.less';
 import { useEffect, useState } from 'react';

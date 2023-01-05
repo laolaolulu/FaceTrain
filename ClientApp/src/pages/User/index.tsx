@@ -1,6 +1,6 @@
 import api from '@/services';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, Image, Modal } from 'antd';
+import { Button, Image, Modal, UploadFile } from 'antd';
 import { useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import EditImgForm from './components/EditImgForm';
@@ -8,11 +8,13 @@ import { urltoFile } from '@/utils/opencv';
 import { CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useIntl } from 'umi';
 
-export let upurls: API.UpFaceUrl[];
+export let upurls: UploadFile[];
 
 export default () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  const [select, setSelect] = useState<API.UpFace>();
+  // const [select, setSelect] = useState<API.UpFace>();
+  //编辑人脸图片选项
+  const [upImg, setUpImg] = useState<UpImg>();
   const actionRef = useRef<ActionType>();
   const intl = useIntl();
 
@@ -22,8 +24,8 @@ export default () => {
       dataIndex: 'id',
       editable: false,
       valueType: 'digit',
-      proFieldProps: { width: '100%' },
-      fieldProps: { min: 1, precision: 0, width: '100%' },
+      width: 50,
+      fieldProps: { min: 1, precision: 0, style: { width: '100%' } },
       formItemProps: {
         rules: [
           {
@@ -37,11 +39,13 @@ export default () => {
       title: intl.formatMessage({ id: 'user.name' }),
       dataIndex: 'userName',
       valueType: 'text',
+      width: 120,
     },
     {
       title: intl.formatMessage({ id: 'user.phone' }),
       dataIndex: 'phone',
       valueType: 'text',
+      width: 120,
     },
     {
       title: intl.formatMessage({ id: 'user.handle' }),
@@ -77,7 +81,8 @@ export default () => {
                     return { name, url, uid: name.split('.')[0] };
                   })
                 : [];
-              setSelect({
+
+              setUpImg({
                 ID: record.id,
                 name: record.userName,
                 urls: upurls,
@@ -115,7 +120,7 @@ export default () => {
         headerTitle={intl.formatMessage({ id: 'user.header' })}
         actionRef={actionRef}
         rowKey="id"
-        scroll={{ y: 'calc(100vh - 260px)' }}
+        scroll={{ y: 'calc(100vh - 310px)' }}
         search={false}
         options={{ setting: false, density: false }}
         toolBarRender={() => [
@@ -168,34 +173,33 @@ export default () => {
         />
       </CreateForm>
       <EditImgForm
-        user={select}
-        setUser={setSelect}
+        upImg={upImg}
+        setUpImg={setUpImg}
         onOk={async () => {
-          if (select) {
+          if (upImg) {
             const reqs: Promise<{ type: string; num: number }>[] = [];
             const modal = Modal.info({
               title: intl.formatMessage({ id: 'user.requesting' }),
               icon: <LoadingOutlined />,
             });
             //#region  处理新增
-            const addfilesasync = select?.urls
-              .filter((f) => f.url.startsWith('data:image'))
-              .map((m) => urltoFile(m.url, m.uid));
-            if (addfilesasync && addfilesasync.length > 0) {
+            const addfiles = upImg.urls
+              .filter((f) => !f.url)
+              .map((m) => m.originFileObj as File);
+            if (addfiles && addfiles.length > 0) {
               reqs.push(
                 new Promise(async (resolve, reject) => {
-                  const addfiles = await Promise.all(addfilesasync);
+                  // const addfiles = await Promise.all(addfilesasync);
                   return api.User.postUserAddImg(
-                    { ID: select.ID },
+                    { ID: upImg.ID },
                     {},
                     addfiles,
-                  )
-                    .then((res) => {
-                      resolve({ type: 'add', num: res });
-                    })
-                    .catch(() => {
-                      reject(0);
-                    });
+                  ).then((res) => {
+                    resolve({ type: 'add', num: res });
+                  });
+                  // .catch(() => {
+                  //   reject(0);
+                  // });
                 }),
               );
             }
@@ -204,14 +208,13 @@ export default () => {
             //#region 处理删除
             var delfaces = upurls
               .filter(
-                (item) =>
-                  select?.urls.map((m) => m.uid).indexOf(item.uid) == -1,
+                (item) => upImg.urls.map((m) => m.uid).indexOf(item.uid) == -1,
               )
               .map((m) => m.name);
             if (delfaces && delfaces.length > 0) {
               reqs.push(
                 api.Face.deleteFaceDel(
-                  { ID: select?.ID },
+                  { ID: upImg.ID },
                   { facesName: delfaces },
                 ).then((res) => ({ type: 'del', num: res })),
               );
@@ -223,7 +226,7 @@ export default () => {
             if (actionRef.current) {
               actionRef.current.reload();
             }
-            setSelect(undefined);
+            setUpImg(undefined);
             if (res) {
               modal.update((prevConfig) => ({
                 ...prevConfig,

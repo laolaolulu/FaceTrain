@@ -1,26 +1,12 @@
 // 全局共享数据示例
-import { DEFAULT_NAME } from '@/constants';
 import { useEffect, useState } from 'react';
-import { createFileFromUrl, loadOpenCv } from '@/utils/opencv';
-export let classifier: any;
+import { createFileFromUrl } from '@/utils/opencv';
+import { faceWorker } from '@/constants';
 
-const useUser = () => {
-  const [name, setName] = useState<string>(DEFAULT_NAME);
-
+export default () => {
   useEffect(() => {
-    loadOpenCv('/opencv.js', () => {
-      const faceCascadeFile = 'haarcascade_frontalface_alt2.xml';
-      classifier = new cv.CascadeClassifier();
-      createFileFromUrl(faceCascadeFile, faceCascadeFile, () => {
-        classifier.load(faceCascadeFile);
-      });
-    });
+    faceWorker.postMessage({ action: 'init' });
   }, []);
 
-  return {
-    name,
-    setName,
-  };
+  return {};
 };
-
-export default useUser;

@@ -18,7 +18,10 @@ export const layout = () => {
       locale: true,
     },
     title: getIntl().formatMessage({ id: 'title' }),
-    fixedHeader: true,
+    //fixedHeader: true,
+    fixSiderbar: true,
+    layout: 'mix',
+    // splitMenus: true,
     actionsRender: () => {
       return [
         <Button
@@ -57,7 +60,6 @@ export const request: RequestConfig = {
   },
   responseInterceptors: [
     (response) => {
-      console.log(response);
       if (response.status > 200 && response.status < 300) {
         message.success(getIntl().formatMessage({ id: 'success' }));
       }
