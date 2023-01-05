@@ -10,14 +10,13 @@ import {
 } from '@ant-design/icons';
 import { Divider, Modal, Upload, UploadFile } from 'antd';
 import { RcFile } from 'antd/lib/upload';
-import React, { PropsWithChildren, useEffect } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { faceWorker } from '@/constants';
 import { upurls } from '../index';
 import styles from '../index.less';
 import { useIntl, getIntl } from 'umi';
 import { sleep } from '@/utils';
-
-let readVideo = false;
+import ImgCanvas from './ImgCanvas';
 
 export default (props: {
   upImg?: UpImg;
@@ -26,7 +25,6 @@ export default (props: {
 }) => {
   const intl = useIntl();
   const { upImg, setUpImg, onOk } = props;
-  useEffect(() => {}, []);
   return (
     <Modal
       maskClosable={false}
@@ -75,381 +73,48 @@ export default (props: {
             content: <img width={300} src={file.url} />,
           });
         }}
-        // onChange={({ fileList: newFileList }) => {
-        //   console.log(newFileList);
-        //   //  setUpImg(upImg ? { ...upImg, urls: newFileList } : undefined);
-        // }}
         beforeUpload={async (file) => {
+          const resfaces: { name: string; faces: File[] }[] = [];
+          const OnOk = (res: any) => {
+            resfaces.push(res);
+            modal.update((prevConfig) => ({
+              ...prevConfig,
+              title: getIntl().formatMessage(
+                { id: 'user.testResult' },
+                { count: resfaces.flatMap((f) => f.faces).length },
+              ),
+            }));
+            if (resfaces.length == 1) {
+              modal.update((prevConfig) => ({
+                ...prevConfig,
+                icon: <CheckCircleOutlined />,
+              }));
+            }
+          };
+
           const modal = Modal.info({
             title: intl.formatMessage({ id: 'user.Testing' }),
             icon: <LoadingOutlined />,
             closable: true,
             width: 500,
             centered: true,
-            okButtonProps: { loading: true },
-            content: (
-              <canvas
-                id="canface"
-                style={{ maxWidth: '100%', maxHeight: '400px' }}
-              />
-            ),
+            content: <ImgCanvas img={file} onOk={OnOk} />,
             onOk: async () => {
-              console.log(facefiles);
-              //   const facemsg = await Promise.all(facemsgasync);
-              //   //获取人脸文件
-              //   const facefiles = facemsg
-              //     .flatMap((f) => f.msg)
-              //     .map((m) => m.faceFile)
-              //     .filter(Boolean) as File[];
-              if (upImg && facefiles.length > 0) {
+              if (upImg && resfaces.length == 1) {
                 const fileList = [...upImg.urls];
-                facefiles.forEach((facef) => {
-                  //  const es: UploadFile = undefined;
-
-                  fileList.push({
-                    uid: `rc-upload-${Date.now().toString()}`,
-                    name: facef.name,
-                    originFileObj: facef as RcFile,
+                resfaces.forEach((item) => {
+                  item.faces.forEach((facef, index) => {
+                    fileList.push({
+                      uid: `rc-upload-${Date.now().toString()}-${index}`,
+                      name: item.name,
+                      originFileObj: facef as RcFile,
+                    });
                   });
                 });
                 setUpImg({ ...upImg, urls: fileList });
-                console.log(fileList);
               }
             },
           });
-
-          const img = new Image();
-          img.onload = async () => {
-            const matimg = cv.imread(img);
-            cv.imshow('canface', matimg);
-            matimg.delete();
-          };
-          img.src = URL.createObjectURL(file);
-
-          //   const bitimg = createImageBitmap(file);
-          //   createImageBitmap(file).then((res) => {
-          //     // const imgcanvas: any = document.getElementById('canface');
-          //     // // console.log(imgcanvas);
-          //     // const ctx: CanvasRenderingContext2D = imgcanvas.getContext('2d');
-          //     // imgcanvas.width = res.width;
-          //     // imgcanvas.height = res.height;
-          //     // var test = new OffscreenCanvas(res.width, res.height);
-
-          //     var tes: any = new OffscreenCanvas(res.width, res.height);
-          //     var s: any = tes.getContext('2d');
-
-          //     s.drawImage(res, 0, 0);
-
-          //     const se = s.getImageData(0, 0, res.width, res.height);
-          //     var mat = cv.matFromImageData(se);
-          //     cv.imshow('canface', mat);
-          //     // ctx.drawImage(
-          //     //   s.getImageData(0, 0, res.width, res.height),
-          //     //   0,
-          //     //   0,
-          //     //   res.width,
-          //     //   res.height,
-          //     // );
-
-          //     // tes.convertToBlob().then(async (blob: any) => {
-          //     //   console.log(await blob.arrayBuffer());
-
-          //     // });
-
-          //     // console.log(imgcanvas);
-          //     // console.log(s);
-          //     // console.log(ctx);
-          //     // console.log(s.getImageData(0, 0, res.width, res.height));
-          //     // // ctx?.drawImage(res, 0, 0, res.width, res.height);
-          //     // // console.log(ctx.getImageData(0, 0, res.width, res.height));
-          //     // const matimg = cv.imread(
-          //     //   s.getImageData(0, 0, res.width, res.height),
-          //     // );
-          //     // cv.imshow('canface', matimg);
-          //   });
-
-          const faceRes = async (res: any) => {
-            //识别完成
-            if (res.data.action == 'res') {
-              clearTimeout(timeout);
-              faceWorker.removeEventListener('message', faceRes);
-              const data: {
-                x: number;
-                y: number;
-                width: number;
-                height: number;
-              }[] = res.data.data;
-
-              const imgcanvas: any = document.getElementById('canface');
-              const ctx: CanvasRenderingContext2D = imgcanvas.getContext('2d');
-
-              for (let index = 0; index < data.length; index++) {
-                const face = data[index];
-                const faceimg = ctx.getImageData(
-                  face.x,
-                  face.y,
-                  face.width,
-                  face.height,
-                );
-
-                const facecanvas = document.createElement('canvas');
-                facecanvas.width = face.width;
-                facecanvas.height = face.height;
-                const facectx = facecanvas.getContext('2d');
-                facectx?.createImageData(faceimg);
-                await new Promise((resolve) => {
-                  facecanvas.toBlob((blob) => {
-                    if (blob) {
-                      const facefile = new File(
-                        [blob],
-                        `${index}_${file?.name}`,
-                        {
-                          type: blob.type,
-                        },
-                      );
-                      facefiles.push(facefile);
-                    }
-                    resolve(undefined);
-                  });
-                });
-              }
-              data.forEach((face) => {
-                ctx.strokeRect(face.x, face.y, face.width, face.height);
-              });
-
-              if (facefiles.length > 0) {
-                modal.update((prevConfig) => ({
-                  ...prevConfig,
-                  title: getIntl().formatMessage(
-                    { id: 'user.testResult' },
-                    { count: facefiles.length },
-                  ),
-                  icon: <CheckCircleOutlined />,
-                  okButtonProps: { loading: false },
-                }));
-              } else {
-                modal.update((prevConfig) => ({
-                  ...prevConfig,
-                  title: getIntl().formatMessage({ id: 'user.notTest' }),
-                  icon: <CloseCircleOutlined />,
-                  okButtonProps: { loading: false },
-                }));
-              }
-            }
-          };
-          const timeout = setTimeout(() => {
-            faceWorker.removeEventListener('message', faceRes);
-            //识别超时
-            modal.update((prevConfig) => ({
-              ...prevConfig,
-              title: getIntl().formatMessage({ id: 'user.facetimeout' }),
-              icon: <FieldTimeOutlined />,
-              okButtonProps: { loading: false },
-            }));
-          }, 10000);
-          faceWorker.addEventListener('message', faceRes);
-          faceWorker.postMessage({ action: 'start', file });
-          //   };
-          //   img.src = URL.createObjectURL(file);
-
-          //   const bitimg = await self.createImageBitmap(file);
-          //   const mat = new cv.Mat(bitimg.height, bitimg.width, cv.CV_8UC4);
-
-          //   const reader = new FileReader();
-          //   reader.onload = (res) => {
-          //     console.log(reader.result);
-          //     console.log(new Uint8Array(reader.result as ArrayBuffer));
-          //     mat.data.set(new Uint8ClampedArray(reader.result as ArrayBuffer));
-          //     cv.imshow('canface', mat);
-          //     const faceCascadeFile = 'haarcascade_frontalface_alt2.xml';
-          //     const url = './' + faceCascadeFile;
-          //     const classifier = new cv.CascadeClassifier();
-          //     const request = new XMLHttpRequest();
-          //     request.open('GET', url, true);
-          //     request.responseType = 'arraybuffer';
-          //     request.onload = function () {
-          //       if (request.readyState === 4) {
-          //         if (request.status === 200) {
-          //           const data = new Uint8Array(request.response);
-          //           cv.FS_createDataFile('/', url, data, true, false, false);
-          //           classifier.load(faceCascadeFile);
-          //           const faces = new cv.RectVector();
-          //           classifier.detectMultiScale(mat, faces, 1.1, 3, 0);
-
-          //           console.log(faces.size());
-          //         } else {
-          //           console.error(
-          //             'Failed to load ' + url + ' status: ' + request.status,
-          //           );
-          //         }
-          //       }
-          //     };
-          //     request.send();
-          //   };
-          //   reader.readAsArrayBuffer(file);
-
-          //   myWorker.postMessage(uInt8Array.buffer, [uInt8Array]);
-
-          //   const img = new Image();
-          //   img.src = URL.createObjectURL(file);
-          //   img.onload = async () => {
-          //     const matimg = cv.imread(img);
-          //     const faceCascadeFile = 'haarcascade_frontalface_alt2.xml';
-          //     const url = './' + faceCascadeFile;
-          //     const classifier = new cv.CascadeClassifier();
-          //     const request = new XMLHttpRequest();
-          //     request.open('GET', url, true);
-          //     request.responseType = 'arraybuffer';
-          //     request.onload = function () {
-          //       if (request.readyState === 4) {
-          //         if (request.status === 200) {
-          //           const data = new Uint8Array(request.response);
-          //           cv.FS_createDataFile('/', url, data, true, false, false);
-          //           classifier.load(faceCascadeFile);
-          //           const faces = new cv.RectVector();
-          //           classifier.detectMultiScale(matimg, faces, 1.1, 3, 0);
-
-          //           console.log(faces.size());
-          //         } else {
-          //           console.error(
-          //             'Failed to load ' + url + ' status: ' + request.status,
-          //           );
-          //         }
-          //       }
-          //     };
-          //     request.send();
-          //   };
-          const fis = file as File;
-
-          const facefiles: File[] = [];
-
-          //#region 读取上传的图片转换为mat
-          new Promise(() => {});
-          //   setTimeout(() => {
-          //     const img = new Image();
-          //     img.src = URL.createObjectURL(file);
-          //     img.onload = async () => {
-          //       const matimg = cv.imread(img);
-          //       const imgcanvas: any = document.getElementById('canface');
-          //       const ctx: CanvasRenderingContext2D = imgcanvas.getContext('2d');
-          //       cv.imshow('canface', matimg);
-          //       //#region 人脸检测
-          //       const faces = new cv.RectVector();
-          //       classifier.detectMultiScale(matimg, faces, 1.1, 3, 0); //人脸检测
-          //       //#endregion
-
-          //       for (let i = 0; i < faces.size(); i++) {
-          //         const face = faces.get(i);
-          //         //画出人脸框
-          //         ctx.strokeRect(face.x, face.y, face.width, face.height);
-
-          //         //创建canvas来进行裁剪
-          //         const tnCanvas = document.createElement('canvas');
-          //         tnCanvas.width = face.width;
-          //         tnCanvas.height = face.height;
-          //         //裁剪人脸区域
-          //         const roi = matimg.roi(
-          //           new cv.Rect(face.x, face.y, face.width, face.height),
-          //         );
-          //         matimg.delete();
-          //         cv.imshow(tnCanvas, roi);
-          //         roi.delete();
-          //         const faceFile = await new Promise<File | undefined>(
-          //           (resolve) => {
-          //             tnCanvas.toBlob((blob) => {
-          //               let fileface: File | undefined = undefined;
-          //               if (blob) {
-          //                 fileface = new File([blob], `${i}_${file?.name}`, {
-          //                   type: blob.type,
-          //                 });
-          //               }
-          //               resolve(fileface);
-          //             });
-          //           },
-          //         );
-          //         if (faceFile) {
-          //           facefiles.push(faceFile);
-          //         }
-          //       }
-          //       faces.delete();
-          //       // const msgasync = new Array(faces.size())
-          //       //   .fill(0)
-          //       //   .map(async (_, i) => {
-
-          //       //     //将裁剪出的图片转换为文件
-          //       //     const faceFile = await new Promise<File | undefined>(
-          //       //       (resolve) => {
-          //       //         tnCanvas.toBlob((blob) => {
-          //       //           roi.delete();
-          //       //           let fileface: File | undefined = undefined;
-          //       //           if (blob) {
-          //       //             fileface = new File([blob], `${i}_${file?.name}`, {
-          //       //               type: blob.type,
-          //       //             });
-          //       //           }
-          //       //           resolve(fileface);
-          //       //         });
-          //       //       },
-          //       //     );
-          //       //     const res: { x: number; y: number; faceFile?: File } = {
-          //       //       x: face.x,
-          //       //       y: face.y,
-          //       //       faceFile,
-          //       //     };
-          //       //     return res;
-          //       //   });
-          //       if (facefiles.length > 0) {
-          //         modal.update((prevConfig) => ({
-          //           ...prevConfig,
-          //           title: intl.formatMessage(
-          //             { id: 'user.testResult' },
-          //             { count: facefiles.length },
-          //           ),
-          //           icon: <CheckCircleOutlined />,
-          //         }));
-          //       } else {
-          //         modal.update((prevConfig) => ({
-          //           ...prevConfig,
-          //           title: intl.formatMessage({ id: 'user.notTest' }),
-          //           icon: <CloseCircleOutlined />,
-          //         }));
-          //       }
-          //     };
-          //   }, 1000);
-
-          //#endregion
-
-          //#region 界面显示上传结果并画出识别到的人脸并将识别到的脸转换base64
-          //   for (let i = 0; i < faces.size(); ++i) {
-          //     const face = faces.get(i);
-          //     const point1 = new cv.Point(face.x, face.y);
-          //     const point2 = new cv.Point(
-          //       face.x + face.width,
-          //       face.y + face.height,
-          //     );
-          //     cv.rectangle(matimg, point1, point2, [0, 0, 255, 255]);
-
-          //     const tnCanvas = document.createElement('canvas');
-          //     const tnCanvasContext = tnCanvas.getContext('2d');
-          //     tnCanvas.width = face.width;
-          //     tnCanvas.height = face.height;
-
-          //     tnCanvasContext?.drawImage(
-          //       img,
-          //       face.x,
-          //       face.y,
-          //       face.width,
-          //       face.height,
-          //       0,
-          //       0,
-          //       face.width,
-          //       face.height,
-          //     );
-          //     addurls.push(tnCanvas.toDataURL());
-          //   }
-          //   cv.imshow('canface', matimg);
-          //   matimg.delete();
-          //#endregion
 
           return false;
         }}
@@ -470,6 +135,8 @@ export default (props: {
           <VideoCameraAddOutlined
             onClick={(e) => {
               e.stopPropagation();
+
+              let readVideo = false;
               const modal = Modal.info({
                 title: intl.formatMessage({ id: 'user.Testing' }),
                 icon: <ScanOutlined />,
@@ -485,16 +152,11 @@ export default (props: {
                   ></video>
                 ),
                 afterClose: () => {
-                  stream.then((res) => {
-                    readVideo = false;
-                    res.stream.getVideoTracks().forEach((element) => {
-                      element.stop();
-                    });
-                  });
+                  readVideo = false;
                 },
               });
 
-              const stream = navigator.mediaDevices
+              navigator.mediaDevices
                 .getUserMedia({
                   video: true,
                   audio: false,
@@ -505,67 +167,110 @@ export default (props: {
                   video.addEventListener('canplay', () => {
                     video.height = video.videoHeight;
                     video.width = video.videoWidth;
-                    const faces = new cv.RectVector();
-                    const src = new cv.Mat(
-                      video.videoHeight,
-                      video.videoWidth,
-                      cv.CV_8UC4,
-                    );
 
-                    const cap = new cv.VideoCapture(video);
+                    const faceRes = async (res: any) => {
+                      //识别完成
+                      if (
+                        res.data.action == 'res' &&
+                        res.data.name == 'video-lp-img'
+                      ) {
+                        readVideo = false;
+                        faceWorker.removeEventListener('message', faceRes);
+
+                        const data: {
+                          x: number;
+                          y: number;
+                          width: number;
+                          height: number;
+                        }[] = res.data.data;
+
+                        modal.update((prevConfig) => ({
+                          ...prevConfig,
+                          title: getIntl().formatMessage(
+                            { id: 'user.testResult' },
+                            { count: data.length },
+                          ),
+                          icon: <CheckCircleOutlined />,
+                        }));
+
+                        setTimeout(() => {
+                          modal.destroy();
+                        }, 600);
+
+                        const imageData = new ImageData(
+                          new Uint8ClampedArray(res.data.buffer),
+                          video.width,
+                          video.height,
+                        );
+                        ctx.putImageData(imageData, 0, 0);
+
+                        const blobs: Promise<File>[] = data.map((face) => {
+                          const faceimg = ctx.getImageData(
+                            face.x,
+                            face.y,
+                            face.width,
+                            face.height,
+                          );
+                          const facecanvas: any = new OffscreenCanvas(
+                            face.width,
+                            face.height,
+                          );
+                          const facectx = facecanvas.getContext('2d');
+                          facectx.putImageData(faceimg, 0, 0);
+                          return facecanvas.convertToBlob();
+                        });
+                        const faces = await Promise.all(blobs);
+                        if (upImg) {
+                          const fileList = [...upImg.urls];
+                          faces.forEach((facef, index) => {
+                            fileList.push({
+                              uid: `rc-upload-${Date.now().toString()}-${index}`,
+                              name: 'item.name',
+                              originFileObj: facef as RcFile,
+                            });
+                          });
+                          setUpImg({ ...upImg, urls: fileList });
+                        }
+                      }
+                    };
+                    faceWorker.addEventListener('message', faceRes);
+
+                    const imgcanvas: any = new OffscreenCanvas(
+                      video.width,
+                      video.height,
+                    );
+                    const ctx = imgcanvas.getContext('2d');
 
                     new Promise(async () => {
                       readVideo = true;
                       while (readVideo) {
-                        await sleep(100);
+                        await sleep(200);
                         //将视频当前帧读取到src
-                        cap.read(src);
-                        //监测人脸
-                        classifier.detectMultiScale(src, faces, 1.1, 3, 0);
-
-                        //遍历人脸
-                        for (let i = 0; i < faces.size(); ++i) {
-                          readVideo = false;
-                          modal?.destroy();
-                          let face = faces.get(i);
-
-                          //定义canvas来接收人脸区域
-                          const tnCanvas = document.createElement('canvas');
-                          tnCanvas.width = face.width;
-                          tnCanvas.height = face.height;
-                          //裁剪人脸区域
-                          const roi = src.roi(
-                            new cv.Rect(
-                              face.x,
-                              face.y,
-                              face.width,
-                              face.height,
-                            ),
-                          );
-
-                          cv.imshow(tnCanvas, roi);
-
-                          //   setUser((user) => {
-                          //     let fileList: API.UpFaceUrl[] = [];
-                          //     if (user?.urls) {
-                          //       fileList = [...user.urls];
-                          //     }
-                          //     fileList.push({
-                          //       name: `${video}_${i}`,
-                          //       uid: (Date.now() + i).toString(),
-                          //       url: tnCanvas.toDataURL(),
-                          //     });
-                          //     return user
-                          //       ? { ...user, urls: fileList }
-                          //       : undefined;
-                          //   });
-                        }
+                        ctx.drawImage(video, 0, 0, video.width, video.height);
+                        let buffer = ctx.getImageData(
+                          0,
+                          0,
+                          video.width,
+                          video.height,
+                        ).data.buffer;
+                        faceWorker.postMessage(
+                          {
+                            action: 'start',
+                            name: 'video-lp-img',
+                            buffer,
+                            width: video.width,
+                            height: video.height,
+                          },
+                          [buffer],
+                        );
                       }
+                      stream.getVideoTracks().forEach((element) => {
+                        element.stop();
+                      });
                     });
                   });
 
                   video.play();
-                  return { stream };
                 });
             }}
           />

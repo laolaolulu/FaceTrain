@@ -14,12 +14,15 @@ self.onmessage = async ({ data }) => {
       }
       break;
     case 'start':
-      const bitimg = await self.createImageBitmap(data.file);
-      const canvas = new OffscreenCanvas(bitimg.width, bitimg.height);
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(bitimg, 0, 0);
-      const imgdata = ctx.getImageData(0, 0, bitimg.width, bitimg.height);
-      var mat = cv.matFromImageData(imgdata);
+      //   const bitimg = await self.createImageBitmap(data.file);
+      //   const canvas = new OffscreenCanvas(bitimg.width, bitimg.height);
+      //   const ctx = canvas.getContext('2d');
+      //   ctx.drawImage(bitimg, 0, 0);
+      //   const imgdata = ctx.getImageData(0, 0, bitimg.width, bitimg.height);
+      //   var mat = cv.matFromImageData(imgdata);
+      console.log(new Date());
+      const mat = new cv.Mat(data.height, data.width, cv.CV_8UC4);
+      mat.data.set(new Uint8Array(data.buffer));
       const faces = new cv.RectVector();
       classifier.detectMultiScale(mat, faces, 1.1, 3, 0);
       const resdata = Array(faces.size())
@@ -33,7 +36,25 @@ self.onmessage = async ({ data }) => {
             height: face.height,
           };
         });
-      self.postMessage({ action: 'res', data: resdata });
+      faces.delete();
+      mat.delete();
+
+      if (data.name == 'video-lp-img') {
+        if (resdata.length > 0) {
+          self.postMessage(
+            {
+              action: 'res',
+              name: data.name,
+              data: resdata,
+              buffer: data.buffer,
+            },
+            [data.buffer],
+          );
+        }
+      } else {
+        self.postMessage({ action: 'res', name: data.name, data: resdata });
+      }
+
       break;
 
     default:

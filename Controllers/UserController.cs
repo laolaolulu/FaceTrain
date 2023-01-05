@@ -67,7 +67,7 @@ namespace FaceTrain.Controllers
                 {
                     throw;
                 }
-            }           
+            }
 
             return Created("", user.ID);
         }
@@ -135,10 +135,12 @@ namespace FaceTrain.Controllers
                 {
                     Directory.CreateDirectory(imgurl);
                 }
-                foreach (var img in image)
+                var dtstr = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                for (int i = 0; i < image.Length; i++)
                 {
-                    using var facemat = Mat.FromStream(img.OpenReadStream(), ImreadModes.Color);
-                    Cv2.ImWrite(imgurl + string.Format("/{0}", img.FileName), facemat);
+                    var path = string.Format("{0}/{1}-{2}.{3}", imgurl, dtstr, i, image[i].ContentType.Substring(6));
+                    using var facemat = Mat.FromStream(image[i].OpenReadStream(), ImreadModes.Color);
+                    Cv2.ImWrite(path, facemat);
                 }
                 return Ok(image.Length);
             }
