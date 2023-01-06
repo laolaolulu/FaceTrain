@@ -24,7 +24,7 @@ import {
   UploadProps,
 } from 'antd';
 import React, { useMemo, useRef, useState } from 'react';
-import api from '@/services';
+import api from '@/services/api';
 import { UploadFile } from 'antd/es/upload';
 import { downfile } from '@/utils';
 import TestForm from './components/TestForm';

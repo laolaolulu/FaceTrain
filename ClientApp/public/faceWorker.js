@@ -1,6 +1,6 @@
-console.log('test.js load');
 let classifier;
 self.importScripts('./opencv.js');
+
 self.onmessage = async ({ data }) => {
   switch (data.action) {
     case 'init':
@@ -13,15 +13,7 @@ self.onmessage = async ({ data }) => {
         };
       }
       break;
-    case 'start':
-      //   const bitimg = await self.createImageBitmap(data.file);
-      //   const canvas = new OffscreenCanvas(bitimg.width, bitimg.height);
-      //   const ctx = canvas.getContext('2d');
-      //   ctx.drawImage(bitimg, 0, 0);
-      //   const imgdata = ctx.getImageData(0, 0, bitimg.width, bitimg.height);
-      //   var mat = cv.matFromImageData(imgdata);
-      console.log(new Date());
-
+    case 'detection':
       const mat = new cv.Mat(data.height, data.width, cv.CV_8UC4);
       mat.data.set(new Uint8Array(data.buffer));
       const faces = new cv.RectVector();
@@ -39,32 +31,14 @@ self.onmessage = async ({ data }) => {
         });
       faces.delete();
       mat.delete();
-
-      if (data.name == 'video-lp-img') {
-        if (resdata.length > 0) {
-          self.postMessage(
-            {
-              action: 'res',
-              name: data.name,
-              data: resdata,
-              buffer: data.buffer,
-            },
-            [data.buffer],
-          );
-        }
-      } else {
-        self.postMessage({ action: 'res', name: data.name, data: resdata });
-      }
-
+      self.postMessage({ action: 'res', name: data.name, data: resdata });
       break;
-
     default:
       break;
   }
 };
 const onloadCallback = () => {
-  const faceCascadeFile = 'haarcascade_frontalface_alt2.xml';
-  const url = './' + faceCascadeFile;
+  const url = 'haarcascade_frontalface_alt2.xml';
   classifier = new cv.CascadeClassifier();
   const request = new XMLHttpRequest();
   request.open('GET', url, true);
@@ -74,7 +48,7 @@ const onloadCallback = () => {
       if (request.status === 200) {
         const data = new Uint8Array(request.response);
         cv.FS_createDataFile('/', url, data, true, false, false);
-        classifier.load(faceCascadeFile);
+        classifier.load(url);
       } else {
         console.error('Failed to load ' + url + ' status: ' + request.status);
       }

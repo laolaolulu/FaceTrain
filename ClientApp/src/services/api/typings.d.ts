@@ -1,4 +1,4 @@
-declare namespace API1 {
+declare namespace API {
   type deleteFaceDelModelParams = {
     fileName: string;
   };

@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenCvSharp;
 using OpenCvSharp.Face;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using System.Text.Json;
 
 namespace FaceTrain.Controllers
 {
@@ -36,7 +38,7 @@ namespace FaceTrain.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpPut]
-        public IActionResult Train([FromForm] string[] label, string type = "LBPH")
+        public IActionResult Train(string[] label, string? type = "LBPH")
         {
             using var ctx = new AppDbContext();
             var labels = ctx.UserInfos.Select(s => new
@@ -98,12 +100,15 @@ namespace FaceTrain.Controllers
         [HttpPut]
         // [ProducesResponseType(typeof(IEnumerable<(string name, int label, double confidence, string msg)>), 200)]
         //  [ProducesResponseType(typeof(IEnumerable<A>), 200)]
-        public ActionResult<IEnumerable<PredictRes>> Predict([Required] IFormFile[] image, string model = "")
+        public ActionResult<IEnumerable<PredictRes>> Predict([Required] IFormFile[] image, string? model = null)
         {
             var imgurl = "wwwroot/Model/";
-            if (model == "")
+            if (model == null)
             {
-                var namemodels = Directory.GetFiles(imgurl).LastOrDefault();
+                var namemodels = Directory.GetFiles(imgurl)
+                    .Select(s => (time: System.IO.File.GetLastWriteTime(s), src: s))
+                    .OrderByDescending(o => o.time).FirstOrDefault().src;
+
                 if (namemodels == null)
                 {
                     return NotFound();
@@ -204,7 +209,7 @@ namespace FaceTrain.Controllers
         /// <param name="facesName"></param>
         /// <returns></returns>
         [HttpDelete]
-        public ActionResult<int> Del([FromForm] List<string> facesName, [Required] int ID)
+        public ActionResult<int> Del([Required] int ID, string[] facesName)
         {
             var res = 0;
             foreach (var name in facesName)

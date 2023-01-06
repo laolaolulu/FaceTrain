@@ -14,7 +14,10 @@ export async function postFaceAddModel(body: {}, file?: File, options?: { [key: 
     const item = (body as any)[ele];
 
     if (item !== undefined && item !== null) {
-      formData.append(ele, item);
+      formData.append(
+        ele,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+      );
     }
   });
 
@@ -29,29 +32,19 @@ export async function postFaceAddModel(body: {}, file?: File, options?: { [key: 
 /** 删除用户脸图片 DELETE /api/Face/Del */
 export async function deleteFaceDel(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API1.deleteFaceDelParams,
-  body: {
-    facesName?: string[];
-  },
+  params: API.deleteFaceDelParams,
+  body: string[],
   options?: { [key: string]: any },
 ) {
-  const formData = new FormData();
-
-  Object.keys(body).forEach((ele) => {
-    const item = (body as any)[ele];
-
-    if (item !== undefined && item !== null) {
-      formData.append(ele, item);
-    }
-  });
-
   return request<number>('/api/Face/Del', {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     params: {
       ...params,
     },
-    data: formData,
-    requestType: 'form',
+    data: body,
     ...(options || {}),
   });
 }
@@ -59,7 +52,7 @@ export async function deleteFaceDel(
 /** 删除模型 DELETE /api/Face/DelModel */
 export async function deleteFaceDelModel(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API1.deleteFaceDelModelParams,
+  params: API.deleteFaceDelModelParams,
   options?: { [key: string]: any },
 ) {
   return request<any>('/api/Face/DelModel', {
@@ -82,7 +75,7 @@ export async function getFaceGetModel(options?: { [key: string]: any }) {
 /** 人脸识别 PUT /api/Face/Predict */
 export async function putFacePredict(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API1.putFacePredictParams,
+  params: API.putFacePredictParams,
   body: {},
   image?: File[],
   options?: { [key: string]: any },
@@ -97,11 +90,14 @@ export async function putFacePredict(
     const item = (body as any)[ele];
 
     if (item !== undefined && item !== null) {
-      formData.append(ele, item);
+      formData.append(
+        ele,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+      );
     }
   });
 
-  return request<API1.PredictRes[]>('/api/Face/Predict', {
+  return request<API.PredictRes[]>('/api/Face/Predict', {
     method: 'PUT',
     params: {
       ...params,
@@ -115,31 +111,21 @@ export async function putFacePredict(
 /** 人脸模型训练 PUT /api/Face/Train */
 export async function putFaceTrain(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API1.putFaceTrainParams,
-  body: {
-    label?: string[];
-  },
+  params: API.putFaceTrainParams,
+  body: string[],
   options?: { [key: string]: any },
 ) {
-  const formData = new FormData();
-
-  Object.keys(body).forEach((ele) => {
-    const item = (body as any)[ele];
-
-    if (item !== undefined && item !== null) {
-      formData.append(ele, item);
-    }
-  });
-
   return request<any>('/api/Face/Train', {
     method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     params: {
       // type has a default value: LBPH
       type: 'LBPH',
       ...params,
     },
-    data: formData,
-    requestType: 'form',
+    data: body,
     ...(options || {}),
   });
 }

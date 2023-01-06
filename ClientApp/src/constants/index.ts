@@ -1,1 +1,1 @@
-export const faceWorker = new Worker('./test.js');
+export const faceWorker = new Worker('./faceWorker.js');

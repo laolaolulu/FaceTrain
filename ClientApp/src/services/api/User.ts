@@ -22,11 +22,14 @@ export async function postUserAdd(
     const item = (body as any)[ele];
 
     if (item !== undefined && item !== null) {
-      formData.append(ele, item);
+      formData.append(
+        ele,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+      );
     }
   });
 
-  return request<API1.UserInfo>('/api/User/Add', {
+  return request<number>('/api/User/Add', {
     method: 'POST',
     data: formData,
     requestType: 'form',
@@ -37,7 +40,7 @@ export async function postUserAdd(
 /** 添加用户人脸 POST /api/User/AddImg */
 export async function postUserAddImg(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API1.postUserAddImgParams,
+  params: API.postUserAddImgParams,
   body: {},
   image?: File[],
   options?: { [key: string]: any },
@@ -52,7 +55,10 @@ export async function postUserAddImg(
     const item = (body as any)[ele];
 
     if (item !== undefined && item !== null) {
-      formData.append(ele, item);
+      formData.append(
+        ele,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+      );
     }
   });
 
@@ -70,7 +76,7 @@ export async function postUserAddImg(
 /** 删除用户 DELETE /api/User/Del */
 export async function deleteUserDel(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API1.deleteUserDelParams,
+  params: API.deleteUserDelParams,
   options?: { [key: string]: any },
 ) {
   return request<any>('/api/User/Del', {
@@ -85,10 +91,10 @@ export async function deleteUserDel(
 /** 获取用户数据 GET /api/User/Get */
 export async function getUserGet(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API1.getUserGetParams,
+  params: API.getUserGetParams,
   options?: { [key: string]: any },
 ) {
-  return request<API1.UserInfoResPage>('/api/User/Get', {
+  return request<API.UserInfoResPage>('/api/User/Get', {
     method: 'GET',
     params: {
       // current has a default value: 1
@@ -121,7 +127,10 @@ export async function putUserPut(
     const item = (body as any)[ele];
 
     if (item !== undefined && item !== null) {
-      formData.append(ele, item);
+      formData.append(
+        ele,
+        typeof item === 'object' && !(item instanceof File) ? JSON.stringify(item) : item,
+      );
     }
   });
 

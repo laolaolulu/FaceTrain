@@ -17,7 +17,6 @@
     "@ant-design/pro-components": "^2.0.1",
     "@umijs/max": "4.0.41",
     "@umijs/max-plugin-openapi": "^2.0.0",
-    "@umijs/openapi": "^1.7.1",
     "ahooks": "^3.7.4",
     "antd": "^5.0.2",
     "ts-node": "^10.9.1"

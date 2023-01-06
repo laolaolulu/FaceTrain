@@ -16,7 +16,7 @@ export default {
   'user.faceTitle': '上传或删除人脸照片（{msg}）',
   'user.facePrompt': '未保存，放弃更改吗？',
   'user.Testing': '检测中...',
-  'user.testResult': '检测到（{count}）张人脸',
+  'user.testResult': '图片({imgcount}/{imgs}) 人脸({faces})',
   'user.notTest': '未检测到人脸',
   'user.facedelres': '删除了（{num}）张人脸',
   'user.faceaddres': '新增了（{num}）张人脸',

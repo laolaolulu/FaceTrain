@@ -16,7 +16,7 @@ export default {
   'user.faceTitle': 'Upload or delete face photos（{msg}）',
   'user.facePrompt': 'Not saved. Discard changes?',
   'user.Testing': 'Testing...',
-  'user.testResult': '（{count}）face detected',
+  'user.testResult': 'image({imgcount}/{imgs}) face({faces})',
   'user.notTest': 'No face detected',
   'user.facedelres': '（{num}）faces deleted',
   'user.faceaddres': '（{num}）faces added',

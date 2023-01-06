@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OpenCvSharp;
 using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
 namespace FaceTrain.Controllers
 {
@@ -116,6 +117,13 @@ namespace FaceTrain.Controllers
 
             ctx.UserInfos.Remove(userInfo);
             await ctx.SaveChangesAsync();
+
+            //判断如果有人脸照片也一并删除
+            var imgurl = string.Format("wwwroot/Faces/{0}", ID);
+            if (Directory.Exists(imgurl))
+            {
+                Directory.Delete(imgurl,true);
+            }
 
             return NoContent();
         }

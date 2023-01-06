@@ -16,7 +16,7 @@ import { upurls } from '../index';
 import styles from '../index.less';
 import { useIntl, getIntl } from 'umi';
 import { sleep } from '@/utils';
-import ImgCanvas from './ImgCanvas';
+import ImgCanvas from '@/components/ImgCanvas';
 
 export default (props: {
   upImg?: UpImg;
@@ -74,7 +74,7 @@ export default (props: {
           });
         }}
         beforeUpload={async (file) => {
-          const resfaces: { name: string; faces: File[] }[] = [];
+          const resfaces: NameFaces[] = [];
           const OnOk = (res: any) => {
             resfaces.push(res);
             modal.update((prevConfig) => ({

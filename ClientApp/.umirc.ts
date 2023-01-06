@@ -60,7 +60,6 @@ export default defineConfig({
   plugins: ['@umijs/max-plugin-openapi'],
   openAPI: {
     projectName: 'api',
-    namespace: 'API1',
     requestLibPath: "import { request } from 'umi'",
     schemaPath: 'https://localhost:54321/swagger/v1/swagger.json',
     mock: false,

@@ -1,4 +1,4 @@
-import api from '@/services';
+import api from '@/services/api';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, Image, Modal, UploadFile } from 'antd';
 import { useRef, useState } from 'react';
@@ -120,6 +120,7 @@ export default () => {
         headerTitle={intl.formatMessage({ id: 'user.header' })}
         actionRef={actionRef}
         rowKey="id"
+        columns={columns}
         scroll={{ y: 'calc(100vh - 310px)' }}
         search={false}
         options={{ setting: false, density: false }}
@@ -151,7 +152,6 @@ export default () => {
             total: data.total,
           };
         }}
-        columns={columns}
       />
 
       <CreateForm
@@ -213,10 +213,9 @@ export default () => {
               .map((m) => m.name);
             if (delfaces && delfaces.length > 0) {
               reqs.push(
-                api.Face.deleteFaceDel(
-                  { ID: upImg.ID },
-                  { facesName: delfaces },
-                ).then((res) => ({ type: 'del', num: res })),
+                api.Face.deleteFaceDel({ ID: upImg.ID }, delfaces).then(
+                  (res) => ({ type: 'del', num: res }),
+                ),
               );
             }
             //#endregion

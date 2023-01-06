@@ -1,6 +1,7 @@
 import {
   CheckCircleOutlined,
   LoadingOutlined,
+  PlusOutlined,
   ScanOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
@@ -13,15 +14,18 @@ import {
   Radio,
   Select,
   Upload,
+  UploadFile,
 } from 'antd';
 import { faceWorker } from '@/constants';
-import api from '@/services';
+import api from '@/services/api';
 import '../index.less';
 import { useEffect, useState } from 'react';
 import SelectCamera from './SelectCamera';
-import { useIntl } from 'umi';
+import { useIntl, getIntl } from 'umi';
 import { sleep } from '@/utils';
 import { useRequest } from '@umijs/max';
+import ImgCanvas from '@/components/ImgCanvas';
+import { RcFile } from 'antd/es/upload';
 
 let readVideo = false;
 
@@ -29,55 +33,9 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
   const { models } = props;
   const [form, setForm] = useState('Video');
   const intl = useIntl();
-  const { loading: predicting, run: Predict } = useRequest(
-    api.Face.putFacePredict,
-    {
-      manual: true,
-      onSuccess: (res, par) => {
-        const resc: any = par[3];
-        res?.forEach(
-          (element: {
-            label: number;
-            confidence: number;
-            name: string;
-            msg: string;
-          }) => {
-            const index = element.name.indexOf('_');
-            if (index > -1) {
-              const name = element.name.substring(index + 1);
-              const faceid = Number(element.name.substring(0, index));
-
-              const fmm = resc.facemsg.find((f: any) => f.name == name);
-              if (fmm) {
-                fmm.ctx.font = '20px "微软雅黑"';
-                fmm.ctx.fillStyle = 'red';
-                fmm.ctx.textBaseline = 'top';
-                fmm.ctx.fillText(
-                  `id:${element.label} c:${element.confidence.toFixed(0)}`,
-                  fmm.msg[faceid].x,
-                  fmm.msg[faceid].y,
-                );
-                fmm.ctx.fillText(
-                  element.msg,
-                  fmm.msg[faceid].x,
-                  fmm.msg[faceid].y + 20,
-                );
-              }
-            }
-          },
-        );
-
-        resc.modal.update((prevConfig: any) => ({
-          ...prevConfig,
-          title: intl.formatMessage({ id: 'model.tested' }),
-          icon: <CheckCircleOutlined />,
-        }));
-      },
-    },
-  );
 
   return (
-    <Form
+    <Form<{ from: string; model: string; imgs: UploadFile[]; camera: string }>
       labelCol={{ span: 6 }}
       style={{ marginTop: 10 }}
       initialValues={{ from: 'Video' }}
@@ -215,9 +173,63 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
             return;
           }
 
-          const files: any[] = values.imgs.fileList.filter(
-            (f: any) => f.originFileObj,
-          );
+          const resfaces: NameFaces[] = [];
+
+          const OnOk = (res: NameFaces) => {
+            resfaces.push(res);
+            modal.update((prevConfig) => ({
+              ...prevConfig,
+              title: getIntl().formatMessage(
+                { id: 'user.testResult' },
+                {
+                  faces: resfaces.flatMap((f) => f.faces).length,
+                  imgs: resfaces.length,
+                  imgcount: values.imgs.length,
+                },
+              ),
+            }));
+            if (resfaces.length == values.imgs.length) {
+              //请求后端识别
+              api.Face.putFacePredict(
+                { model: values.model },
+                {},
+                resfaces.flatMap((f) => f.faces.flatMap((f) => f.file)),
+              ).then((res) => {
+                modal.update((prevConfig) => ({
+                  ...prevConfig,
+                  icon: <CheckCircleOutlined />,
+                }));
+                resfaces.forEach((element) => {
+                  const canvas: any = document.getElementById(element.name);
+                  const ctx = canvas.getContext('2d');
+                  if (ctx) {
+                    ctx.font = '60px "微软雅黑"';
+                    ctx.fillStyle = 'rgb(253, 238, 152)';
+                    ctx.textBaseline = 'top';
+                    res
+                      .filter((f) => f.name.includes(element.name))
+                      .map((m) => {
+                        const index = m.name.indexOf('_');
+                        if (index > -1) {
+                          const faceid = m.name.substring(0, index + 1);
+                          const em = element.faces.find((f) =>
+                            f.file.name.startsWith(faceid),
+                          );
+                          if (em) {
+                            ctx.fillText(
+                              `id:${m.label} c:${m.confidence.toFixed(0)}`,
+                              em.x,
+                              em.y,
+                            );
+                            ctx.fillText(m.msg, em.x, em.y + 60);
+                          }
+                        }
+                      });
+                  }
+                });
+              });
+            }
+          };
 
           //#region 创建界面canvas显示识别结果
           const modal = Modal.info({
@@ -227,108 +239,24 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
             width: 500,
             centered: true,
             content: (
-              <Carousel infinite={false} draggable={true}>
-                {files.map((m) => (
+              <Carousel
+                style={{ display: 'grid' }}
+                infinite={false}
+                draggable={true}
+              >
+                {values.imgs.map((m) => (
                   <div key={m.uid}>
-                    <canvas
-                      id={m.name}
-                      style={{
-                        maxHeight: 400,
-                        maxWidth: '100%',
-                      }}
-                    />
+                    {m.originFileObj ? (
+                      <ImgCanvas img={m.originFileObj} onOk={OnOk} />
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 ))}
               </Carousel>
             ),
           });
           //#endregion
-
-          const facemsgasync: Promise<{
-            ctx: CanvasRenderingContext2D;
-            name: string;
-            msg: { x: number; y: number; faceFile?: File }[];
-          }>[] = files.map(async (m: any) => {
-            const img = new Image();
-            img.src = URL.createObjectURL(m.originFileObj);
-            await img.decode();
-            const mat = cv.imread(img);
-
-            cv.imshow(m.name, mat);
-            const imgcanvas: any = document.getElementById(m.name);
-            const ctx: CanvasRenderingContext2D = imgcanvas.getContext('2d');
-
-            //#region 人脸检测
-            const faces = new cv.RectVector();
-            try {
-              //   const gray = new cv.Mat();
-              //   cv.cvtColor(matimg, gray, cv.COLOR_RGBA2GRAY, 0); //灰度化
-              classifier.detectMultiScale(mat, faces, 1.1, 3, 0); //人脸检测
-              // gray.delete();
-            } catch (err) {
-              console.log(err);
-            }
-            //#endregion
-
-            //#region 将人脸裁剪储存到待识别请求集合
-            const msgasync = new Array(faces.size())
-              .fill(0)
-              .map(async (_, i) => {
-                const face = faces.get(i);
-                //画出人脸框
-                ctx.strokeRect(face.x, face.y, face.width, face.height);
-
-                //创建canvas来进行裁剪
-                const tnCanvas = document.createElement('canvas');
-                tnCanvas.width = face.width;
-                tnCanvas.height = face.height;
-                //裁剪出人脸传入后端请求识别
-                //裁剪人脸区域
-                const roi = mat.roi(
-                  new cv.Rect(face.x, face.y, face.width, face.height),
-                );
-                mat.delete();
-                cv.imshow(tnCanvas, roi);
-                //将裁剪出的图片转换为文件
-                const faceFile = await new Promise<File | undefined>(
-                  (resolve) => {
-                    tnCanvas.toBlob((blob) => {
-                      roi.delete();
-                      let file: File | undefined = undefined;
-                      if (blob) {
-                        file = new File([blob], `${i}_${m.name}`, {
-                          type: blob.type,
-                        });
-                      }
-                      resolve(file);
-                    });
-                  },
-                );
-                const res: { x: number; y: number; faceFile?: File } = {
-                  x: face.x,
-                  y: face.y,
-                  faceFile,
-                };
-                return res;
-              });
-
-            //#endregion
-            const msg = await Promise.all(msgasync);
-            faces.delete();
-            return {
-              ctx,
-              name: m.name,
-              msg,
-            };
-          });
-          const facemsg = await Promise.all(facemsgasync);
-          //获取人脸文件
-          const facefiles = facemsg
-            .flatMap((f) => f.msg)
-            .map((m) => m.faceFile)
-            .filter(Boolean) as File[];
-          //请求后端识别
-          Predict({ model: values.model }, {}, facefiles, { modal, facemsg });
         }
       }}
     >
@@ -365,17 +293,27 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
       </Form.Item>
       {form == 'Photo' ? (
         <Form.Item
-          label={intl.formatMessage({ id: 'model.selectImgLabel' })}
+          //  label={intl.formatMessage({ id: 'model.selectImgLabel' })}
           name="imgs"
-          valuePropName="img"
+          valuePropName="fileList"
+          getValueFromEvent={(e) => {
+            if (Array.isArray(e)) {
+              return e;
+            }
+            return e?.fileList;
+          }}
         >
           <Upload
-            listType="picture"
             multiple={true}
+            onPreview={undefined}
             beforeUpload={() => false}
             className="upload-list-inline"
+            listType="picture-card"
           >
-            <Button icon={<UploadOutlined />}>Upload</Button>
+            <div>
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>Upload</div>
+            </div>
           </Upload>
         </Form.Item>
       ) : (
@@ -387,7 +325,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
         </Form.Item>
       )}
       <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-        <Button loading={predicting} type="primary" htmlType="submit">
+        <Button type="primary" htmlType="submit">
           {intl.formatMessage({ id: 'model.test' })}
         </Button>
       </Form.Item>
