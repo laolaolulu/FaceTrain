@@ -70,6 +70,7 @@ export default () => {
       header={{
         title: intl.formatMessage({ id: 'model.title' }),
       }}
+      childrenContentStyle={{ padding: '0 10px' }}
     >
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12} xxl={16}>

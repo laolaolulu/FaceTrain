@@ -47,10 +47,10 @@ app.UseSpaStaticFiles();
 
 if (app.Environment.IsDevelopment())
 {
-    //app.UseSpa(spa =>
-    //{
-    //    spa.Options.SourcePath = "ClientApp";
-    //});
+    app.UseSpa(spa =>
+    {
+        spa.Options.SourcePath = "ClientApp";
+    });
 }
 
 

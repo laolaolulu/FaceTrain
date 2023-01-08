@@ -39,19 +39,19 @@ export default () => {
       title: intl.formatMessage({ id: 'user.name' }),
       dataIndex: 'userName',
       valueType: 'text',
-      width: 120,
+      // width: 120,
     },
     {
       title: intl.formatMessage({ id: 'user.phone' }),
       dataIndex: 'phone',
       valueType: 'text',
-      width: 120,
+      //width: 120,
     },
     {
       title: intl.formatMessage({ id: 'user.handle' }),
       dataIndex: 'option',
       valueType: 'option',
-      width: 160,
+      //  width: 160,
       render: (_, record, __, action) => (
         <>
           <a
@@ -117,12 +117,14 @@ export default () => {
   return (
     <>
       <ProTable<API.UserInfo>
+        tableLayout="auto"
         headerTitle={intl.formatMessage({ id: 'user.header' })}
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
-        scroll={{ y: 'calc(100vh - 310px)' }}
+        scroll={{ y: 'calc(100vh - 280px)', x: 700 }}
         search={false}
+        cardBordered
         options={{ setting: false, density: false }}
         toolBarRender={() => [
           <Button

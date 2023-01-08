@@ -21,6 +21,7 @@ export const layout = () => {
     //fixedHeader: true,
     fixSiderbar: true,
     layout: 'mix',
+    contentStyle: { padding: '0' },
     // splitMenus: true,
     actionsRender: () => {
       return [
