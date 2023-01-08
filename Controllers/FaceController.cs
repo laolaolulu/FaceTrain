@@ -1,5 +1,7 @@
 ﻿using FaceTrain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Classification;
+using NuGet.Packaging;
 using OpenCvSharp;
 using OpenCvSharp.Face;
 using System;
@@ -96,18 +98,19 @@ namespace FaceTrain.Controllers
         /// </summary>
         /// <param name="image"></param>
         /// <param name="model"></param>
+        /// <param name="isface">是否为人脸区域图片</param>
+        ///  [ProducesResponseType(typeof(IEnumerable<(string name, int label, double confidence, string msg)>), 200)]
+        ///  [ProducesResponseType(typeof(IEnumerable<A>), 200)]
         /// <returns></returns>
         [HttpPut]
-        // [ProducesResponseType(typeof(IEnumerable<(string name, int label, double confidence, string msg)>), 200)]
-        //  [ProducesResponseType(typeof(IEnumerable<A>), 200)]
-        public ActionResult<IEnumerable<PredictRes>> Predict([Required] IFormFile[] image, string? model = null)
+        public ActionResult<IEnumerable<PredictRes>> Predict([Required] IFormFile[] image, string? model = null, bool? isface = true)
         {
             var imgurl = "wwwroot/Model/";
             if (model == null)
             {
                 var namemodels = Directory.GetFiles(imgurl)
-                    .Select(s => (time: System.IO.File.GetLastWriteTime(s), src: s))
-                    .OrderByDescending(o => o.time).FirstOrDefault().src;
+                    .Select(s => new { time = System.IO.File.GetLastWriteTime(s), src = s })
+                    .OrderByDescending(o => o.time).FirstOrDefault()?.src;
 
                 if (namemodels == null)
                 {
@@ -136,32 +139,53 @@ namespace FaceTrain.Controllers
                 }
 
                 recognizer.Read(imgurl + model);
-                List<Task<PredictRes>> ts = new();
+                List<Task<List<PredictRes>>> ts = new();
                 foreach (var item in image)
                 {
-                    var t = Task.Run<PredictRes>(() =>
+                    var t = Task.Run(() =>
                       {
                           var facemat = Mat.FromStream(item.OpenReadStream(), ImreadModes.Grayscale);
-                          if (model.StartsWith("Eigen_") || model.StartsWith("Fisher_"))
-                          {
-                              facemat = facemat.Resize(new Size(200, 200));
-                          }
-                          recognizer.Predict(facemat, out int label, out double confidence);
-                          facemat.Dispose();
-                          string msg = Encoding.Default.GetString(Convert.FromBase64String(recognizer.GetLabelInfo(label)));
 
-                          return new PredictRes() { Name = item.FileName, Label = label, Confidence = confidence, Msg = msg };
+                          if (isface == false)
+                          {
+                              var faces = Tool.Classifier.DetectMultiScale(facemat);
+                              List<PredictRes> reslist = new();
+                              for (int i = 0; i < faces.Length; i++)
+                              {
+                                using  Mat face = facemat[faces[i]];
+                                  reslist.Add(PredictHelp(recognizer, face, model, string.Format("{0}_{1}", i, item.FileName), faces[i].X, faces[i].Y, faces[i].Width, faces[i].Height));
+                              }
+                              return reslist;
+                          }
+                          else
+                          {
+                              return new List<PredictRes>() { PredictHelp(recognizer, facemat, model, item.FileName) };
+                          }
+
                       });
                     ts.Add(t);
                 }
                 Task.WaitAll(ts.ToArray());
                 recognizer.Dispose();
-                return Ok(ts.Select(s => s.Result));
+                return Ok(ts.SelectMany(s => s.Result));
             }
             else
             {
                 return NotFound();
             }
+        }
+
+        PredictRes PredictHelp(FaceRecognizer recognizer, Mat facemat, string model, string name, int? x = null, int? y = null, int? width = null, int? height = null)
+        {
+            if (model.StartsWith("Eigen_") || model.StartsWith("Fisher_"))
+            {
+                facemat = facemat.Resize(new Size(200, 200));
+            }
+            recognizer.Predict(facemat, out int label, out double confidence);
+            facemat.Dispose();
+            string msg = Encoding.Default.GetString(Convert.FromBase64String(recognizer.GetLabelInfo(label)));
+
+            return new PredictRes() { Name = name, Label = label, Confidence = confidence, Msg = msg, X = x, Y = y, Width = width, Height = height };
         }
 
         /// <summary>
@@ -238,5 +262,10 @@ namespace FaceTrain.Controllers
         public double Confidence { get; set; }
         [Required]
         public string Msg { get; set; } = "";
+
+        public int? X { get; set; }
+        public int? Y { get; set; }
+        public int? Width { get; set; }
+        public int? Height { get; set; }
     }
 }

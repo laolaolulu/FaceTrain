@@ -1,10 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using OpenCvSharp;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace FaceTrain
 {
     public class Tool
     {
+        /// <summary>
+        /// 人脸检测级联分类器
+        /// </summary>
+        public static CascadeClassifier Classifier = new ("wwwroot/Haar/haarcascade_frontalface_alt2.xml");
     }
 
    

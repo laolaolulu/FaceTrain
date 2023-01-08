@@ -47,6 +47,7 @@ export const layout = () => {
 export const request: RequestConfig = {
   errorConfig: {
     errorHandler: (error: any) => {
+      console.log(error);
       Modal.error({
         title: `${getIntl().formatMessage({ id: 'error' })}:${
           error.response.status

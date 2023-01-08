@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OpenCvSharp;
+using OpenCvSharp.Face;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Xml.Linq;
 
 namespace FaceTrain.Controllers
@@ -122,7 +124,7 @@ namespace FaceTrain.Controllers
             var imgurl = string.Format("wwwroot/Faces/{0}", ID);
             if (Directory.Exists(imgurl))
             {
-                Directory.Delete(imgurl,true);
+                Directory.Delete(imgurl, true);
             }
 
             return NoContent();
@@ -132,10 +134,12 @@ namespace FaceTrain.Controllers
         /// </summary>
         /// <param name="ID">用户id</param>
         /// <param name="image">人脸</param>
+        /// <param name="isface">是否为人脸区域图片</param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult AddImg([Required] int ID, [Required] IFormFile[] image, bool update = false)
+        public IActionResult AddImg([Required] int ID, [Required] IFormFile[] image, bool? isface = true)
         {
+            int count = 0;
             if (UserInfoExists(ID))
             {
                 var imgurl = string.Format("wwwroot/Faces/{0}", ID);
@@ -146,11 +150,26 @@ namespace FaceTrain.Controllers
                 var dtstr = DateTime.Now.ToString("yyyyMMddHHmmssfff");
                 for (int i = 0; i < image.Length; i++)
                 {
-                    var path = string.Format("{0}/{1}-{2}.{3}", imgurl, dtstr, i, image[i].ContentType.Substring(6));
+                    var path = string.Format("{0}-{1}.{2}", dtstr, i, image[i].ContentType.Substring(6));
                     using var facemat = Mat.FromStream(image[i].OpenReadStream(), ImreadModes.Color);
-                    Cv2.ImWrite(path, facemat);
+                    if (isface == false)
+                    {
+                        var faces = Tool.Classifier.DetectMultiScale(facemat);
+                        for (int Index = 0; Index < faces.Length; Index++)
+                        {
+                            using Mat face = facemat[faces[Index]];
+                            Cv2.ImWrite(string.Format("{0}/{1}_{2}", imgurl, Index, path), face);
+                            count++;
+                        }
+
+                    }
+                    else
+                    {
+                        Cv2.ImWrite(string.Format("{0}/{1}", imgurl, path), facemat);
+                        count++;
+                    }
                 }
-                return Ok(image.Length);
+                return Ok(count);
             }
             else
             {

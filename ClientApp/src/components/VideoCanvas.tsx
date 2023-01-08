@@ -1,15 +1,13 @@
 import { useEffect, useRef } from 'react';
-import { faceWorker } from '@/constants';
-import { RcFile } from 'antd/es/upload';
 
-export default (props: { img: RcFile; onOk: (resface: NameFaces) => void }) => {
+export default (props: { img: File; onOk: (resface: NameFaces) => void }) => {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     if (ref.current) {
-      const ctx = ref.current.getContext('2d', { willReadFrequently: true });
+      const faceWorker = new Worker('./faceWorker.js');
       const faceRes = async (res: any) => {
         //识别完成
-        if (res.data.action == 'res' && res.data.name == props.img.uid && ctx) {
+        if (res.data.action == 'res' && res.data.name == props.img.name) {
           faceWorker.removeEventListener('message', faceRes);
           const data: {
             x: number;
@@ -19,7 +17,7 @@ export default (props: { img: RcFile; onOk: (resface: NameFaces) => void }) => {
           }[] = res.data.data;
 
           const filexy = data.map((face, i) => {
-            const faceimg = ctx.getImageData(
+            const faceimg = ctx?.getImageData(
               face.x,
               face.y,
               face.width,
@@ -42,40 +40,47 @@ export default (props: { img: RcFile; onOk: (resface: NameFaces) => void }) => {
           });
           const faces = await Promise.all(filexy);
           props.onOk({ name: props.img.name, faces });
-
-          ctx.lineWidth = 10;
-          ctx.strokeStyle = 'deepskyblue';
+          if (ctx) {
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = 'deepskyblue';
+          }
 
           data.forEach((face) => {
-            ctx.strokeRect(face.x, face.y, face.width, face.height);
+            ctx?.strokeRect(face.x, face.y, face.width, face.height);
           });
+        } else if (res.data.action == 'initok') {
+          const imgbit = await imgbitasy;
+          if (ctx) {
+            const buffer = ctx.getImageData(0, 0, imgbit.width, imgbit.height)
+              .data.buffer;
+            faceWorker.postMessage(
+              {
+                action: 'detection',
+                name: props.img.name,
+                buffer,
+                width: imgbit.width,
+                height: imgbit.height,
+              },
+              [buffer],
+            );
+          }
         }
       };
+      faceWorker.addEventListener('message', faceRes);
 
-      createImageBitmap(props.img).then((imgbit) => {
+      const ctx = ref.current.getContext('2d');
+
+      const imgbitasy = createImageBitmap(props.img).then((imgbit) => {
         if (ref.current && ctx) {
           ref.current.width = imgbit.width;
           ref.current.height = imgbit.height;
           ctx.drawImage(imgbit, 0, 0);
-
-          const buffer = ctx.getImageData(0, 0, imgbit.width, imgbit.height)
-            .data.buffer;
-          faceWorker.addEventListener('message', faceRes);
-          faceWorker.postMessage(
-            {
-              action: 'detection',
-              name: props.img.uid,
-              buffer,
-              width: imgbit.width,
-              height: imgbit.height,
-            },
-            [buffer],
-          );
         }
+        return imgbit;
       });
 
       return () => {
-        faceWorker.removeEventListener('message', faceRes);
+        faceWorker.terminate();
       };
     }
   }, []);

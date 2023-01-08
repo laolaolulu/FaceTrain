@@ -6,7 +6,7 @@
 Migrations/
 imgtest/
 wwwroot/dist/
-wwwroot/Model/
+wwwroot/Model/*
 *.db-shm
 *.db-wal
 

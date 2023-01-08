@@ -293,9 +293,9 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
       </Form.Item>
       {form == 'Photo' ? (
         <Form.Item
-          //  label={intl.formatMessage({ id: 'model.selectImgLabel' })}
           name="imgs"
           valuePropName="fileList"
+          style={{ maxHeight: 220, overflowY: 'auto' }}
           getValueFromEvent={(e) => {
             if (Array.isArray(e)) {
               return e;
@@ -306,7 +306,9 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
           <Upload
             multiple={true}
             onPreview={undefined}
+            maxCount={10}
             beforeUpload={() => false}
+            showUploadList={{ showPreviewIcon: false }}
             className="upload-list-inline"
             listType="picture-card"
           >
@@ -324,7 +326,7 @@ export default (props: { models: API.UpFaceUrl[] | undefined }) => {
           <SelectCamera />
         </Form.Item>
       )}
-      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+      <Form.Item style={{ textAlign: 'center' }}>
         <Button type="primary" htmlType="submit">
           {intl.formatMessage({ id: 'model.test' })}
         </Button>
