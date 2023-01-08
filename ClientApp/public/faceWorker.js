@@ -23,6 +23,8 @@ cv['onRuntimeInitialized'] = () => {
 self.onmessage = async ({ data }) => {
   switch (data.action) {
     case 'detection':
+      console.log('start ' + data.name + ' ' + new Date());
+
       const mat = new cv.matFromArray(
         data.height,
         data.width,
@@ -45,7 +47,9 @@ self.onmessage = async ({ data }) => {
         });
       faces.delete();
       mat.delete();
+      console.log('end ' + data.name + ' ' + new Date());
       self.postMessage({ action: 'res', name: data.name, data: resdata });
+
       break;
     default:
       break;
