@@ -21,6 +21,9 @@ export default (props: {
           }
 
           return stream;
+        })
+        .catch((error) => {
+          console.log(error);
         });
 
       refvideo.current.addEventListener('canplay', () => {
@@ -200,7 +203,7 @@ export default (props: {
 
       return () => {
         stream.then((res) => {
-          res.getVideoTracks().forEach((element) => {
+          res?.getVideoTracks().forEach((element) => {
             element.stop();
           });
           faceWorker.removeEventListener('message', faceRes);

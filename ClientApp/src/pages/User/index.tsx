@@ -122,7 +122,7 @@ export default () => {
         actionRef={actionRef}
         rowKey="id"
         columns={columns}
-        scroll={{ y: 'calc(100vh - 280px)', x: 700 }}
+        scroll={{ y: 'calc(100vh - 280px)' }}
         search={false}
         cardBordered
         options={{ setting: false, density: false }}

@@ -53,7 +53,7 @@ export default () => {
       init();
     },
   });
-  const models: API.UpFaceUrl[] | undefined = useMemo(() => {
+  const models: UpFaceUrl[] | undefined = useMemo(() => {
     if (data) {
       return data.map((m: string, index: number) => ({
         uid: index.toString(),

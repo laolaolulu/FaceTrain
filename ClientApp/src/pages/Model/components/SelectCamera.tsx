@@ -8,7 +8,11 @@ export default (props: any) => {
   useEffect(() => {
     //注意第一次没有权限获取不到id
     navigator.mediaDevices.enumerateDevices().then((devices) => {
-      setCameras(devices.filter((item) => item.kind == 'videoinput'));
+      const ds = devices.filter((item) => item.kind == 'videoinput');
+      if (ds.length > 0) {
+        setCameras(ds);
+        props.onChange(ds[0].deviceId);
+      }
     });
   }, []);
 
@@ -16,6 +20,7 @@ export default (props: any) => {
     <Select
       onChange={props.onChange}
       placeholder={intl.formatMessage({ id: 'model.video.placeholder' })}
+      //  value={cameras && cameras.length > 0 ? cameras[0].deviceId : undefined}
     >
       {cameras?.map((m) => (
         <Select.Option key={m.deviceId} value={m.deviceId}>

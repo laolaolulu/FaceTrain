@@ -10,11 +10,11 @@ declare global {
   //     urls: UpFaceUrl[];
   //   };
 
-  //   type UpFaceUrl = {
-  //     name: string;
-  //     url: string;
-  //     uid: string;
-  //   };
+  type UpFaceUrl = {
+    name?: string;
+    url?: string;
+    uid: string;
+  };
   type UpImg = {
     /** 车库ID */
     ID: number;
