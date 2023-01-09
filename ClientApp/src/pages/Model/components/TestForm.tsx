@@ -323,6 +323,7 @@ export default (props: { models: UpFaceUrl[] | undefined }) => {
                 accept="image/*"
                 className="upload-list-inline"
                 listType="picture-card"
+                // buttonProps={{}}
                 fieldProps={{
                   multiple: true,
                   maxCount: 10,
@@ -330,10 +331,10 @@ export default (props: { models: UpFaceUrl[] | undefined }) => {
                   showUploadList: { showPreviewIcon: false },
                 }}
               >
-                <div>
+                {/* <div>
                   <PlusOutlined />
                   <div style={{ marginTop: 8 }}>Upload</div>
-                </div>
+                </div> */}
               </ProFormUploadButton>
             );
           }
