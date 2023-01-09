@@ -1,7 +1,7 @@
 import api from '@/services/api';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, Image, Modal, UploadFile } from 'antd';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import EditImgForm from './components/EditImgForm';
 import { urltoFile } from '@/utils/opencv';
