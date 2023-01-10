@@ -25,10 +25,9 @@ namespace FaceTrain.Controllers
         [HttpGet]
         public IEnumerable<string> GetModel()
         {
-            //  using var ctx = new AppDbContext();
-            // int total = ctx.UserInfos.Count();
-            var models =
-                  Directory.GetFiles("wwwroot/Model/").Select(s => Request.Scheme + "://" + Request.Host.Value + s.TrimStart("wwwroot".ToArray()));
+            var models = Directory.GetFiles("wwwroot/Model/")
+                    .Select(s => new { time = System.IO.File.GetLastWriteTime(s), src = Request.Scheme + "://" + Request.Host.Value + s.TrimStart("wwwroot".ToArray()) })
+                    .OrderByDescending(o => o.time).Select(s=>s.src);         
 
             return models;
         }

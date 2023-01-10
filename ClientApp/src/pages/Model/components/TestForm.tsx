@@ -41,19 +41,23 @@ type TestForm = {
 
 export default (props: { models: UpFaceUrl[] | undefined }) => {
   const { models } = props;
-  const [form, setForm] = useState('Photo');
+  const [form] = Form.useForm();
   const intl = useIntl();
 
-  const ref = useRef();
+  useEffect(() => {
+    if (models && models.length > 0) {
+      form.setFieldValue('model', models[0].name);
+    }
+  }, [models]);
 
   return (
     <ProForm<TestForm>
-      //</ProForm></ProForm> form={ref}
+      form={form}
+      layout={'horizontal'}
       labelCol={{ span: 6 }}
       style={{ marginTop: 10 }}
       initialValues={{
         from: 'Video',
-        // model: models[0].name,
       }}
       onValuesChange={(values) => {
         // console.log(values);
@@ -229,6 +233,7 @@ export default (props: { models: UpFaceUrl[] | undefined }) => {
 
       <ProFormRadio.Group
         name="from"
+        rules={[{ required: true }]}
         label={intl.formatMessage({ id: 'model.fromLabel' })}
         options={[
           {
@@ -323,19 +328,14 @@ export default (props: { models: UpFaceUrl[] | undefined }) => {
                 accept="image/*"
                 className="upload-list-inline"
                 listType="picture-card"
-                // buttonProps={{}}
+                title={<div>Upload</div>}
                 fieldProps={{
                   multiple: true,
                   maxCount: 10,
                   beforeUpload: () => false,
                   showUploadList: { showPreviewIcon: false },
                 }}
-              >
-                {/* <div>
-                  <PlusOutlined />
-                  <div style={{ marginTop: 8 }}>Upload</div>
-                </div> */}
-              </ProFormUploadButton>
+              ></ProFormUploadButton>
             );
           }
         }}
