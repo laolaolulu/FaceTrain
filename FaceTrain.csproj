@@ -33,6 +33,7 @@
 		<Folder Include="wwwroot\Model\" />
 		<Folder Include="Resource\" />
 		<Folder Include="wwwroot\Haar\" />
+		<Folder Include="docs\" />
 	</ItemGroup>
 
 	<ItemGroup>

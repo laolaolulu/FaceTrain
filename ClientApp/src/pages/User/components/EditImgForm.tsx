@@ -28,7 +28,9 @@ export default (props: {
 
   const [upfile, setUpfile] = useState<RcFile[]>();
   useEffect(() => {}, [upfile]);
-  const ImgOk = () => {};
+  const ImgOk = (res: any) => {
+    console.log(res);
+  };
 
   return (
     <>
@@ -307,10 +309,17 @@ export default (props: {
         closable={true}
         centered={true}
         open={upfile ? true : false}
+        bodyStyle={{ textAlign: 'center' }}
         title={
           <>
-            <ScanOutlined />
-            {intl.formatMessage({ id: 'user.Testing' })}
+            <ScanOutlined style={{ marginRight: 10 }} />
+            {/* {intl.formatMessage(
+                { id: 'user.testResult' },
+                {
+                  faces: upfile.flatMap((f) => f.faces).length,
+                  imgs: upfile.length,
+                  imgcount: values.imgs.length,
+                })} */}
           </>
         }
         onCancel={() => {
