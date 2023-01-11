@@ -39,7 +39,8 @@ export default () => {
     },
   });
 
-  const { data, run: init } = useRequest(api.Face.getFaceGetModel);
+  const { data, run: init } = useRequest(api.Face.getFaceGetModel,{onBefore:()=>{return ''}});
+
   const { run: Add } = useRequest(api.Face.postFaceAddModel, {
     manual: true,
     onSuccess: () => {
