@@ -8,7 +8,15 @@ import {
   UploadOutlined,
   VideoCameraAddOutlined,
 } from '@ant-design/icons';
-import { Carousel, Divider, Modal, Upload, UploadFile } from 'antd';
+import {
+  Carousel,
+  Divider,
+  message,
+  Modal,
+  Select,
+  Upload,
+  UploadFile,
+} from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { faceWorker } from '@/constants';
@@ -17,6 +25,7 @@ import styles from '../index.less';
 import { useIntl, getIntl } from 'umi';
 import { sleep } from '@/utils';
 import ImgCanvas from '@/components/ImgCanvas';
+import VideoCanvas from '@/components/VideoCanvas';
 
 export default (props: {
   upImg?: UpImg;
@@ -115,145 +124,83 @@ export default (props: {
             <UploadOutlined />
             <Divider type="vertical" style={{ margin: 0 }} />
             <VideoCameraAddOutlined
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.stopPropagation();
-
-                let readVideo = false;
-                const modal = Modal.info({
-                  title: intl.formatMessage({ id: 'user.Testing' }),
-                  icon: <ScanOutlined />,
-                  closable: true,
-                  centered: true,
-                  content: (
-                    <video
-                      id="video"
-                      style={{
-                        maxWidth: '100%',
-                        height: '100%',
-                      }}
-                    ></video>
-                  ),
-                  afterClose: () => {
-                    readVideo = false;
-                  },
-                });
-
-                navigator.mediaDevices
-                  .getUserMedia({
-                    video: true,
-                    audio: false,
-                  })
-                  .then(async (stream) => {
-                    const video: any = document.getElementById('video');
-                    video.srcObject = stream;
-                    video.addEventListener('canplay', () => {
-                      video.height = video.videoHeight;
-                      video.width = video.videoWidth;
-
-                      const faceRes = async (res: any) => {
-                        //识别完成
-                        if (
-                          res.data.action == 'res' &&
-                          res.data.name == 'video-lp-img'
-                        ) {
-                          readVideo = false;
-                          faceWorker.removeEventListener('message', faceRes);
-
-                          const data: {
-                            x: number;
-                            y: number;
-                            width: number;
-                            height: number;
-                          }[] = res.data.data;
-
-                          modal.update((prevConfig) => ({
-                            ...prevConfig,
-                            title: getIntl().formatMessage(
-                              { id: 'user.testResult' },
-                              { count: data.length },
-                            ),
-                            icon: <CheckCircleOutlined />,
+                const deviceId = await new Promise<string | undefined>(
+                  (resolve) => {
+                    navigator.mediaDevices
+                      .enumerateDevices()
+                      .then((devices) => {
+                        const voides = devices
+                          .filter((item) => item.kind == 'videoinput')
+                          .map((m) => ({
+                            key: m.deviceId,
+                            label: m.label,
+                            value: m.deviceId,
                           }));
-
-                          setTimeout(() => {
-                            modal.destroy();
-                          }, 600);
-
-                          const imageData = new ImageData(
-                            new Uint8ClampedArray(res.data.buffer),
-                            video.width,
-                            video.height,
-                          );
-                          ctx.putImageData(imageData, 0, 0);
-
-                          const blobs: Promise<File>[] = data.map((face) => {
-                            const faceimg = ctx.getImageData(
-                              face.x,
-                              face.y,
-                              face.width,
-                              face.height,
-                            );
-                            const facecanvas: any = new OffscreenCanvas(
-                              face.width,
-                              face.height,
-                            );
-                            const facectx = facecanvas.getContext('2d');
-                            facectx.putImageData(faceimg, 0, 0);
-                            return facecanvas.convertToBlob();
-                          });
-                          const faces = await Promise.all(blobs);
-                          if (upImg) {
-                            const fileList = [...upImg.urls];
-                            faces.forEach((facef, index) => {
-                              fileList.push({
-                                uid: `rc-upload-${Date.now().toString()}-${index}`,
-                                name: 'item.name',
-                                originFileObj: facef as RcFile,
-                              });
-                            });
-                            setUpImg({ ...upImg, urls: fileList });
-                          }
-                        }
-                      };
-                      faceWorker.addEventListener('message', faceRes);
-
-                      const imgcanvas: any = new OffscreenCanvas(
-                        video.width,
-                        video.height,
-                      );
-                      const ctx = imgcanvas.getContext('2d');
-
-                      new Promise(async () => {
-                        readVideo = true;
-                        while (readVideo) {
-                          await sleep(200);
-                          //将视频当前帧读取到src
-                          ctx.drawImage(video, 0, 0, video.width, video.height);
-                          let buffer = ctx.getImageData(
-                            0,
-                            0,
-                            video.width,
-                            video.height,
-                          ).data.buffer;
-                          faceWorker.postMessage(
-                            {
-                              action: 'start',
-                              name: 'video-lp-img',
-                              buffer,
-                              width: video.width,
-                              height: video.height,
+                        if (voides.length > 1) {
+                          const modal = Modal.info({
+                            title: intl.formatMessage({
+                              id: 'user.selectvideo',
+                            }),
+                            width: 300,
+                            closable: true,
+                            centered: true,
+                            okButtonProps: { style: { display: 'none' } },
+                            content: (
+                              <Select
+                                style={{ marginTop: 10, width: '100%' }}
+                                placeholder={intl.formatMessage({
+                                  id: 'user.selectvideo',
+                                })}
+                                options={voides}
+                                onChange={(res) => {
+                                  modal.destroy();
+                                  resolve(res);
+                                }}
+                              />
+                            ),
+                            onCancel: () => {
+                              resolve(undefined);
                             },
-                            [buffer],
-                          );
+                          });
+                        } else {
+                          resolve(voides[0]?.value);
                         }
-                        stream.getVideoTracks().forEach((element) => {
-                          element.stop();
-                        });
+                      })
+                      .catch(() => {
+                        resolve(undefined);
                       });
-                    });
-
-                    video.play();
+                  },
+                );
+                if (deviceId) {
+                  const modal = Modal.info({
+                    title: intl.formatMessage({ id: 'user.Testing' }),
+                    icon: <ScanOutlined />,
+                    closable: true,
+                    centered: true,
+                    content: (
+                      <VideoCanvas
+                        camera={deviceId}
+                        onOk={(resface: NameFaces) => {
+                          if (upImg && resface.faces.length > 0) {
+                            modal.destroy();
+                            const urls: UploadFile[] = upImg.urls.concat(
+                              resface.faces.map((m) => ({
+                                uid: 'rc-upload-' + m.file.name,
+                                name: m.file.name,
+                                originFileObj: m.file as RcFile,
+                              })),
+                            );
+                            setUpImg({ ...upImg, urls });
+                          }
+                        }}
+                      />
+                    ),
                   });
+                } else {
+                  message.warning(intl.formatMessage({ id: 'user.novideo' }));
+                }
               }}
             />
           </div>

@@ -219,12 +219,16 @@ export default (props: { models: UpFaceUrl[] | undefined }) => {
               <ProFormSelect
                 name="camera"
                 label={intl.formatMessage({ id: 'model.videoValue' })}
-                rules={[{ required: true }]}
+                rules={[
+                  {
+                    required: true,
+                    message: intl.formatMessage({ id: 'user.selectvideo' }),
+                  },
+                ]}
                 placeholder={intl.formatMessage({
                   id: 'model.video.placeholder',
                 })}
                 request={async () => {
-                  console.log('加载camera=request');
                   const data = await navigator.mediaDevices
                     .enumerateDevices()
                     .then((devices) => {

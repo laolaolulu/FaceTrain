@@ -21,6 +21,8 @@ export default {
   'user.facedelres': '（{num}）faces deleted',
   'user.faceaddres': '（{num}）faces added',
   'user.facetimeout': 'Face detection timeout',
+  'user.selectvideo': 'Please select a camera',
+  'user.novideo': 'No camera',
 
   'model.title': 'Model management',
   'model.train': 'Train',

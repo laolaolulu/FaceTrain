@@ -21,6 +21,8 @@ export default {
   'user.facedelres': '删除了（{num}）张人脸',
   'user.faceaddres': '新增了（{num}）张人脸',
   'user.facetimeout': '人脸检测超时',
+  'user.selectvideo': '请选择摄像头',
+  'user.novideo': '没有摄像头',
 
   'model.title': '模型管理',
   'model.train': '训练',
