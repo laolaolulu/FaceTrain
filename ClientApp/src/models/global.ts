@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 export default () => {
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then((dev) => {
-      console.log(dev);
       if (
         dev.length == 0 ||
         !dev.find((f) => f.deviceId && f.kind == 'videoinput')
