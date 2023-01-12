@@ -26,10 +26,17 @@ export default (props: {
   const intl = useIntl();
   const { upImg, setUpImg, onOk } = props;
 
-  const [upfile, setUpfile] = useState<RcFile[]>();
-  useEffect(() => {}, [upfile]);
+  const [upfile, setUpfile] = useState<{ file: RcFile; faces?: File[] }[]>();
+
   const ImgOk = (res: any) => {
-    console.log(res);
+    setUpfile((files) => {
+      const upm = files?.find((f) => f.file.name == res.name);
+      if (upm && files) {
+        upm.faces = res.faces.map((m: any) => m.file);
+        return [...files];
+      }
+      return files;
+    });
   };
 
   return (
@@ -83,67 +90,14 @@ export default (props: {
               content: <img width={300} src={file.url} />,
             });
           }}
-          beforeUpload={async (_, files) => {
-            setUpfile(files);
-            //   const resfaces: NameFaces[] = [];
-            //   const OnOk = (res: any) => {
-            //     resfaces.push(res);
-            //     modal.update((prevConfig) => ({
-            //       ...prevConfig,
-            //       title: getIntl().formatMessage(
-            //         { id: 'user.testResult' },
-            //         { count: resfaces.flatMap((f) => f.faces).length },
-            //       ),
-            //     }));
-            //     if (resfaces.length == 1) {
-            //       modal.update((prevConfig) => ({
-            //         ...prevConfig,
-            //         icon: <CheckCircleOutlined />,
-            //       }));
-            //     }
-            //   };
-
-            //   const modal = Modal.info({
-            //     title: intl.formatMessage({ id: 'user.Testing' }),
-            //     icon: <LoadingOutlined />,
-            //     closable: true,
-            //     width: 500,
-            //     centered: true,
-            //     content: (
-            //       <Carousel
-            //         style={{ display: 'grid' }}
-            //         infinite={false}
-            //         draggable={true}
-            //       >
-            //         {values.imgs.map((m) => (
-            //           <div key={m.uid}>
-            //             {m.originFileObj ? (
-            //               <ImgCanvas img={m.originFileObj} onOk={OnOk} />
-            //             ) : (
-            //               <></>
-            //             )}
-            //           </div>
-            //         ))}
-            //       </Carousel>
-            //     ),
-            //     //<ImgCanvas img={file} onOk={OnOk} />
-            //     onOk: async () => {
-            //       if (upImg && resfaces.length == 1) {
-            //         const fileList = [...upImg.urls];
-            //         resfaces.forEach((item) => {
-            //           item.faces.forEach((facef, index) => {
-            //             fileList.push({
-            //               uid: `rc-upload-${Date.now().toString()}-${index}`,
-            //               name: item.name,
-            //               originFileObj: facef as RcFile,
-            //             });
-            //           });
-            //         });
-            //         setUpImg({ ...upImg, urls: fileList });
-            //       }
-            //     },
-            //   });
-
+          beforeUpload={async (file) => {
+            setUpfile((f) => {
+              let res = [{ file }];
+              if (f) {
+                res = [...f, ...res];
+              }
+              return res;
+            });
             return false;
           }}
           onRemove={(file) => {
@@ -308,28 +262,51 @@ export default (props: {
       <Modal
         closable={true}
         centered={true}
+        destroyOnClose
         open={upfile ? true : false}
         bodyStyle={{ textAlign: 'center' }}
         title={
           <>
-            <ScanOutlined style={{ marginRight: 10 }} />
-            {/* {intl.formatMessage(
-                { id: 'user.testResult' },
-                {
-                  faces: upfile.flatMap((f) => f.faces).length,
-                  imgs: upfile.length,
-                  imgcount: values.imgs.length,
-                })} */}
+            <span style={{ color: '#1677ff', fontSize: 22, marginRight: 12 }}>
+              {upfile?.filter((f) => f.faces).length == upfile?.length ? (
+                <CheckCircleOutlined />
+              ) : (
+                <LoadingOutlined />
+              )}
+            </span>
+            {intl.formatMessage(
+              { id: 'user.testResult' },
+              {
+                faces: upfile?.flatMap((f) => f.faces).length || 0,
+                imgs: upfile?.filter((f) => f.faces).length || 0,
+                imgcount: upfile?.length || 0,
+              },
+            )}
           </>
         }
         onCancel={() => {
           setUpfile(undefined);
         }}
+        onOk={() => {
+          if (upfile && upImg) {
+            const urls: UploadFile[] = upImg.urls.concat(
+              upfile
+                .flatMap((m) => m.faces)
+                .map((m) => ({
+                  uid: 'rc-upload-' + m?.name,
+                  name: m?.name as string,
+                  originFileObj: m as RcFile,
+                })),
+            );
+            setUpImg({ ...upImg, urls });
+            setUpfile(undefined);
+          }
+        }}
       >
         <Carousel style={{ display: 'grid' }} infinite={false} draggable={true}>
           {upfile?.map((m) => (
-            <div key={m.uid}>
-              <ImgCanvas img={m} onOk={ImgOk} />
+            <div key={m.file.uid}>
+              <ImgCanvas img={m.file} onOk={ImgOk} />
             </div>
           ))}
         </Carousel>

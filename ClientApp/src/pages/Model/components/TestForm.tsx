@@ -33,6 +33,8 @@ export default (props: { models: UpFaceUrl[] | undefined }) => {
   useEffect(() => {
     if (models && models.length > 0) {
       form.setFieldValue('model', models[0].name);
+    } else {
+      form.setFieldValue('model', undefined);
     }
   }, [models]);
 
