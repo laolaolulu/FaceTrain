@@ -1,10 +1,27 @@
 // 全局共享数据示例
 import { useEffect, useState } from 'react';
-import { createFileFromUrl } from '@/utils/opencv';
-import { faceWorker } from '@/constants';
 
 export default () => {
   useEffect(() => {
+    navigator.mediaDevices.enumerateDevices().then((dev) => {
+      console.log(dev);
+      if (
+        dev.length == 0 ||
+        !dev.find((f) => f.deviceId && f.kind == 'videoinput')
+      ) {
+        //可能没有授权摄像头
+        navigator.mediaDevices
+          .getUserMedia({
+            video: true,
+          })
+          .then((res) => {
+            res.getVideoTracks().forEach((element) => {
+              element.stop();
+            });
+          });
+      }
+    });
+
     // setTimeout(() => {
     //   faceWorker.postMessage({ action: 'init' });
     // }, 10000);

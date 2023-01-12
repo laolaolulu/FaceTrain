@@ -42,88 +42,6 @@ export default (props: {
           });
           sendmsg();
         }
-
-        // imgctx.drawImage(video, 0, 0, video.width, video.height);
-        // const buffer = imgctx.getImageData(0, 0, video.width, video.height)
-        //   .data.buffer;
-        // faceWorker.postMessage(
-        //   {
-        //     action: 'detection',
-        //     name: props.camera,
-        //     buffer,
-        //     width: video.width,
-        //     height: video.height,
-        //   },
-        //   [buffer],
-        // );
-
-        // const faces = new cv.RectVector();
-        // const src = new cv.Mat(
-        //   video.videoHeight,
-        //   video.videoWidth,
-        //   cv.CV_8UC4,
-        // );
-        // const imgcanvas: any = document.getElementById('canvas');
-        // imgcanvas.width = video.videoWidth;
-        // imgcanvas.height = video.videoHeight;
-        // const ctx: CanvasRenderingContext2D = imgcanvas.getContext('2d');
-        // const cap = new cv.VideoCapture(video);
-
-        // new Promise(async () => {
-        //   //   readVideo = true;
-        //   //   while (readVideo) {
-        //   //     await sleep(100);
-        //   //     //清除画的人脸框
-        //   //     ctx.clearRect(0, 0, video.videoWidth, video.videoHeight);
-        //   //     //将视频当前帧读取到src
-        //   //     cap.read(src);
-        //   //     //监测人脸
-        //   //     classifier.detectMultiScale(src, faces, 1.1, 3, 0);
-        //   //     //遍历人脸
-        //   //     for (let i = 0; i < faces.size(); ++i) {
-        //   //       let face = faces.get(i);
-        //   //       //定义canvas来接收人脸区域
-        //   //       const tnCanvas = document.createElement('canvas');
-        //   //       tnCanvas.width = face.width;
-        //   //       tnCanvas.height = face.height;
-        //   //       //裁剪人脸区域
-        //   //       const roi = src.roi(
-        //   //         new cv.Rect(face.x, face.y, face.width, face.height),
-        //   //       );
-        //   //       cv.imshow(tnCanvas, roi);
-        //   //       //将裁剪出的图片转换为文件
-        //   //       tnCanvas.toBlob((blob) => {
-        //   //         if (blob) {
-        //   //           const file = new File(
-        //   //             [blob],
-        //   //             `video.${blob.type.split('/')[1]}`,
-        //   //             {
-        //   //               type: blob.type,
-        //   //             },
-        //   //           );
-        //   //           //请求后端识别
-        //   //           api.Face.putFacePredict({ model: values.model }, {}, [
-        //   //             file,
-        //   //           ]).then((res) => {
-        //   //             ctx.font = '20px "微软雅黑"';
-        //   //             ctx.fillStyle = 'red';
-        //   //             ctx.textBaseline = 'top';
-        //   //             ctx.fillText(
-        //   //               `id:${res[0].label} c:${res[0].confidence.toFixed(
-        //   //                 0,
-        //   //               )}`,
-        //   //               face.x,
-        //   //               face.y,
-        //   //             );
-        //   //             ctx.fillText(res[0].msg, face.x, face.y + 20);
-        //   //           });
-        //   //         }
-        //   //       });
-        //   //       //画出人脸框
-        //   //       ctx.strokeRect(face.x, face.y, face.width, face.height);
-        //   //     }
-        //   //   }
-        // });
       });
 
       let vodeoctx: any;
@@ -174,6 +92,7 @@ export default (props: {
             );
             const facectx = facecanvas.getContext('2d');
             facectx.putImageData(faceimg, 0, 0);
+
             return facecanvas.convertToBlob().then((blob: any) => ({
               file: new File([blob], `${i}_${props.camera}`, {
                 type: blob.type,

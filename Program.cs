@@ -5,7 +5,7 @@ using System.Reflection;
 
 var es = typeof(int);
 var e1 = typeof(UserInfo);
-var e2 = typeof((int a,string ));
+var e2 = typeof((int a, string));
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel(options =>
@@ -45,16 +45,13 @@ app.UseSwaggerUI();
 app.UseStaticFiles();
 app.UseSpaStaticFiles();
 
-if (app.Environment.IsDevelopment())
+
+app.UseSpa(spa =>
 {
-    app.UseSpa(spa =>
-    {
-        spa.Options.SourcePath = "ClientApp";
-    });
-}
+    spa.Options.SourcePath = "ClientApp";
+});
 
 
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

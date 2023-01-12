@@ -39,7 +39,11 @@ export default () => {
     },
   });
 
-  const { data, run: init } = useRequest(api.Face.getFaceGetModel,{onBefore:()=>{return ''}});
+  const { data, run: init } = useRequest(api.Face.getFaceGetModel, {
+    onBefore: () => {
+      return '';
+    },
+  });
 
   const { run: Add } = useRequest(api.Face.postFaceAddModel, {
     manual: true,
@@ -54,12 +58,12 @@ export default () => {
       init();
     },
   });
-  const models: UpFaceUrl[] | undefined = useMemo(() => {
+  const models: UploadFile[] | undefined = useMemo(() => {
     if (data) {
       return data.map((m: string, index: number) => ({
         uid: index.toString(),
         src: m,
-        name: m.split('/').at(-1),
+        name: m.split('/').at(-1) ?? '',
         status: 'done',
       }));
     }

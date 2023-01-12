@@ -236,11 +236,12 @@ export default (props: {
         }}
         onOk={() => {
           if (upfile && upImg) {
+            const time = new Date().getTime();
             const urls: UploadFile[] = upImg.urls.concat(
               upfile
                 .flatMap((m) => m.faces)
-                .map((m) => ({
-                  uid: 'rc-upload-' + m?.name,
+                .map((m, index) => ({
+                  uid: `rc-upload-${time}-${index}`,
                   name: m?.name as string,
                   originFileObj: m as RcFile,
                 })),
