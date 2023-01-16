@@ -1,6 +1,6 @@
 {
-  "name": "my-new-app",
-  "productName": "my-new-app",
+  "name": "my-app",
+  "productName": "my-app",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": "src/index.js",
@@ -12,10 +12,7 @@
     "lint": "echo \"No linting configured\""
   },
   "keywords": [],
-  "author": {
-    "name": "LP",
-    "email": "1570800510@qq.com"
-  },
+  "author": "lipeng",
   "license": "MIT",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0"
