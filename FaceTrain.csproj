@@ -9,9 +9,13 @@
 
 	<ItemGroup>
 	  <Compile Remove="ClientApp\**" />
+	  <Compile Remove="electron\**" />
 	  <Content Remove="ClientApp\**" />
+	  <Content Remove="electron\**" />
 	  <EmbeddedResource Remove="ClientApp\**" />
+	  <EmbeddedResource Remove="electron\**" />
 	  <None Remove="ClientApp\**" />
+	  <None Remove="electron\**" />
 	</ItemGroup>
 
 	<ItemGroup>

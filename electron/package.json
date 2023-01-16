@@ -1,8 +1,8 @@
 {
-  "name": "my-app",
-  "productName": "my-app",
+  "name": "face-train",
+  "productName": "FaceTrain",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Help you quickly develop face recognition function",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -15,6 +15,7 @@
   "author": "lipeng",
   "license": "MIT",
   "dependencies": {
+    "child_process": "^1.0.2",
     "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {
