@@ -1,28 +1,31 @@
 {
-  "name": "FaceTrain",
+  "name": "my-new-app",
+  "productName": "my-new-app",
   "version": "1.0.0",
-  "description": "人脸识别模型训练",
-  "main": "main.ts",
-  "author": "lipeng",
-  "license": "MIT",
+  "description": "My Electron application description",
+  "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
+  },
+  "keywords": [],
+  "author": {
+    "name": "LP",
+    "email": "1570800510@qq.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.3",
-    "@electron-forge/maker-deb": "^6.0.3",
-    "@electron-forge/maker-rpm": "^6.0.3",
-    "@electron-forge/maker-squirrel": "^6.0.3",
-    "@electron-forge/maker-zip": "^6.0.3",
-    "electron": "^21.3.0",
-    "electron-winstaller": "^5.1.0",
-    "electron-prebuilt-compile": "2.0.4",
-     "electron-forge": "^5.2.2"
-  },
-  "dependencies": {
-    "electron-squirrel-startup": "^1.0.0",
-  
-    "electron-compile": "^6.4.3"}
+    "@electron-forge/cli": "^6.0.4",
+    "@electron-forge/maker-deb": "^6.0.4",
+    "@electron-forge/maker-rpm": "^6.0.4",
+    "@electron-forge/maker-squirrel": "^6.0.4",
+    "@electron-forge/maker-zip": "^6.0.4",
+    "electron": "22.0.2"
+  }
 }
