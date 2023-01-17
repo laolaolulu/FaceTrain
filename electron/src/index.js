@@ -1,9 +1,16 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, shell } = require('electron');
 const path = require('path');
 const { execFile } = require('child_process');
-
+// 忽略证书相关错误
+app.commandLine.appendSwitch('ignore-certificate-errors');
+//启动后台服务
+execFile('FaceTrain', {
+  cwd: path.join(__dirname, '../publish/'),
+});
+//禁用硬件加速
 //app.disableHardwareAcceleration();
-//Menu.setApplicationMenu(null); //关闭菜单栏
+//关闭菜单栏
+Menu.setApplicationMenu(null);
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -19,22 +26,18 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-  console.log(__dirname);
-  execFile('FaceTrain.exe', {
-    cwd: `${__dirname}/publish`,
-  });
 
   // and load the index.html of the app.
-  // mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  //mainWindow.loadFile(path.join(__dirname, './index.html'));
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 
-  //mainWindow.loadURL('https://localhost:54321');
+  mainWindow.loadURL('https://localhost:54321');
 
-  mainWindow.on('new-window', (e, url) => {
-    e.preventDefault();
-    require('electron').shell.openExternal(url);
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
   });
 };
 
