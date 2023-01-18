@@ -5,6 +5,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DocumentationFile>.\FaceTrain.xml</DocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -42,6 +43,9 @@
 	<ItemGroup>
 	  <None Update="face.db">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="FaceTrain.xml">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </None>
 	  <None Update="lp.p12">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

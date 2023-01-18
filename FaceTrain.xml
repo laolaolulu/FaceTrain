@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FaceTrain</name>
+    </assembly>
+    <members>
+        <member name="T:FaceTrain.Controllers.FaceController">
+            <summary>
+            人脸管理
+            </summary>
+        </member>
+        <member name="M:FaceTrain.Controllers.FaceController.GetModel">
+            <summary>
+            获取模型列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FaceTrain.Controllers.FaceController.Train(System.String[],System.String)">
+            <summary>
+            人脸模型训练
+            </summary>
+            <param name="label"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FaceTrain.Controllers.FaceController.Predict(Microsoft.AspNetCore.Http.IFormFile[],System.String,System.Nullable{System.Boolean})">
+            <summary>
+            人脸识别
+            </summary>
+            <param name="image"></param>
+            <param name="model"></param>
+            <param name="isface">是否为人脸区域图片</param>       
+            <returns></returns>
+        </member>
+        <member name="M:FaceTrain.Controllers.FaceController.AddModel(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传模型
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FaceTrain.Controllers.FaceController.DelModel(System.String)">
+            <summary>
+            删除模型
+            </summary>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FaceTrain.Controllers.FaceController.Del(System.Int32,System.String[])">
+            <summary>
+            删除用户脸图片
+            </summary>
+            <param name="ID"></param>
+            <param name="facesName"></param>
+            <returns></returns>
+        </member>
+        <member name="T:FaceTrain.Controllers.UserController">
+            <summary>
+            用户信息
+            </summary>
+        </member>
+        <member name="M:FaceTrain.Controllers.UserController.#ctor(FaceTrain.Models.AppDbContext)">
+            <summary>
+            
+            </summary>
+            <param name="_ctx"></param>
+        </member>
+        <member name="M:FaceTrain.Controllers.UserController.Get(System.Int32,System.Int32)">
+            <summary>
+            获取用户数据
+            </summary>
+            <param name="current"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FaceTrain.Controllers.UserController.Add(FaceTrain.Models.UserInfo)">
+            <summary>
+            添加用户
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FaceTrain.Controllers.UserController.Put(FaceTrain.Models.UserInfo)">
+            <summary>
+            修改用户
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FaceTrain.Controllers.UserController.Del(System.Int32)">
+            <summary>
+            删除用户
+            </summary>
+            <param name="ID">用户ID</param>
+            <returns></returns>
+        </member>
+        <member name="M:FaceTrain.Controllers.UserController.AddImg(System.Int32,Microsoft.AspNetCore.Http.IFormFile[],System.Nullable{System.Boolean})">
+            <summary>
+            添加用户人脸
+            </summary>
+            <param name="ID">用户id</param>
+            <param name="image">人脸</param>
+            <param name="isface">是否为人脸区域图片</param>
+            <returns></returns>
+        </member>
+        <member name="M:FaceTrain.Models.AppDbContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)">
+            <summary>
+            重载配置
+            </summary>
+            <param name="optionsBuilder"></param>
+        </member>
+        <member name="M:FaceTrain.Models.AppDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="T:FaceTrain.Models.UserInfo">
+            <summary>
+            用户信息
+            </summary>
+        </member>
+        <member name="P:FaceTrain.Models.UserInfo.ID">
+            <summary>
+            用户ID
+            </summary>
+        </member>
+        <member name="P:FaceTrain.Models.UserInfo.UserName">
+            <summary>
+            用户名字
+            </summary>
+        </member>
+        <member name="P:FaceTrain.Models.UserInfo.Phone">
+            <summary>
+            用户手机号
+            </summary>
+        </member>
+        <member name="P:FaceTrain.Models.UserInfo.Faces">
+            <summary>
+            人脸图片url
+            </summary>
+        </member>
+        <member name="F:FaceTrain.Tool.Classifier">
+            <summary>
+            人脸检测级联分类器
+            </summary>
+        </member>
+        <member name="T:FaceTrain.ResPage`1">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:FaceTrain.ResPage`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="list"></param>
+            <param name="total"></param>
+        </member>
+        <member name="P:FaceTrain.ResPage`1.Total">
+            <summary>
+            分页总行数
+            </summary>
+        </member>
+        <member name="P:FaceTrain.ResPage`1.List">
+            <summary>
+            分页数据集合
+            </summary>
+        </member>
+    </members>
+</doc>
