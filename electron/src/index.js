@@ -1,27 +1,25 @@
-const { app, BrowserWindow, Menu, shell,dialog } = require('electron');
+const { app, BrowserWindow, Menu, shell, dialog } = require('electron');
 const path = require('path');
 const { execFile } = require('child_process');
 // 忽略证书相关错误
 app.commandLine.appendSwitch('ignore-certificate-errors');
-//启动后台服务
-const mypath=path.join(__dirname, '../publish/');
 
-const star=new Promise((resolve)=>{
-  const ser=execFile(mypath+'FaceTrain',{
+const star = new Promise((resolve) => {
+  //启动后台服务
+  const mypath = path.join(__dirname, '../publish/');
+  const ser = execFile(mypath + 'FaceTrain', {
     cwd: mypath,
   });
-  const timeout=setTimeout(()=>{resolve(false)},5000)
-  ser.stdout.on('data',(msg)=>{
-    
-   if (msg.includes('54321')) {
-    clearTimeout(timeout)
-    resolve(true)
-   }     
-    })
-    
-})
-
-
+  const timeout = setTimeout(() => {
+    resolve(false);
+  }, 5000);
+  ser.stdout.on('data', (msg) => {
+    if (msg.includes('54321')) {
+      clearTimeout(timeout);
+      resolve(true);
+    }
+  });
+});
 
 //禁用硬件加速
 app.disableHardwareAcceleration();
@@ -33,7 +31,7 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-const createWindow = async() => {
+const createWindow = async () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -42,7 +40,7 @@ const createWindow = async() => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
- 
+
   // and load the index.html of the app.
   //mainWindow.loadFile(path.join(__dirname, './index.html'));
 
@@ -53,12 +51,11 @@ const createWindow = async() => {
     shell.openExternal(url);
     return { action: 'deny' };
   });
-if (await star) {
-  mainWindow.loadURL('https://localhost:54321');  
-}else{
-  dialog.showErrorBox('Error','Service startup timeout')
-}
- 
+  if (await star) {
+    mainWindow.loadURL('https://localhost:54321');
+  } else {
+    dialog.showErrorBox('Error', 'Service startup timeout');
+  }
 };
 
 // This method will be called when Electron has finished
@@ -72,7 +69,6 @@ app.on('ready', createWindow);
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
-    
   }
 });
 
