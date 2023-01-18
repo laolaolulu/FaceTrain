@@ -97,9 +97,7 @@ namespace FaceTrain.Controllers
         /// </summary>
         /// <param name="image"></param>
         /// <param name="model"></param>
-        /// <param name="isface">是否为人脸区域图片</param>
-        ///  [ProducesResponseType(typeof(IEnumerable<(string name, int label, double confidence, string msg)>), 200)]
-        ///  [ProducesResponseType(typeof(IEnumerable<A>), 200)]
+        /// <param name="isface">是否为人脸区域图片</param>       
         /// <returns></returns>
         [HttpPut]
         public ActionResult<IEnumerable<PredictRes>> Predict([Required] IFormFile[] image, string? model = null, bool? isface = true)
