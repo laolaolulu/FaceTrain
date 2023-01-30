@@ -5,9 +5,6 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<UserSecretsId>9f951560-1dd4-4796-b44e-471af8a3e536</UserSecretsId>
-		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-		<DockerfileContext>.</DockerfileContext>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -46,6 +43,9 @@
 	<ItemGroup>
 	  <None Update="face.db">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="FaceTrain.xml">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </None>
 	  <None Update="lp.p12">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
