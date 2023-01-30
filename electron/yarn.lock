@@ -174,9 +174,9 @@
     fs-extra "^10.0.0"
 
 "@electron/asar@^3.2.1":
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/@electron/asar/-/asar-3.2.2.tgz#f6ae4eb4343ad00b994c40db3f09f71f968ff9c0"
-  integrity sha512-32fMU68x8a6zvxtC1IC/BhPDKTh8rQjdmwEplj3CDpnkcwBzZVN9v/8cK0LJqQ0FOQQVZW8BWZ1S6UU53TYR4w==
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/@electron/asar/-/asar-3.2.3.tgz#f598db50061ae5f90ad651f0255366b4e818000e"
+  integrity sha512-wmOfE6szYyqZhRIiLH+eyZEp+bGcJI0OD/SCvSUrfBE0jvauyGYO2ZhpWxmNCcDojKu5DYrsVqT5BOCZZ01XIg==
   dependencies:
     chromium-pickle-js "^0.2.0"
     commander "^5.0.0"
@@ -1798,9 +1798,9 @@ minimatch@^3.0.4, minimatch@^3.1.1:
     brace-expansion "^1.1.7"
 
 minimatch@^5.0.1:
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.4.tgz#4e2d39d872684e97b309a9104251c3f1aa4e9d1c"
-  integrity sha512-U0iNYXt9wALljzfnGkhFSy5sAC6/SCR3JrHrlsdJz4kF8MvhTRQNiC59iUi1iqsitV7abrNAJWElVL9pdnoUgw==
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.6.tgz#1cfcb8cf5522ea69952cd2af95ae09477f122a96"
+  integrity sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==
   dependencies:
     brace-expansion "^2.0.1"
 

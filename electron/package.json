@@ -1,6 +1,6 @@
 {
-  "name": "face-train",
-  "productName": "FaceTrain",
+  "name": "FaceTrain-app",
+  "productName": "FaceTrain-app",
   "version": "1.0.0",
   "description": "Help you quickly develop face recognition function",
   "main": "src/index.js",
