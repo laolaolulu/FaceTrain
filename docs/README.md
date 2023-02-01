@@ -1,67 +1,27 @@
-# 助你快速开发人脸识别功能
+# Minimal Mistakes remote theme starter
 
-- 使用opencv内置的人脸识别算法
-- 可帮助你进行用户人脸信息维护
-- 一对多识别模型训练并导出xml模型文件
-- 拥有简单的测试功能
-- 开放webapi接口方便后期上生产环境
-- 前端React+后端dotnetcore助你跨平台使用
-- 完成electron打包方便测试预览
-- 更多的是祝你能学到更多的新姿势
+Click [**Use this template**](https://github.com/mmistakes/mm-github-pages-starter/generate) button above for the quickest method of getting started with the [Minimal Mistakes Jekyll theme](https://github.com/mmistakes/minimal-mistakes).
 
-## 废话不多上预览图
-![image](Resource/preview.webp)
-![image](Resource/imguser.png)
-## 我要去下载尝试
-[给你打包好了，来伸手接住 https://github.com/laolaolulu/FaceTrain/releases](https://github.com/laolaolulu/FaceTrain/releases)
+Contains basic configuration to get you a site with:
 
-## 我是否能修改代码实现我想要的功能？
-- 前端使用React技术（vue行不行？哎你去学习下React嘛很简单的）
-- 前端脚手架使用阿里的umijs
-- UI库还是阿里的antd
-- OpenApi-Swagger
-- 后端使用VisualStudio2022工具开发
-- .net core 6 webapi 
-- 人脸识别算法来自OpenCvSharp
+- Sample posts.
+- Sample top navigation.
+- Sample author sidebar with social links.
+- Sample footer links.
+- Paginated home page.
+- Archive pages for posts grouped by year, category, and tag.
+- Sample about page.
+- Sample 404 page.
+- Site wide search.
 
-## 项目目录介绍
-- FaceTrain //根目录
-    - ClientApp //前端代码
-	- Controllers //webapi控制器
-	- electron //桌面版打包
-	- Models //数据库模型（EntityFramework）
-	- Resource //公共资源
-	- wwwroot
-		- dist //前端build后的文件
-		- Faces //人脸数据图片
-		- Model //训练模型储存目录
-	* face.db //数据库文件（sqlite）
-	* lp.p12 //ssl证书（方便web调用摄像头）
+Replace sample content with your own and [configure as necessary](https://mmistakes.github.io/minimal-mistakes/docs/configuration/).
 
-## 模型使用demo
-- c#
+---
 
-```//待完善 ```
-- java
+## Troubleshooting
 
-```//待完善 ```
-- python
+If you have a question about using Jekyll, start a discussion on the [Jekyll Forum](https://talk.jekyllrb.com/) or [StackOverflow](https://stackoverflow.com/questions/tagged/jekyll). Other resources:
 
-```//待完善 ```
-- node
-
-```//待完善 ```
-- c++
-
-```//待完善 ```
-
-## 我要自行编译
-文档待完善
-
-## 写在最后
-- 微软大法好！
-- 谷歌da法好！
-
-每一段代码都不能保证没有bug希望大家别骂娘，欢迎提交issues我有空时会去处理修复；
-工具生成的模型适合于一对多人脸识别，如果你是需要一对一的人脸匹配认证这个工具不适合；
-LBPH算法识别结果confidence小于50才能保证识别的准确性；
+- [Ruby 101](https://jekyllrb.com/docs/ruby-101/)
+- [Setting up a Jekyll site with GitHub Pages](https://jekyllrb.com/docs/github-pages/)
+- [Configuring GitHub Metadata](https://github.com/jekyll/github-metadata/blob/master/docs/configuration.md#configuration) to work properly when developing locally and avoid `No GitHub API authentication could be found. Some fields may be missing or have incorrect data.` warnings.
