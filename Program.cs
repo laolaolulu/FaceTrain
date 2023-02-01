@@ -3,10 +3,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
-var es = typeof(int);
-var e1 = typeof(UserInfo);
-var e2 = typeof((int a, string));
-
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel(options =>
 {
