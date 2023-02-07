@@ -1,21 +1,21 @@
-# # hidden files
-# .*
-# !.git*
-# !.editorconfig
-# !.nojekyll
-# !.husky
-# !.commitlintrc.json
-# !.versionrc.json
-# !.stylelintrc.json
+# hidden files
+.*
+!.git*
+!.editorconfig
+!.nojekyll
+!.husky
+!.commitlintrc.json
+!.versionrc.json
+!.stylelintrc.json
 
-# # bundler cache
-# _site
-# vendor
-# Gemfile.lock
+# bundler cache
+_site
+vendor
+Gemfile.lock
 
-# # rubygem
-# *.gem
+# rubygem
+*.gem
 
-# # npm dependencies
-# node_modules
-# package-lock.json
+# npm dependencies
+node_modules
+package-lock.json
