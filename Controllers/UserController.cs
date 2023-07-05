@@ -33,7 +33,7 @@ namespace FaceTrain.Controllers
         /// <param name="pageSize"></param>
         /// <returns></returns>
         [HttpGet]
-        public ResPage<UserInfo> Get(int current = 1, int pageSize = 20)
+        public ApiRes<ResPage<UserInfo>> Get(int current = 1, int pageSize = 20)
         {
             var users = ctx.UserInfos;
             int total = users.Count();
@@ -44,7 +44,7 @@ namespace FaceTrain.Controllers
                    Directory.GetFiles(string.Format("wwwroot/Faces/{0}/", item.ID))
                    .Select(s => Request.Scheme + "://" + Request.Host.Value + s.TrimStart("wwwroot".ToArray())) : null;
             }
-            return new ResPage<UserInfo>(data, total);
+            return ApiTool.ResPage(data, total);
         }
 
         /// <summary>
@@ -53,26 +53,10 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<int>> Add([FromForm, Required] UserInfo user)
+        public ApiRes<int> Add([FromForm, Required] UserInfo user)
         {
             ctx.UserInfos.Add(user);
-            try
-            {
-                await ctx.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (UserInfoExists(user.ID))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return Created("", user.ID);
+            return ApiTool.Save(ctx.SaveChanges(), user.ID);
         }
         /// <summary>
         /// 修改用户
@@ -80,28 +64,10 @@ namespace FaceTrain.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<IActionResult> Put([FromForm, Required] UserInfo user)
+        public ApiRes Put([FromForm, Required] UserInfo user)
         {
             ctx.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await ctx.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserInfoExists(user.ID))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-
+            return ApiTool.Save(ctx.SaveChanges());
         }
         /// <summary>
         /// 删除用户
@@ -109,16 +75,16 @@ namespace FaceTrain.Controllers
         /// <param name="ID">用户ID</param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<IActionResult> Del([Required] int ID)
+        public ApiRes Del([Required] int ID)
         {
-            var userInfo = await ctx.UserInfos.FindAsync(ID);
+            var userInfo =  ctx.UserInfos.Find(ID);
             if (userInfo == null)
             {
-                return NotFound();
+                return ApiTool.Failure();
             }
 
             ctx.UserInfos.Remove(userInfo);
-            await ctx.SaveChangesAsync();
+            var res= ctx.SaveChanges();
 
             //判断如果有人脸照片也一并删除
             var imgurl = string.Format("wwwroot/Faces/{0}", ID);
@@ -126,8 +92,7 @@ namespace FaceTrain.Controllers
             {
                 Directory.Delete(imgurl, true);
             }
-
-            return NoContent();
+            return ApiTool.Save(res);
         }
         /// <summary>
         /// 添加用户人脸
@@ -137,10 +102,9 @@ namespace FaceTrain.Controllers
         /// <param name="isface">是否为人脸区域图片</param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult AddImg([Required] int ID, [Required] IFormFile[] image, bool? isface = true)
-        {
-            int count = 0;
-            if (UserInfoExists(ID))
+        public ApiRes<int> AddImg([Required] int ID, [Required] IFormFile[] image, bool? isface = true)
+        {         
+            if (ctx.UserInfos.Any(e => e.ID == ID))
             {
                 var imgurl = string.Format("wwwroot/Faces/{0}", ID);
                 if (!Directory.Exists(imgurl))
@@ -148,6 +112,7 @@ namespace FaceTrain.Controllers
                     Directory.CreateDirectory(imgurl);
                 }
                 var dtstr = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                int count = 0;
                 for (int i = 0; i < image.Length; i++)
                 {
                     var path = string.Format("{0}-{1}.{2}", dtstr, i, image[i].ContentType.Substring(6));
@@ -169,21 +134,18 @@ namespace FaceTrain.Controllers
                         count++;
                     }
                 }
-                return Ok(count);
+                return ApiTool.Success(count);
             }
             else
             {
-                return NotFound();
+                return ApiTool.Failure<int>();
             }
         }
 
 
 
 
-        private bool UserInfoExists(int id)
-        {
-            return ctx.UserInfos.Any(e => e.ID == id);
-        }
+      
     }
 
 

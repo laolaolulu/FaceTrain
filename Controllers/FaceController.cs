@@ -23,13 +23,13 @@ namespace FaceTrain.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<string> GetModel()
+        public ApiRes<IEnumerable<string>> GetModel()
         {
             var models = Directory.GetFiles("wwwroot/Model/")
                     .Select(s => new { time = System.IO.File.GetLastWriteTime(s), src = Request.Scheme + "://" + Request.Host.Value + s.TrimStart("wwwroot".ToArray()) })
-                    .OrderByDescending(o => o.time).Select(s=>s.src);         
+                    .OrderByDescending(o => o.time).Select(s => s.src);
 
-            return models;
+            return ApiTool.Success(models);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace FaceTrain.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpPut]
-        public IActionResult Train(string[] label, string? type = "LBPH")
+        public ApiRes Train(string[] label, string? type = "LBPH")
         {
             using var ctx = new AppDbContext();
             var labels = ctx.UserInfos.Select(s => new
@@ -87,7 +87,7 @@ namespace FaceTrain.Controllers
             var modelname = string.Format("{0}_{1}_{2}.xml", type, labels.Length, DateTime.Now.ToString("yyyyMMddHHmmss"));
             recognizer.Save("wwwroot/Model/" + modelname);
             recognizer.Dispose();
-            return NoContent();
+            return ApiTool.Success();
         }
 
 
@@ -100,7 +100,7 @@ namespace FaceTrain.Controllers
         /// <param name="isface">是否为人脸区域图片</param>       
         /// <returns></returns>
         [HttpPut]
-        public ActionResult<IEnumerable<PredictRes>> Predict([Required] IFormFile[] image, string? model = null, bool? isface = true)
+        public ApiRes<IEnumerable<PredictRes>> Predict([Required] IFormFile[] image, string? model = null, bool? isface = true)
         {
             var imgurl = "wwwroot/Model/";
             if (model == null)
@@ -111,7 +111,7 @@ namespace FaceTrain.Controllers
 
                 if (namemodels == null)
                 {
-                    return NotFound();
+                    return ApiTool.Failure<IEnumerable<PredictRes>>("Model not found");
                 }
                 else
                 {
@@ -149,7 +149,7 @@ namespace FaceTrain.Controllers
                               List<PredictRes> reslist = new();
                               for (int i = 0; i < faces.Length; i++)
                               {
-                                using  Mat face = facemat[faces[i]];
+                                  using Mat face = facemat[faces[i]];
                                   reslist.Add(PredictHelp(recognizer, face, model, string.Format("{0}_{1}", i, item.FileName), faces[i].X, faces[i].Y, faces[i].Width, faces[i].Height));
                               }
                               return reslist;
@@ -164,15 +164,15 @@ namespace FaceTrain.Controllers
                 }
                 Task.WaitAll(ts.ToArray());
                 recognizer.Dispose();
-                return Ok(ts.SelectMany(s => s.Result));
+                return ApiTool.Success(ts.SelectMany(s => s.Result));
             }
             else
             {
-                return NotFound();
+                return ApiTool.Failure<IEnumerable<PredictRes>>("Model not found");
             }
         }
 
-        PredictRes PredictHelp(FaceRecognizer recognizer, Mat facemat, string model, string name, int? x = null, int? y = null, int? width = null, int? height = null)
+        static PredictRes PredictHelp(FaceRecognizer recognizer, Mat facemat, string model, string name, int? x = null, int? y = null, int? width = null, int? height = null)
         {
             if (model.StartsWith("Eigen_") || model.StartsWith("Fisher_"))
             {
@@ -191,7 +191,7 @@ namespace FaceTrain.Controllers
         /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult AddModel([Required] IFormFile file)
+        public ApiRes AddModel([Required] IFormFile file)
         {
             var imgurl = "wwwroot/Model/";
             if (System.IO.File.Exists(imgurl + file.FileName))
@@ -203,7 +203,7 @@ namespace FaceTrain.Controllers
                 imgurl += file.FileName;
             }
             System.IO.File.Create(imgurl);
-            return NoContent();
+            return ApiTool.Success();
         }
         /// <summary>
         /// 删除模型
@@ -211,7 +211,7 @@ namespace FaceTrain.Controllers
         /// <param name="fileName"></param>
         /// <returns></returns>
         [HttpDelete]
-        public IActionResult DelModel([Required] string fileName)
+        public ApiRes DelModel([Required] string fileName)
         {
             var imgurl = "wwwroot/Model/";
             if (System.IO.File.Exists(imgurl + fileName))
@@ -220,7 +220,7 @@ namespace FaceTrain.Controllers
                 GC.WaitForPendingFinalizers();
                 System.IO.File.Delete(imgurl + fileName);
             }
-            return NoContent();
+            return ApiTool.Success();
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace FaceTrain.Controllers
         /// <param name="facesName"></param>
         /// <returns></returns>
         [HttpDelete]
-        public ActionResult<int> Del([Required] int ID, string[] facesName)
+        public ApiRes<int> Del([Required] int ID, string[] facesName)
         {
             var res = 0;
             foreach (var name in facesName)
@@ -242,27 +242,52 @@ namespace FaceTrain.Controllers
                     res++;
                 }
             }
-            return Ok(res);
+            return ApiTool.Success(res);
         }
 
 
     }
 
-
+    /// <summary>
+    /// 预测信息
+    /// </summary>
     public class PredictRes
     {
+        /// <summary>
+        /// 图片文件名称
+        /// </summary>
         [Required]
-        public string Name { get; set; } = "";
+        public string Name { get; set; }
+        /// <summary>
+        /// 推理识别结果
+        /// </summary>
         [Required]
         public int Label { get; set; }
+        /// <summary>
+        /// 置信度
+        /// </summary>
         [Required]
         public double Confidence { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         [Required]
         public string Msg { get; set; } = "";
-
+        /// <summary>
+        /// 
+        /// </summary>
         public int? X { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public int? Y { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public int? Width { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public int? Height { get; set; }
     }
 }

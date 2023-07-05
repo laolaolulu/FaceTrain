@@ -1,11 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Reflection;
 
 namespace FaceTrain.Models
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class AppDbContext : DbContext
     {
+        /// <summary>
+        /// 用户信息表
+        /// </summary>
         public virtual DbSet<UserInfo> UserInfos { get; set; }
 
         /// <summary>
