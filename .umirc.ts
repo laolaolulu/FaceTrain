@@ -40,6 +40,8 @@ export default defineConfig({
       component: './Model',
     },
   ],
+  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
+  history: { type: 'hash' },
   npmClient: 'pnpm',
   // proxy: {
   //     '/api': {
@@ -49,14 +51,17 @@ export default defineConfig({
   //         pathRewrite: { '^': '' },
   //     },
   // },
-  outputPath: '../wwwroot/dist',
-  // headScripts: [
-  //     {
-  //         src: './opencv.js',
-  //         async: true,
-  //         // onload: 'opencvload();',
-  //     },
-  // ],
+  //outputPath: '../wwwroot/dist',
+
+  headScripts: [
+    // {
+    //   src: 'opencv_js.js',
+    //   async: true,
+    // },
+    // {
+    //   src: './testcmake.js',
+    // },
+  ],
   //   plugins: ['@umijs/max-plugin-openapi'],
   //   openAPI: {
   //     projectName: 'api',

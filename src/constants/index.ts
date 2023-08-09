@@ -1,21 +1,21 @@
-let faceWorker: any;
-export const getFaceWorker = async () => {
+let faceWorker: Worker;
+export const getFaceWorker = () => {
   if (!faceWorker) {
-    const faceWorker1 = new Worker('./faceWorker5.js');
-    faceWorker = new Promise((resolve) => {
-      const initres = (res: any) => {
-        if (res.data.action === 'init') {
-          faceWorker1.removeEventListener('message', initres);
-          resolve(faceWorker1);
-        }
-      };
-      faceWorker1.addEventListener('message', initres);
-      faceWorker1.postMessage({
-        action: 'init',
-      });
-    });
+    faceWorker = new Worker('./faceWorker.js');
+    // faceWorker = new Promise((resolve) => {
+    //   const initres = (res: any) => {
+    //     if (res.data.action === 'init') {
+    //       faceWorker1.removeEventListener('message', initres);
+    //       resolve(faceWorker1);
+    //     }
+    //   };
+    //   faceWorker1.addEventListener('message', initres);
+    //   faceWorker1.postMessage({
+    //     action: 'init',
+    //   });
+    // });
   }
-  return await faceWorker;
+  return faceWorker;
 };
 
 // let isonloadopencv = true;

@@ -1,3 +1,5 @@
+import { wrap } from 'comlink';
+
 export const downfile = (url: string) => {
   let request = new XMLHttpRequest();
   request.open('GET', url, true);
@@ -22,4 +24,40 @@ export const downfile = (url: string) => {
 export const sleep = (time: number) => {
   // eslint-disable-next-line no-promise-executor-return
   return new Promise((resolve) => setTimeout(resolve, time));
+};
+
+//定义全局faceWorker对象
+let faceWorker: any;
+export const getWorker = () => {
+  if (!faceWorker) {
+    faceWorker = wrap(new Worker('./worker.js'));
+  }
+  return faceWorker;
+};
+
+/**通过图片file获取 imageData*/
+export const getSendImgData = (file: File): Promise<ImageData> => {
+  return new Promise((resolve, reject) => {
+    const outtime = setTimeout(() => {
+      reject();
+    }, 3000);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const ctx = new OffscreenCanvas(img.width, img.height).getContext(
+          '2d',
+          {
+            willReadFrequently: true,
+          },
+        )!;
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+        resolve(imageData);
+        clearTimeout(outtime);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
 };

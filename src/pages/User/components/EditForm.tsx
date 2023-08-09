@@ -82,12 +82,12 @@ export default (props: {
         <ProFormText
           name="name"
           rules={[{ required: true }]}
-          labelCol={{ span: 4 }}
+          labelCol={{ span: 5 }}
           label={intl.formatMessage({ id: 'user.name' })}
         />
         <ProFormText
           name="phone"
-          labelCol={{ span: 4 }}
+          labelCol={{ span: 5 }}
           label={intl.formatMessage({ id: 'user.phone' })}
         />
         <Space wrap={true}>

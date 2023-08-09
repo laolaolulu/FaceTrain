@@ -4,6 +4,7 @@
   "author": "LP <1570800510@qq.com>",
   "scripts": {
     "build": "max build",
+    "deploy": "gh-pages -d dist",
     "dev": "max dev",
     "format": "prettier --cache --write .",
     "postinstall": "max setup",
@@ -15,12 +16,15 @@
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-components": "^2.0.1",
+    "@types/workerpool": "^6.4.0",
     "@umijs/max": "4.0.41",
     "antd": "^5.0.2",
     "comlink": "^4.4.1",
     "dexie": "^3.2.4",
+    "gh-pages": "^5.0.0",
     "react-dom": "^18.2.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "workerpool": "^6.4.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.3",

@@ -1,6 +1,6 @@
 import '@umijs/max/typings';
 declare global {
-  const cv: any;
+  let cv: any;
   type FaceInfo = {
     id?: number;
     name?: string;
