@@ -4,37 +4,30 @@
   "author": "LP <1570800510@qq.com>",
   "scripts": {
     "build": "max build",
-    "deploy": "gh-pages -d dist",
     "dev": "max dev",
     "format": "prettier --cache --write .",
     "postinstall": "max setup",
-    "openapi": "max openapi",
-    "prepare": "cd .. && husky install ClientApp/.husky",
+    "prepare": "husky install",
     "setup": "max setup",
     "start": "npm run dev"
   },
   "dependencies": {
-    "@ant-design/icons": "^4.7.0",
-    "@ant-design/pro-components": "^2.0.1",
+    "@ant-design/icons": "^5.2.5",
+    "@ant-design/pro-components": "^2.6.11",
     "@types/workerpool": "^6.4.0",
-    "@umijs/max": "4.0.41",
-    "antd": "^5.0.2",
-    "comlink": "^4.4.1",
+    "@umijs/max": "^4.0.75",
+    "antd": "^5.8.2",
     "dexie": "^3.2.4",
-    "gh-pages": "^5.0.0",
-    "react-dom": "^18.2.0",
-    "ts-node": "^10.9.1",
     "workerpool": "^6.4.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.3",
-    "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0",
-    "husky": "^8.0.1",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1",
-    "prettier-plugin-organize-imports": "^2",
-    "prettier-plugin-packagejson": "^2",
-    "typescript": "^4.1.2"
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
+    "prettier": "^3.0.1",
+    "prettier-plugin-organize-imports": "^3.2.3",
+    "prettier-plugin-packagejson": "^2.4.5",
+    "typescript": "^5.1.6"
   }
 }

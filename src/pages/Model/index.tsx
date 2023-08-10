@@ -1,56 +1,35 @@
-import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import {
-  ActionType,
-  FooterToolbar,
-  PageContainer,
+  HistoryOutlined,
+  LoadingOutlined,
+  PictureOutlined,
+  PieChartOutlined,
+} from '@ant-design/icons';
+import {
   ProColumns,
-  ProDescriptions,
-  ProDescriptionsItemProps,
   ProForm,
   ProFormCheckbox,
-  ProFormDependency,
   ProFormInstance,
   ProFormRadio,
-  ProFormSelect,
   ProFormTreeSelect,
   ProFormUploadButton,
-  ProFormUploadDragger,
   ProTable,
 } from '@ant-design/pro-components';
-import { getWorker, getSendImgData } from '@/utils';
 import {
   Image as AntdImage,
-  Button,
   Card,
-  Checkbox,
   Col,
-  Divider,
-  Drawer,
-  Form,
-  message,
   Modal,
-  Radio,
   Row,
-  Select,
-  Space,
-  Table,
   Tag,
-  Upload,
-  UploadProps,
   Spin,
   Carousel,
 } from 'antd';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import api from '@/services/api';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { UploadFile } from 'antd/es/upload';
-import { downfile } from '@/utils';
-import TestForm from './components/TestForm';
+import { formatBytes } from '@/utils';
 import { useIntl } from 'umi';
 import {} from '@/constants';
 import { db } from '@/db';
-import { wrap } from 'comlink';
-import Column from 'antd/es/table/Column';
-import ColumnGroup from 'antd/es/table/ColumnGroup';
 import './index.less';
 import { detection } from '@/utils/worker';
 
@@ -107,6 +86,7 @@ const detectionModel = [
 ];
 
 type FaceRect = { height: number; width: number; x: number; y: number };
+
 type DetectionDataType = {
   index: number;
   imgfile: UploadFile;
@@ -120,7 +100,7 @@ type DetectionDataType = {
 };
 
 const getFace = (file: File, rect: FaceRect) =>
-  new Promise((resolve) => {
+  new Promise<string>((resolve) => {
     const image = new Image();
     const reader = new FileReader();
 
@@ -153,48 +133,6 @@ export default () => {
   const formDetectionRef = useRef<ProFormInstance>();
   const intl = useIntl();
 
-  useEffect(() => {
-    // eslint-disable-next-line no-async-promise-executor
-  }, []);
-
-  // const { loading: training, run: Train } = useRequest(api.Face.putFaceTrain, {
-  //   manual: true,
-  //   onSuccess: () => {
-  //     init();
-  //   },
-  // });
-
-  // const { data, run: init } = useRequest(api.Face.getFaceGetModel, {
-  //   onBefore: () => {
-  //     return '';
-  //   },
-  // });
-
-  // const { run: Add } = useRequest(api.Face.postFaceAddModel, {
-  //   manual: true,
-  //   onSuccess: () => {
-  //     init();
-  //   },
-  // });
-
-  // const { run: Delete } = useRequest(api.Face.deleteFaceDelModel, {
-  //   manual: true,
-  //   onSuccess: () => {
-  //     init();
-  //   },
-  // });
-  // const models: UploadFile[] | undefined = useMemo(() => {
-  //   if (data) {
-  //     return data.map((m: string, index: number) => ({
-  //       uid: index.toString(),
-  //       src: m,
-  //       name: m.split('/').at(-1) ?? '',
-  //       status: 'done',
-  //     }));
-  //   }
-  //   return undefined;
-  // }, [data]);
-
   const [detectionData, setDetectionData] = useState<{
     mnames: { mname: string; index: number }[];
     data: DetectionDataType[];
@@ -216,6 +154,7 @@ export default () => {
         title: '图片',
         dataIndex: 'imgfile',
         fixed: 'left',
+        align: 'center',
         render: (_, record: DetectionDataType) => (
           <Spin
             spinning={
@@ -225,7 +164,20 @@ export default () => {
                 detectionData.mnames.length
             }
           >
-            <AntdImage width={50} src={record.imgfile.thumbUrl} />
+            <AntdImage
+              width={80}
+              src={record.imgfile.thumbUrl}
+              preview={{
+                afterOpenChange: () => {
+                  console.log('xxoo');
+                },
+                // imageRender: () => {
+                //     console.log('xxoo')
+                //   return <></>;
+                // },
+                // src: record.imgfile.originFileObj,
+              }}
+            />
           </Spin>
         ),
       },
@@ -233,33 +185,40 @@ export default () => {
         title: '图片名称',
         dataIndex: 'name',
         fixed: 'left',
-        render: (_, record: DetectionDataType) => record.imgfile.name,
+        render: (_, record: DetectionDataType) => (
+          <>
+            {record.imgfile.name}
+            <Tag icon={<PieChartOutlined />} color="cyan">
+              {formatBytes(record.imgfile.size!)}
+            </Tag>
+          </>
+        ),
       },
     ];
     if (detectionData?.mnames) {
-      detectionData.mnames.forEach(async (element) => {
+      detectionData.mnames.forEach((element) => {
         columns.push({
           title: element.mname,
           dataIndex: element.mname,
-          children: [
-            {
-              title: '耗时',
-              render: (_, record: DetectionDataType) => {
-                const model = record.model?.find(
-                  (f) => f.index === element.index,
-                );
-                return (model && (model.time / 1000)?.toFixed(2)) || '-';
-              },
-            },
-            {
-              title: '数量',
-              render: (_, record: DetectionDataType) =>
-                record.model?.find((f) => f.index === element.index)?.faces
-                  .length,
-            },
-            {
-              title: '人脸',
-              render: (_, record: DetectionDataType) => (
+          align: 'center',
+          render: (_, record: DetectionDataType) => {
+            const model = record.model?.find((f) => f.index === element.index);
+            return model ? (
+              <div style={{ display: 'flex' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-around',
+                  }}
+                >
+                  <Tag icon={<HistoryOutlined />} color="cyan">
+                    {(model.time / 1000)?.toFixed(2)} s
+                  </Tag>
+                  <Tag icon={<PictureOutlined />} color="cyan">
+                    {model.faces.length} faces
+                  </Tag>
+                </div>
                 <AntdImage.PreviewGroup>
                   <Carousel
                     infinite={false}
@@ -274,21 +233,21 @@ export default () => {
                       background: '#364d79',
                     }}
                   >
-                    {record.model
-                      ?.find((f) => f.index === element.index)
-                      ?.faces.map((m, index) => (
-                        <AntdImage
-                          key={`${index}-${element.index}`}
-                          width={80}
-                          height={80}
-                          src={m.face}
-                        />
-                      ))}
+                    {model.faces.map((m, index) => (
+                      <AntdImage
+                        key={`${index}-${element.index}`}
+                        width={80}
+                        height={80}
+                        src={m.face}
+                      />
+                    ))}
                   </Carousel>
                 </AntdImage.PreviewGroup>
-              ),
-            },
-          ],
+              </div>
+            ) : (
+              <LoadingOutlined />
+            );
+          },
         });
       });
     }
@@ -296,12 +255,6 @@ export default () => {
   }, [detectionData]);
 
   return (
-    // <PageContainer
-    //   header={{
-    //     title: intl.formatMessage({ id: 'model.title' }),
-    //   }}
-    //   childrenContentStyle={{ padding: '0 10px' }}
-    // >
     <Row gutter={[16, 16]}>
       <Col xs={24} md={24} xxl={24}>
         <Card title="人脸检测测试">
@@ -335,19 +288,53 @@ export default () => {
                 })),
               });
               //请求人脸检测worker
-              const callback = (res: any) => {
-                console.log(res);
-              };
+
               models.forEach((element, index) => {
+                const callback = async (res: {
+                  index: number;
+                  time: number;
+                  faces: FaceRect[];
+                }) => {
+                  const faces = await Promise.all(
+                    res.faces.map(async (m) => ({
+                      face: await getFace(
+                        values.imgs[res.index].originFileObj,
+                        m,
+                      ),
+                      ...m,
+                    })),
+                  );
+
+                  setDetectionData((state) => {
+                    const resstate = [...(state?.data || [])];
+                    const model = {
+                      index,
+                      time: res.time,
+                      faces,
+                    };
+                    const statedata = resstate.find(
+                      (f) => f.index === res.index,
+                    );
+                    if (statedata?.model) {
+                      statedata.model.push(model);
+                    } else {
+                      statedata!.model = [model];
+                    }
+
+                    return {
+                      ...(state || { mnames: [], data: [] }),
+                      data: resstate,
+                    };
+                  });
+                };
+
                 setTimeout(() => {
                   detection(
                     element.mtype,
                     element.mname,
                     values.imgs.map((m: any) => m.originFileObj),
                     callback,
-                  ).then((res: any) => {
-                    console.log(res);
-                  });
+                  );
                 }, index * 200);
 
                 // values.imgs.forEach(async (img: any) => {
@@ -735,6 +722,5 @@ export default () => {
         </Card>
       </Col>
     </Row>
-    // {/* </PageContainer> */}
   );
 };

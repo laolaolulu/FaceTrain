@@ -29,7 +29,7 @@ export const getFaceWorker = () => {
 //         resolve(false);
 //       };
 //       script.onerror = () => {
-//         console.error('opencv.jsÂä†ËΩΩÂ§±Ë¥•');
+//         console.error('opencv.jsº”‘ÿ ß∞‹');
 //         resolve(true);
 //       };
 //       document.body.appendChild(script);

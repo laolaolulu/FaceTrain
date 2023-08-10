@@ -1,5 +1,3 @@
-import { wrap } from 'comlink';
-
 export const downfile = (url: string) => {
   let request = new XMLHttpRequest();
   request.open('GET', url, true);
@@ -27,13 +25,13 @@ export const sleep = (time: number) => {
 };
 
 //定义全局faceWorker对象
-let faceWorker: any;
-export const getWorker = () => {
-  if (!faceWorker) {
-    faceWorker = wrap(new Worker('./worker.js'));
-  }
-  return faceWorker;
-};
+// let faceWorker: any;
+// export const getWorker = () => {
+//   if (!faceWorker) {
+//     faceWorker = wrap(new Worker('./worker.js'));
+//   }
+//   return faceWorker;
+// };
 
 /**通过图片file获取 imageData*/
 export const getSendImgData = (file: File): Promise<ImageData> => {
@@ -61,3 +59,16 @@ export const getSendImgData = (file: File): Promise<ImageData> => {
     reader.readAsDataURL(file);
   });
 };
+
+/**显示大小 kb/mb */
+export function formatBytes(bytes: number, decimals = 2) {
+  if (bytes === 0) return '0 Bytes';
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}

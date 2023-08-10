@@ -6,8 +6,10 @@ export default defineConfig({
   model: {},
   initialState: {},
   request: {},
-  layout: {},
-  locale: { title: true, default: 'en-US' },
+  layout: {
+    title: '@umijs/max',
+  },
+    locale: { title: true, default: 'en-US' },
   routes: [
     {
       path: '/',
@@ -71,3 +73,4 @@ export default defineConfig({
   //     // serversPath: '',
   //   },
 });
+

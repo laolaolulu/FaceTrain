@@ -6,7 +6,7 @@ import { Button, message, Modal } from 'antd';
 import { SelectLang, getIntl } from 'umi';
 
 // 全局初始化数据配置，用于 Layout 用户信息和权限初始化
-// 更多信息见文档：https://next.umijs.org/docs/api/runtime-config#getinitialstate
+// 更多信息见文档：https://umijs.org/docs/api/runtime-config#getinitialstate
 export async function getInitialState(): Promise<{ name: string }> {
   return { name: 'laolaolulu' };
 }
@@ -25,22 +25,21 @@ export const layout = () => {
 
     actionsRender: () => {
       return [
-        // eslint-disable-next-line react/jsx-key
+        // <Button
+        // key='swagger'
+        //   type="link"
+        //   icon={<ApiOutlined />}
+        //   href={`${window.location.origin}/swagger`}
+        //   target="_blank"
+        // />,
         <Button
-          type="link"
-          icon={<ApiOutlined />}
-          href={`${window.location.origin}/swagger`}
-          target="_blank"
-        />,
-        // eslint-disable-next-line react/jsx-key
-        <Button
+          key="github"
           type="link"
           icon={<GithubOutlined />}
           href={`https://github.com/laolaolulu/FaceTrain`}
           target="_blank"
         />,
-        // eslint-disable-next-line react/jsx-key
-        <SelectLang reload={false} />,
+        <SelectLang key="selectlang" reload={false} />,
       ];
     },
     rightContentRender: false,
