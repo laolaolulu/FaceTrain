@@ -1,5 +1,5 @@
-import workerpool from 'workerpool';
 import { getSendImgData } from '@/utils';
+import workerpool from 'workerpool';
 const obj: any = {};
 
 /**获取文件字节码 */

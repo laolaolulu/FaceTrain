@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { getFaceWorker } from '@/constants';
+//import { getFaceWorker } from '@/constants';
 import { Modal, Select } from 'antd';
 
 let faceWorker: Promise<Worker>;
@@ -159,10 +159,10 @@ export default (props: { onOk: (resface?: NameFaces) => void }) => {
     canvasctx = canvasRef.current?.getContext('2d');
 
     const devicesAsync = getVideoDevices();
-    faceWorker = getFaceWorker().then((res) => {
-      res.addEventListener('message', faceRes);
-      return res;
-    });
+    // faceWorker = getFaceWorker().then((res) => {
+    //   res.addEventListener('message', faceRes);
+    //   return res;
+    // });
     //首次加载摄像头
     switchCamera().then(async () => {
       //获取所有摄像头列表

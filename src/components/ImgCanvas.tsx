@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { getFaceWorker } from '@/constants';
+
 let faceWorker: any;
 
 export default (props: { img: File; onOk: (resface: NameFaces) => void }) => {
@@ -57,35 +57,35 @@ export default (props: { img: File; onOk: (resface: NameFaces) => void }) => {
   useEffect(() => {
     console.log('imgcanvas.load');
 
-    getFaceWorker().then((res) => {
-      faceWorker = res;
-      if (ref.current) {
-        ctx = ref.current.getContext('2d', {
-          willReadFrequently: true,
-        });
-        createImageBitmap(props.img).then((imgbit) => {
-          if (ref.current && ctx) {
-            ref.current.width = imgbit.width;
-            ref.current.height = imgbit.height;
-            ctx.drawImage(imgbit, 0, 0);
+    // getFaceWorker().then((res) => {
+    //   faceWorker = res;
+    //   if (ref.current) {
+    //     ctx = ref.current.getContext('2d', {
+    //       willReadFrequently: true,
+    //     });
+    //     createImageBitmap(props.img).then((imgbit) => {
+    //       if (ref.current && ctx) {
+    //         ref.current.width = imgbit.width;
+    //         ref.current.height = imgbit.height;
+    //         ctx.drawImage(imgbit, 0, 0);
 
-            const buffer = ctx.getImageData(0, 0, imgbit.width, imgbit.height)
-              .data.buffer;
-            faceWorker.addEventListener('message', faceRes);
-            faceWorker.postMessage(
-              {
-                action: 'detection',
-                name: props.img.name,
-                buffer,
-                width: imgbit.width,
-                height: imgbit.height,
-              },
-              [buffer],
-            );
-          }
-        });
-      }
-    });
+    //         const buffer = ctx.getImageData(0, 0, imgbit.width, imgbit.height)
+    //           .data.buffer;
+    //         faceWorker.addEventListener('message', faceRes);
+    //         faceWorker.postMessage(
+    //           {
+    //             action: 'detection',
+    //             name: props.img.name,
+    //             buffer,
+    //             width: imgbit.width,
+    //             height: imgbit.height,
+    //           },
+    //           [buffer],
+    //         );
+    //       }
+    //     });
+    //   }
+    // });
     return () => {
       faceWorker?.removeEventListener('message', faceRes);
     };

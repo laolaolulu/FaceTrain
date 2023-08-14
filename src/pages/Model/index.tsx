@@ -1,3 +1,6 @@
+import { colors } from '@/constants';
+import { formatBytes } from '@/utils';
+import { detection } from '@/utils/worker';
 import {
   HistoryOutlined,
   LoadingOutlined,
@@ -14,24 +17,11 @@ import {
   ProFormUploadButton,
   ProTable,
 } from '@ant-design/pro-components';
-import {
-  Image as AntdImage,
-  Card,
-  Col,
-  Modal,
-  Row,
-  Tag,
-  Spin,
-  Carousel,
-} from 'antd';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useIntl } from '@umijs/max';
+import { Image as AntdImage, Card, Carousel, Col, Modal, Row, Tag } from 'antd';
 import { UploadFile } from 'antd/es/upload';
-import { formatBytes } from '@/utils';
-import { useIntl } from 'umi';
-import {} from '@/constants';
-import { db } from '@/db';
+import { useMemo, useRef, useState } from 'react';
 import './index.less';
-import { detection } from '@/utils/worker';
 
 const detectionModel = [
   {
@@ -85,11 +75,14 @@ const detectionModel = [
   },
 ];
 
+const imgs: HTMLCanvasElement[] = [];
+
 type FaceRect = { height: number; width: number; x: number; y: number };
 
 type DetectionDataType = {
   index: number;
-  imgfile: UploadFile;
+  name: string;
+  size: number;
   model: {
     index: number;
     time: number;
@@ -138,16 +131,7 @@ export default () => {
     data: DetectionDataType[];
   }>();
 
-  useEffect(() => {
-    //console.log(detectionData?.data);
-    // setTimeout(async () => {
-    //   if (cv instanceof Function) {
-    //     cv = await cv();
-    //     console.log(cv);
-    //   }
-    // }, 3000);
-  }, [detectionData?.data]);
-
+  //识别结果表头数据
   const detectionDataColumns = useMemo(() => {
     const columns: ProColumns<DetectionDataType>[] = [
       {
@@ -156,29 +140,19 @@ export default () => {
         fixed: 'left',
         align: 'center',
         render: (_, record: DetectionDataType) => (
-          <Spin
-            spinning={
-              !record.model ||
-              !detectionData ||
-              record.model.filter((f) => f.faces).length !==
-                detectionData.mnames.length
-            }
-          >
-            <AntdImage
-              width={80}
-              src={record.imgfile.thumbUrl}
-              preview={{
-                afterOpenChange: () => {
-                  console.log('xxoo');
-                },
-                // imageRender: () => {
-                //     console.log('xxoo')
-                //   return <></>;
-                // },
-                // src: record.imgfile.originFileObj,
-              }}
-            />
-          </Spin>
+          //   <Spin
+          //     spinning={
+          //       !record.model ||
+          //       !detectionData ||
+          //       record.model.filter((f) => f.faces).length !==
+          //         detectionData.mnames.length
+          //     }
+          //   >
+          <AntdImage
+            key="nameimage"
+            width={80}
+            src={imgs[record.index].toDataURL()}
+          />
         ),
       },
       {
@@ -187,9 +161,9 @@ export default () => {
         fixed: 'left',
         render: (_, record: DetectionDataType) => (
           <>
-            {record.imgfile.name}
+            {record.name}
             <Tag icon={<PieChartOutlined />} color="cyan">
-              {formatBytes(record.imgfile.size!)}
+              {formatBytes(record.size)}
             </Tag>
           </>
         ),
@@ -198,7 +172,9 @@ export default () => {
     if (detectionData?.mnames) {
       detectionData.mnames.forEach((element) => {
         columns.push({
-          title: element.mname,
+          title: () => (
+            <div style={{ color: colors[element.index] }}> {element.mname}</div>
+          ),
           dataIndex: element.mname,
           align: 'center',
           render: (_, record: DetectionDataType) => {
@@ -252,7 +228,7 @@ export default () => {
       });
     }
     return columns;
-  }, [detectionData]);
+  }, [detectionData?.mnames]);
 
   return (
     <Row gutter={[16, 16]}>
@@ -271,6 +247,7 @@ export default () => {
               },
             }}
             onFinish={async (values) => {
+              //获取选中的model及父级项
               const models = detectionModel
                 .flatMap((t) =>
                   t.children.map((n) => ({
@@ -279,30 +256,72 @@ export default () => {
                   })),
                 )
                 .filter((f) => values.model.includes(f.mname));
+              //获取表头数据以及要检测的图片
+              const data = await Promise.all(
+                values.imgs.map(async (m: UploadFile, index: number) => {
+                  imgs[index] = await new Promise<HTMLCanvasElement>(
+                    (resolve) => {
+                      const reader = new FileReader();
+                      reader.onload = function (e) {
+                        const image = new Image();
+                        image.onload = function () {
+                          const canvas = document.createElement('canvas');
+                          canvas.width = image.width;
+                          canvas.height = image.height;
+                          const context = canvas.getContext('2d')!;
+                          context.drawImage(
+                            image,
+                            0,
+                            0,
+                            image.width,
+                            image.height,
+                          );
+                          resolve(canvas);
+                        };
+                        image.src = e.target?.result as string;
+                      };
+                      reader.readAsDataURL(m.originFileObj!);
+                    },
+                  );
+                  return {
+                    index,
+                    name: m.name,
+                    size: m.size,
+                  };
+                }),
+              );
+
               //配置表头以及需要识别的图片
               setDetectionData({
                 mnames: models.map(({ mname }, index) => ({ mname, index })),
-                data: values.imgs.map((m: UploadFile, index: number) => ({
-                  index,
-                  imgfile: m,
-                })),
+                data,
               });
-              //请求人脸检测worker
 
+              //请求人脸检测worker
               models.forEach((element, index) => {
                 const callback = async (res: {
                   index: number;
                   time: number;
                   faces: FaceRect[];
                 }) => {
+                  const context = imgs[res.index].getContext('2d')!;
                   const faces = await Promise.all(
-                    res.faces.map(async (m) => ({
-                      face: await getFace(
-                        values.imgs[res.index].originFileObj,
-                        m,
-                      ),
-                      ...m,
-                    })),
+                    res.faces.map(async (m) => {
+                      //将检测到人脸边框绘制到图片上
+                      context.beginPath();
+                      context.rect(m.x, m.y, m.width, m.height); // 参数分别是 x, y, width, height
+                      context.strokeStyle = colors[index]; // 设置边框颜色
+                      context.lineWidth = 1; // 设置边框宽度
+                      context.stroke(); // 绘制矩形边框
+
+                      return {
+                        face: await getFace(
+                          values.imgs[res.index].originFileObj,
+                          m,
+                        ),
+                        ...m,
+                      };
+                    }),
                   );
 
                   setDetectionData((state) => {
@@ -329,6 +348,7 @@ export default () => {
                 };
 
                 setTimeout(() => {
+                  //启动识别
                   detection(
                     element.mtype,
                     element.mname,
@@ -336,56 +356,7 @@ export default () => {
                     callback,
                   );
                 }, index * 200);
-
-                // values.imgs.forEach(async (img: any) => {
-                //   const imddata = await getSendImgData(img.originFileObj);
-                //   console.log('start', new Date());
-                //   const se = detection(element.mtype, element.mname, imddata);
-                // });
               });
-              //   const worker: any = getWorker();
-              //   for (let index = 0; index < models.length; index++) {
-              //     const element = models[index];
-              //     for (
-              //       let dataindex = 0;
-              //       dataindex < values.imgs.length;
-              //       dataindex++
-              //     ) {
-              //       //请求人脸检测
-              //       const res = await worker.detectMultiScale(
-              //         await getSendImgData(values.imgs[dataindex].originFileObj),
-              //         element.mname,
-              //       );
-              //       //返回人脸矩形框截取到人脸部分
-              //       for (
-              //         let faceindex = 0;
-              //         faceindex < res.faces.length;
-              //         faceindex++
-              //       ) {
-              //         res.faces[faceindex].face = await getFace(
-              //           values.imgs[dataindex].originFileObj,
-              //           res.faces[faceindex],
-              //         );
-              //       }
-              //       console.log(res);
-
-              //       setDetectionData((state) => {
-              //         const resstate = [...(state?.data || [])];
-              //         const statedata = resstate.find(
-              //           (f) => f.index === dataindex,
-              //         );
-              //         if (state && statedata) {
-              //           statedata.model = [
-              //             ...(statedata.model || []),
-              //             { index, ...res },
-              //           ];
-
-              //           return { ...state, data: resstate };
-              //         }
-              //         return state;
-              //       });
-              //     }
-              //   }
             }}
           >
             {/* <ProFormSelect
@@ -588,71 +559,71 @@ export default () => {
                   // console.log(cv);
                   //   const model = new cv.LBPHFaceRecognizer();
                   //   console.log('model', model);
-                  const sendData = db.faceInfos.toArray().then((data) =>
-                    data.map(async (m) => {
-                      const facedata = await Promise.all(
-                        m.faces?.map(
-                          (file) =>
-                            new Promise<ImageData | undefined>((resolve) => {
-                              const timeout = setTimeout(() => {
-                                resolve(undefined);
-                                console.error('人脸图片加载超时3s');
-                              }, 3000);
-                              const reader = new FileReader();
-                              reader.onload = function (event) {
-                                if (event.target?.result) {
-                                  // 创建一个 Image 对象
-                                  const image = new Image();
-                                  image.onload = function () {
-                                    const canvas = new OffscreenCanvas(
-                                      image.width,
-                                      image.height,
-                                    );
-                                    const ctx = canvas.getContext('2d')!;
-                                    ctx.drawImage(image, 0, 0);
+                  //   const sendData = db.faceInfos.toArray().then((data) =>
+                  //     data.map(async (m) => {
+                  //       const facedata = await Promise.all(
+                  //         m.faces?.map(
+                  //           (file) =>
+                  //             new Promise<ImageData | undefined>((resolve) => {
+                  //               const timeout = setTimeout(() => {
+                  //                 resolve(undefined);
+                  //                 console.error('人脸图片加载超时3s');
+                  //               }, 3000);
+                  //               const reader = new FileReader();
+                  //               reader.onload = function (event) {
+                  //                 if (event.target?.result) {
+                  //                   // 创建一个 Image 对象
+                  //                   const image = new Image();
+                  //                   image.onload = function () {
+                  //                     const canvas = new OffscreenCanvas(
+                  //                       image.width,
+                  //                       image.height,
+                  //                     );
+                  //                     const ctx = canvas.getContext('2d')!;
+                  //                     ctx.drawImage(image, 0, 0);
 
-                                    // 获取图像数据
-                                    const imageData = ctx.getImageData(
-                                      0,
-                                      0,
-                                      canvas.width,
-                                      canvas.height,
-                                    );
-                                    resolve(imageData);
-                                    clearTimeout(timeout);
-                                  };
+                  //                     // 获取图像数据
+                  //                     const imageData = ctx.getImageData(
+                  //                       0,
+                  //                       0,
+                  //                       canvas.width,
+                  //                       canvas.height,
+                  //                     );
+                  //                     resolve(imageData);
+                  //                     clearTimeout(timeout);
+                  //                   };
 
-                                  // 将图像数据加载到 Image 对象中
-                                  image.src = event.target.result.toString();
-                                }
-                              };
-                              // 读取文件内容
-                              reader.readAsDataURL(file);
-                            }),
-                        ) ?? [],
-                      );
+                  //                   // 将图像数据加载到 Image 对象中
+                  //                   image.src = event.target.result.toString();
+                  //                 }
+                  //               };
+                  //               // 读取文件内容
+                  //               reader.readAsDataURL(file);
+                  //             }),
+                  //         ) ?? [],
+                  //       );
 
-                      const labelInfo = '';
-                      return {
-                        label: m.id!,
-                        labelInfo,
-                        facedata: (
-                          facedata.filter((f) => f) as ImageData[]
-                        ).map((fd) => ({
-                          width: fd.width,
-                          height: fd.height,
-                          buffer: fd.data.buffer,
-                        })),
-                      };
-                    }),
-                  );
+                  //       const labelInfo = '';
+                  //       return {
+                  //         label: m.id!,
+                  //         labelInfo,
+                  //         facedata: (
+                  //           facedata.filter((f) => f) as ImageData[]
+                  //         ).map((fd) => ({
+                  //           width: fd.width,
+                  //           height: fd.height,
+                  //           buffer: fd.data.buffer,
+                  //         })),
+                  //       };
+                  //     }),
+                  //   );
 
-                  const data = await Promise.all(await sendData);
-                  getFaceWorker()
-                    .detection('a', 'b', 2)
-                    .then((res: any) => {
-                      console.log(res);
-                    });
+                  //   const data = await Promise.all(await sendData);
+                  //   getFaceWorker()
+                  //     .detection('a', 'b', 2)
+                  //     .then((res: any) => {
+                  //       console.log(res);
+                  //     });
                   //   faceWorker.postMessage(
                   //     {
                   //       action: 'train',
