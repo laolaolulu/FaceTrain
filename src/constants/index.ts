@@ -13,3 +13,86 @@ export const colors = [
   '#faad14',
   '#a0d911',
 ];
+
+export const faceModel = {
+  detection: [
+    {
+      value: 'Haarcascade',
+      info: 'OpenCV',
+      children: [
+        {
+          value: 'haarcascade_frontalface_alt2.xml',
+          date: '2013-12-19',
+        },
+        {
+          value: 'haarcascade_frontalface_default.xml',
+          date: '2013-12-19',
+        },
+        {
+          value: 'haarcascade_frontalface_alt.xml',
+          date: '2013-12-19',
+        },
+        {
+          value: 'haarcascade_frontalface_alt_tree.xml',
+          date: '2013-12-19',
+        },
+      ],
+    },
+    {
+      value: 'SSD',
+      children: [
+        {
+          value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
+          date: '2019-07-30',
+        },
+      ],
+    },
+    {
+      value: 'SCRFD',
+      children: [
+        //   {
+        //     //value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
+        //   },
+      ],
+    },
+    {
+      value: 'RetinaFace',
+      children: [
+        //   {
+        //     value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
+        //   },
+      ],
+    },
+    {
+      value: 'BlazeFace',
+      children: [
+        //   {
+        //     value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
+        //   },
+      ],
+    },
+  ],
+  recognition: [
+    {
+      value: 'OpenFace',
+      children: [
+        {
+          value: 'nn4.v1.t7',
+          date: '2016-01-20',
+        },
+        {
+          value: 'nn4.v2.t7',
+          date: '2016-01-20',
+        },
+        {
+          value: 'nn4.small1.v1.t7',
+          date: '2016-01-20',
+        },
+        {
+          value: 'nn4.small2.v1.t7',
+          date: '2016-01-20',
+        },
+      ],
+    },
+  ],
+};

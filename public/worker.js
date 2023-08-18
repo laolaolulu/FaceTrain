@@ -70,12 +70,13 @@ const detection_ssd = async (mname, images) => {
         images.forEach((image, index) => {
             const img = new cv.matFromImageData(image);
             cv.cvtColor(img, img, cv.COLOR_RGBA2BGR);
-            const blob = cv.blobFromImage(img, 1, { width: 192, height: 144 }, [104, 117, 123, 0], false, false);
+            const blob = cv.blobFromImage(img, 1, { width: 300, height: 300 });
             netDet.setInput(blob);
             const startTime = performance.now();
             const out = netDet.forward();
             const endTime = performance.now();
             const faces = [];
+
             for (let i = 0, n = out.data32F.length; i < n; i += 7) {
                 const confidence = out.data32F[i + 2];
                 let left = out.data32F[i + 3] * img.cols;
