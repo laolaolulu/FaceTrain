@@ -52,6 +52,7 @@ obj['haarcascade'] = async (
     .then(function () {
       pool.terminate(); // terminate all workers when done
     });
+  return pool;
 };
 
 obj['ssd'] = async (
@@ -70,6 +71,7 @@ obj['ssd'] = async (
     .then(function () {
       pool.terminate(); // terminate all workers when done
     });
+  return pool;
 };
 
 export const detection = (
