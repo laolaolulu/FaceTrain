@@ -34,7 +34,7 @@ import {
   Tag,
 } from 'antd';
 import { UploadFile } from 'antd/es/upload';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { WorkerPool } from 'workerpool';
 import ProFormFromVideo from './components/FromVideo';
 import './index.less';
@@ -139,10 +139,11 @@ const getFace = (file: File, rect: FaceRect) =>
   });
 
 export default () => {
+  //人脸检测表单ref
   const formDetectionRef = useRef<ProFormInstance>();
   const fromVideoRef = useRef(null);
   const intl = useIntl();
-
+  //人脸检测结果数据
   const [detectionData, setDetectionData] = useState<{
     mnames: { mname: string; index: number }[];
     data: DetectionDataType[];
@@ -249,24 +250,35 @@ export default () => {
     return columns;
   }, [detectionData?.mnames]);
 
-  //   //是否正在进行人脸检测
-  //   const detectioning = useMemo(() => {
-  //     if (!detectionData?.data) {
-  //       return false;
-  //     }
+  //是否正在进行人脸检测
+  const detectioning = useMemo(() => {
+    return detectionPool.filter((f) => f.stats().totalWorkers > 0).length > 0;
+    //   if (!detectionData?.data) {
+    //     return false;
+    //   }
 
-  //     const models = detectionData.data.filter((f) => !f.model);
-  //     if (models.length > 0) {
-  //       return true;
-  //     }
+    //   const models = detectionData.data.filter((f) => !f.model);
+    //   if (models.length > 0) {
+    //     return true;
+    //   }
 
-  //     const invalidModelLength = detectionData.data.some(
-  //       (f) => f.model.length !== detectionData?.mnames.length,
-  //     );
+    //   const invalidModelLength = detectionData.data.some(
+    //     (f) => f.model.length !== detectionData?.mnames.length,
+    //   );
 
-  //     return invalidModelLength;
-  //   }, [detectionData?.data]);
-
+    //   return invalidModelLength;
+  }, [detectionData?.data, detectionPool]);
+  useEffect(() => {
+    return () => {
+      //清除未结束的线程
+      setDetectionPool((state) => {
+        state.forEach((pool) => {
+          pool.terminate(true);
+        });
+        return [];
+      });
+    };
+  }, []);
   return (
     <>
       <ProForm
@@ -384,6 +396,7 @@ export default () => {
           extra={[
             <ProForm.Item name="imgfrom" key="1" noStyle>
               <Segmented
+                disabled={detectioning}
                 options={[
                   {
                     value: 'files',
@@ -397,32 +410,20 @@ export default () => {
               />
             </ProForm.Item>,
             <Space.Compact key="2" block>
-              <Button
-                loading={detectionPool.length > 0}
-                type="primary"
-                htmlType="submit"
-              >
+              <Button loading={detectioning} type="primary" htmlType="submit">
                 检测人脸
               </Button>
               <Button
                 type="primary"
                 icon={<PauseOutlined />}
-                style={{ display: detectionPool.length > 0 ? 'unset' : 'none' }}
+                style={{
+                  display: detectioning ? 'unset' : 'none',
+                }}
                 onClick={() => {
                   detectionPool.forEach((pool) => {
                     pool.terminate(true);
                   });
                   setDetectionPool([]);
-                  //   if (
-                  //     formDetectionRef.current?.getFieldValue('imgfrom') ===
-                  //     'videos'
-                  //   ) {
-                  //   } else {
-                  //     setDetectionData((data) => {
-                  //         data?.data.
-                  //       return data;
-                  //     });
-                  //   }
                 }}
               />
             </Space.Compact>,
@@ -545,7 +546,7 @@ export default () => {
               columns={detectionDataColumns}
               dataSource={detectionData.data}
               rowKey={'index'}
-              scroll={{ x: true }}
+              scroll={{ x: 'calc(100vw)', y: 'calc(100vh - 250px)' }}
             />
           ) : null}
         </PageContainer>
