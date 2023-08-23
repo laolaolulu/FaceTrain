@@ -6,7 +6,6 @@ import {
   HistoryOutlined,
   LoadingOutlined,
   PauseOutlined,
-  PictureOutlined,
   PieChartOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
@@ -23,6 +22,7 @@ import {
 import { useIntl } from '@umijs/max';
 import {
   Image as AntdImage,
+  Badge,
   Button,
   Carousel,
   Col,
@@ -32,6 +32,7 @@ import {
   Segmented,
   Space,
   Tag,
+  Typography,
 } from 'antd';
 import { UploadFile } from 'antd/es/upload';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -159,6 +160,7 @@ export default () => {
         dataIndex: 'imgfile',
         fixed: 'left',
         align: 'center',
+        width: 100,
         render: (_, record: DetectionDataType) => (
           //   <Spin
           //     spinning={
@@ -170,7 +172,7 @@ export default () => {
           //   >
           <AntdImage
             key="nameimage"
-            width={80}
+            style={{ maxHeight: 100 }}
             src={imgs[record.index].toDataURL()}
           />
         ),
@@ -179,13 +181,18 @@ export default () => {
         title: '图片名称',
         dataIndex: 'name',
         fixed: 'left',
+        width: 150,
         render: (_, record: DetectionDataType) => (
-          <>
-            {record.name}
+          <div>
+            <Typography.Paragraph
+              ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
+            >
+              {record.name}
+            </Typography.Paragraph>
             <Tag icon={<PieChartOutlined />} color="cyan">
               {formatBytes(record.size)}
             </Tag>
-          </>
+          </div>
         ),
       },
     ];
@@ -200,45 +207,59 @@ export default () => {
           render: (_, record: DetectionDataType) => {
             const model = record.model?.find((f) => f.index === element.index);
             return model ? (
-              <div style={{ display: 'flex' }}>
-                <div
+              <div>
+                <Badge count={model.faces.length}>
+                  <Tag
+                    icon={<HistoryOutlined />}
+                    color={colors[element.index]}
+                    style={{
+                      position: 'absolute',
+                      top: -10,
+                      zIndex: 1,
+                      left: -10,
+                      opacity: 0.9,
+                    }}
+                  >
+                    {(model.time / 1000)?.toFixed(2)} s
+                  </Tag>
+                  <AntdImage.PreviewGroup>
+                    <Carousel
+                      infinite={false}
+                      draggable={true}
+                      // autoplay={true}
+                      dots={{ className: 'dotclass' }}
+                      style={{
+                        display: 'grid',
+                        maxHeight: 100,
+
+                        maxWidth: 80,
+                        background: '#364d79',
+                      }}
+                    >
+                      {model.faces.map((m, index) => (
+                        <AntdImage
+                          key={`${index}-${element.index}`}
+                          width={80}
+                          height={80}
+                          src={m.face}
+                        />
+                      ))}
+                    </Carousel>
+                  </AntdImage.PreviewGroup>
+                </Badge>
+
+                {/* <div
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-around',
                   }}
                 >
-                  <Tag icon={<HistoryOutlined />} color="cyan">
-                    {(model.time / 1000)?.toFixed(2)} s
-                  </Tag>
+                 
                   <Tag icon={<PictureOutlined />} color="cyan">
                     {model.faces.length} faces
                   </Tag>
-                </div>
-                <AntdImage.PreviewGroup>
-                  <Carousel
-                    infinite={false}
-                    draggable={true}
-                    // autoplay={true}
-                    dots={{ className: 'dotclass' }}
-                    style={{
-                      display: 'grid',
-                      maxHeight: 100,
-
-                      maxWidth: 80,
-                      background: '#364d79',
-                    }}
-                  >
-                    {model.faces.map((m, index) => (
-                      <AntdImage
-                        key={`${index}-${element.index}`}
-                        width={80}
-                        height={80}
-                        src={m.face}
-                      />
-                    ))}
-                  </Carousel>
-                </AntdImage.PreviewGroup>
+                </div> */}
               </div>
             ) : (
               <LoadingOutlined />
@@ -268,6 +289,7 @@ export default () => {
 
     //   return invalidModelLength;
   }, [detectionData?.data, detectionPool]);
+
   useEffect(() => {
     return () => {
       //清除未结束的线程
@@ -540,6 +562,7 @@ export default () => {
 
           {detectionData ? (
             <ProTable<DetectionDataType>
+              size="small"
               headerTitle="检测结果"
               search={false}
               pagination={false}
