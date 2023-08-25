@@ -1,17 +1,67 @@
-# README
+# ÖúÄã¿ìËÙ¿ª·¢ÈËÁ³Ê¶±ð¹¦ÄÜ
 
-`@umijs/max` æ¨¡æ¿é¡¹ç›®ï¼Œæ›´å¤šåŠŸèƒ½å‚è€ƒ [Umi Max ç®€ä»‹](https://next.umijs.org/zh-CN/docs/max/introduce)
+- Ê¹ÓÃopencvÄÚÖÃµÄÈËÁ³Ê¶±ðËã·¨
+- ¿É°ïÖúÄã½øÐÐÓÃ»§ÈËÁ³ÐÅÏ¢Î¬»¤
+- Ò»¶Ô¶àÊ¶±ðÄ£ÐÍÑµÁ·²¢µ¼³öxmlÄ£ÐÍÎÄ¼þ
+- ÓµÓÐ¼òµ¥µÄ²âÊÔ¹¦ÄÜ
+- ¿ª·Åwebapi½Ó¿Ú·½±ãºóÆÚÉÏÉú²ú»·¾³
+- Ç°¶ËReact+ºó¶ËdotnetcoreÖúÄã¿çÆ½Ì¨Ê¹ÓÃ
+- Íê³Éelectron´ò°ü·½±ã²âÊÔÔ¤ÀÀ
+- ¸ü¶àµÄÊÇ×£ÄãÄÜÑ§µ½¸ü¶àµÄÐÂ×ËÊÆ
 
-### openapi ä½¿ç”¨é—®é¢˜
+## ·Ï»°²»¶àÉÏÔ¤ÀÀÍ¼
+![image](Resource/preview.webp)
+![image](Resource/imguser.png)
+## ÎÒÒªÈ¥ÏÂÔØ³¢ÊÔ
+[¸øÄã´ò°üºÃÁË£¬À´ÉìÊÖ½Ó×¡ https://github.com/laolaolulu/FaceTrain/releases](https://github.com/laolaolulu/FaceTrain/releases)
 
-- è¡¨å•ä¸­çš„æ•°ç»„è¢«è‡ªåŠ¨è½¬æ¢ä¸ºå­—ç¬¦ä¸²äº†
+## ÎÒÊÇ·ñÄÜÐÞ¸Ä´úÂëÊµÏÖÎÒÏëÒªµÄ¹¦ÄÜ£¿
+- Ç°¶ËÊ¹ÓÃReact¼¼Êõ£¨vueÐÐ²»ÐÐ£¿°¥ÄãÈ¥Ñ§Ï°ÏÂReactÂïºÜ¼òµ¥µÄ£©
+- Ç°¶Ë½ÅÊÖ¼ÜÊ¹ÓÃ°¢ÀïµÄumijs
+- UI¿â»¹ÊÇ°¢ÀïµÄantd
+- OpenApi-Swagger
+- ºó¶ËÊ¹ÓÃVisualStudio2022¹¤¾ß¿ª·¢
+- .net core 6 webapi 
+- ÈËÁ³Ê¶±ðËã·¨À´×ÔOpenCvSharp
 
-### web worker ä½¿ç”¨é—®é¢˜
+## ÏîÄ¿Ä¿Â¼½éÉÜ
+- FaceTrain //¸ùÄ¿Â¼
+    - ClientApp //Ç°¶Ë´úÂë
+	- Controllers //webapi¿ØÖÆÆ÷
+	- electron //×ÀÃæ°æ´ò°ü
+	- Models //Êý¾Ý¿âÄ£ÐÍ£¨EntityFramework£©
+	- Resource //¹«¹²×ÊÔ´
+	- wwwroot
+		- dist //Ç°¶ËbuildºóµÄÎÄ¼þ
+		- Faces //ÈËÁ³Êý¾ÝÍ¼Æ¬
+		- Model //ÑµÁ·Ä£ÐÍ´¢´æÄ¿Â¼
+	* face.db //Êý¾Ý¿âÎÄ¼þ£¨sqlite£©
+	* lp.p12 //sslÖ¤Êé£¨·½±ãwebµ÷ÓÃÉãÏñÍ·£©
 
-- åŒä¸€ä¸ª worker å®žä¾‹ä½¿ç”¨çš„åŒä¸€ä¸ªçº¿ç¨‹
-- å¤šä¸ª worker å¦‚ä½•å…±äº«åŒä¸€ä¸ªå•ä¾‹å¯¹è±¡ï¼Ÿ
+## Ä£ÐÍÊ¹ÓÃdemo
+- c#
 
-### è®¾è®¡
+```//´ýÍêÉÆ ```
+- java
 
-- ä¸ºèŠ‚çœä¼ è¾“æµé‡å‘åŽç«¯è¯·æ±‚è¯†åˆ«æ—¶å‰ç«¯å…ˆæˆªå–äººè„¸éƒ¨åˆ†ï¼Œå¹¶ä¸”æ²¡æœ‰äººè„¸çš„å›¾ç‰‡ä¸è¿›è¡Œè¯·æ±‚åŽç«¯è¯†åˆ«
-- ç”±äºŽæ‘„åƒå¤´æœªæŽˆæƒä¹‹å‰æ— æ³•èŽ·å–åˆ°æ‘„åƒå¤´åˆ—è¡¨ï¼Œç¨‹åºå¯åŠ¨æ—¶åŽ»æ‰“å¼€æ‘„åƒå¤´è®©ç”¨æˆ·æŽˆæƒåŽç„¶åŽå†å…³é—­æ‘„åƒå¤´
+```//´ýÍêÉÆ ```
+- python
+
+```//´ýÍêÉÆ ```
+- node
+
+```//´ýÍêÉÆ ```
+- c++
+
+```//´ýÍêÉÆ ```
+
+## ÎÒÒª×ÔÐÐ±àÒë
+ÎÄµµ´ýÍêÉÆ
+
+## Ð´ÔÚ×îºó
+- Î¢ÈíDFºÃ£¡
+- ¹È¸èDFºÃ£¡
+
+Ã¿Ò»¶Î´úÂë¶¼²»ÄÜ±£Ö¤Ã»ÓÐbugÏ£Íû´ó¼Ò±ðÂîÄï£¬»¶Ó­Ìá½»issuesÎÒÓÐ¿ÕÊ±»áÈ¥´¦ÀíÐÞ¸´£»
+¹¤¾ßÉú³ÉµÄÄ£ÐÍÊÊºÏÓÚÒ»¶Ô¶àÈËÁ³Ê¶±ð£¬Èç¹ûÄãÊÇÐèÒªÒ»¶ÔÒ»µÄÈËÁ³Æ¥ÅäÈÏÖ¤Õâ¸ö¹¤¾ß²»ÊÊºÏ£»
+LBPHËã·¨Ê¶±ð½á¹ûconfidenceÐ¡ÓÚ50²ÅÄÜ±£Ö¤Ê¶±ðµÄ×¼È·ÐÔ£»

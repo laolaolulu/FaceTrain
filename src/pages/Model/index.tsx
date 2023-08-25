@@ -200,10 +200,14 @@ export default () => {
       detectionData.mnames.forEach((element) => {
         columns.push({
           title: () => (
-            <div style={{ color: colors[element.index] }}>{element.mname}</div>
+            <Typography.Paragraph
+              style={{ color: colors[element.index], marginBottom: 'unset' }}
+              ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
+            >
+              {element.mname}
+            </Typography.Paragraph>
           ),
           dataIndex: element.mname,
-          align: 'center',
           render: (_, record: DetectionDataType) => {
             const model = record.model?.find((f) => f.index === element.index);
             return (
@@ -574,7 +578,7 @@ export default () => {
               dataSource={detectionData.data}
               rowKey={'index'}
               scroll={{
-                x: `calc(${detectionDataColumns.length} * 100px)`,
+                x: detectionData.mnames.length * 100 + 250,
                 y: 'calc(100vh - 250px)',
               }}
             />
