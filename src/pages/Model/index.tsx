@@ -3,7 +3,6 @@ import { formatBytes } from '@/utils';
 import { detection } from '@/utils/worker';
 import {
   FileImageOutlined,
-  HistoryOutlined,
   LoadingOutlined,
   PauseOutlined,
   PieChartOutlined,
@@ -27,6 +26,7 @@ import {
   Carousel,
   Col,
   Divider,
+  Empty,
   Modal,
   Row,
   Segmented,
@@ -200,55 +200,57 @@ export default () => {
       detectionData.mnames.forEach((element) => {
         columns.push({
           title: () => (
-            <div style={{ color: colors[element.index] }}> {element.mname}</div>
+            <div style={{ color: colors[element.index] }}>{element.mname}</div>
           ),
           dataIndex: element.mname,
           align: 'center',
           render: (_, record: DetectionDataType) => {
             const model = record.model?.find((f) => f.index === element.index);
-            return model ? (
-              <div>
-                <Badge count={model.faces.length}>
-                  <Tag
-                    icon={<HistoryOutlined />}
-                    color={colors[element.index]}
-                    style={{
-                      position: 'absolute',
-                      top: -10,
-                      zIndex: 1,
-                      left: -10,
-                      opacity: 0.9,
-                    }}
+            return (
+              <div style={{ width: 80, margin: '0 auto' }}>
+                {model ? (
+                  <Badge.Ribbon
+                    placement="start"
+                    text={`${(model.time / 1000)?.toFixed(2)} s`}
+                    color={model.faces.length === 0 ? 'red' : 'green'}
+                    style={{ top: 2 }}
                   >
-                    {(model.time / 1000)?.toFixed(2)} s
-                  </Tag>
-                  <AntdImage.PreviewGroup>
-                    <Carousel
-                      infinite={false}
-                      draggable={true}
-                      // autoplay={true}
-                      dots={{ className: 'dotclass' }}
-                      style={{
-                        display: 'grid',
-                        maxHeight: 100,
+                    {model.faces.length === 0 ? (
+                      <Empty
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        style={{
+                          backgroundColor: '#fcecec',
+                          margin: 0,
+                          padding: 5,
+                        }}
+                      />
+                    ) : (
+                      <AntdImage.PreviewGroup>
+                        <Carousel
+                          infinite={false}
+                          draggable={true}
+                          // autoplay={true}
+                          dots={{ className: 'dotclass' }}
+                          style={{
+                            display: 'grid',
+                            maxHeight: 100,
+                            maxWidth: 80,
+                            background: '#364d79',
+                          }}
+                        >
+                          {model.faces.map((m, index) => (
+                            <AntdImage
+                              key={`${index}-${element.index}`}
+                              width={80}
+                              height={80}
+                              src={m.face}
+                            />
+                          ))}
+                        </Carousel>
+                      </AntdImage.PreviewGroup>
+                    )}
 
-                        maxWidth: 80,
-                        background: '#364d79',
-                      }}
-                    >
-                      {model.faces.map((m, index) => (
-                        <AntdImage
-                          key={`${index}-${element.index}`}
-                          width={80}
-                          height={80}
-                          src={m.face}
-                        />
-                      ))}
-                    </Carousel>
-                  </AntdImage.PreviewGroup>
-                </Badge>
-
-                {/* <div
+                    {/* <div
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -260,9 +262,11 @@ export default () => {
                     {model.faces.length} faces
                   </Tag>
                 </div> */}
+                  </Badge.Ribbon>
+                ) : (
+                  <LoadingOutlined />
+                )}
               </div>
-            ) : (
-              <LoadingOutlined />
             );
           },
         });
@@ -569,7 +573,10 @@ export default () => {
               columns={detectionDataColumns}
               dataSource={detectionData.data}
               rowKey={'index'}
-              scroll={{ x: 'calc(100vw)', y: 'calc(100vh - 250px)' }}
+              scroll={{
+                x: `calc(${detectionDataColumns.length} * 100px)`,
+                y: 'calc(100vh - 250px)',
+              }}
             />
           ) : null}
         </PageContainer>
