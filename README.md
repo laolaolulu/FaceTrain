@@ -1,67 +1,81 @@
-# ÖúÄã¿ìËÙ¿ª·¢ÈËÁ³Ê¶±ð¹¦ÄÜ
+# ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½
 
-- Ê¹ÓÃopencvÄÚÖÃµÄÈËÁ³Ê¶±ðËã·¨
-- ¿É°ïÖúÄã½øÐÐÓÃ»§ÈËÁ³ÐÅÏ¢Î¬»¤
-- Ò»¶Ô¶àÊ¶±ðÄ£ÐÍÑµÁ·²¢µ¼³öxmlÄ£ÐÍÎÄ¼þ
-- ÓµÓÐ¼òµ¥µÄ²âÊÔ¹¦ÄÜ
-- ¿ª·Åwebapi½Ó¿Ú·½±ãºóÆÚÉÏÉú²ú»·¾³
-- Ç°¶ËReact+ºó¶ËdotnetcoreÖúÄã¿çÆ½Ì¨Ê¹ÓÃ
-- Íê³Éelectron´ò°ü·½±ã²âÊÔÔ¤ÀÀ
-- ¸ü¶àµÄÊÇ×£ÄãÄÜÑ§µ½¸ü¶àµÄÐÂ×ËÊÆ
+- Ê¹ï¿½ï¿½opencvï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ã·¨
+- ï¿½É°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢Î¬ï¿½ï¿½
+- Ò»ï¿½Ô¶ï¿½Ê¶ï¿½ï¿½Ä£ï¿½ï¿½Ñµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xmlÄ£ï¿½ï¿½ï¿½Ä¼ï¿½
+- Óµï¿½Ð¼òµ¥µÄ²ï¿½ï¿½Ô¹ï¿½ï¿½ï¿½
+- ï¿½ï¿½ï¿½ï¿½webapiï¿½Ó¿Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+- Ç°ï¿½ï¿½React+ï¿½ï¿½ï¿½dotnetcoreï¿½ï¿½ï¿½ï¿½ï¿½Æ½Ì¨Ê¹ï¿½ï¿½
+- ï¿½ï¿½ï¿½electronï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¤ï¿½ï¿½
+- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×£ï¿½ï¿½ï¿½ï¿½Ñ§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-## ·Ï»°²»¶àÉÏÔ¤ÀÀÍ¼
-![image](Resource/preview.webp)
-![image](Resource/imguser.png)
-## ÎÒÒªÈ¥ÏÂÔØ³¢ÊÔ
-[¸øÄã´ò°üºÃÁË£¬À´ÉìÊÖ½Ó×¡ https://github.com/laolaolulu/FaceTrain/releases](https://github.com/laolaolulu/FaceTrain/releases)
+## ï¿½Ï»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¤ï¿½ï¿½Í¼
 
-## ÎÒÊÇ·ñÄÜÐÞ¸Ä´úÂëÊµÏÖÎÒÏëÒªµÄ¹¦ÄÜ£¿
-- Ç°¶ËÊ¹ÓÃReact¼¼Êõ£¨vueÐÐ²»ÐÐ£¿°¥ÄãÈ¥Ñ§Ï°ÏÂReactÂïºÜ¼òµ¥µÄ£©
-- Ç°¶Ë½ÅÊÖ¼ÜÊ¹ÓÃ°¢ÀïµÄumijs
-- UI¿â»¹ÊÇ°¢ÀïµÄantd
+![image](Resource/preview.webp) ![image](Resource/imguser.png)
+
+## ï¿½ï¿½ÒªÈ¥ï¿½ï¿½ï¿½Ø³ï¿½ï¿½ï¿½
+
+[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½×¡ https://github.com/laolaolulu/FaceTrain/releases](https://github.com/laolaolulu/FaceTrain/releases)
+
+## ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Þ¸Ä´ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ä¹ï¿½ï¿½Ü£ï¿½
+
+- Ç°ï¿½ï¿½Ê¹ï¿½ï¿½Reactï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vueï¿½Ð²ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½È¥Ñ§Ï°ï¿½ï¿½Reactï¿½ï¿½Ü¼òµ¥µÄ£ï¿½
+- Ç°ï¿½Ë½ï¿½ï¿½Ö¼ï¿½Ê¹ï¿½Ã°ï¿½ï¿½ï¿½ï¿½umijs
+- UIï¿½â»¹ï¿½Ç°ï¿½ï¿½ï¿½ï¿½antd
 - OpenApi-Swagger
-- ºó¶ËÊ¹ÓÃVisualStudio2022¹¤¾ß¿ª·¢
-- .net core 6 webapi 
-- ÈËÁ³Ê¶±ðËã·¨À´×ÔOpenCvSharp
+- ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½VisualStudio2022ï¿½ï¿½ï¿½ß¿ï¿½ï¿½ï¿½
+- .net core 6 webapi
+- ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ã·¨ï¿½ï¿½ï¿½ï¿½OpenCvSharp
 
-## ÏîÄ¿Ä¿Â¼½éÉÜ
-- FaceTrain //¸ùÄ¿Â¼
-    - ClientApp //Ç°¶Ë´úÂë
-	- Controllers //webapi¿ØÖÆÆ÷
-	- electron //×ÀÃæ°æ´ò°ü
-	- Models //Êý¾Ý¿âÄ£ÐÍ£¨EntityFramework£©
-	- Resource //¹«¹²×ÊÔ´
-	- wwwroot
-		- dist //Ç°¶ËbuildºóµÄÎÄ¼þ
-		- Faces //ÈËÁ³Êý¾ÝÍ¼Æ¬
-		- Model //ÑµÁ·Ä£ÐÍ´¢´æÄ¿Â¼
-	* face.db //Êý¾Ý¿âÎÄ¼þ£¨sqlite£©
-	* lp.p12 //sslÖ¤Êé£¨·½±ãwebµ÷ÓÃÉãÏñÍ·£©
+## ï¿½ï¿½Ä¿Ä¿Â¼ï¿½ï¿½ï¿½ï¿½
 
-## Ä£ÐÍÊ¹ÓÃdemo
+- FaceTrain //ï¿½ï¿½Ä¿Â¼
+  - ClientApp //Ç°ï¿½Ë´ï¿½ï¿½ï¿½
+  - Controllers //webapiï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  - electron //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  - Models //ï¿½ï¿½ï¿½Ý¿ï¿½Ä£ï¿½Í£ï¿½EntityFrameworkï¿½ï¿½
+  - Resource //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
+  - wwwroot
+    - dist //Ç°ï¿½ï¿½buildï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
+    - Faces //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Æ¬
+    - Model //Ñµï¿½ï¿½Ä£ï¿½Í´ï¿½ï¿½ï¿½Ä¿Â¼
+  * face.db //ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½sqliteï¿½ï¿½
+  * lp.p12 //sslÖ¤ï¿½é£¨ï¿½ï¿½ï¿½ï¿½webï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½
+
+## Ä£ï¿½ï¿½Ê¹ï¿½ï¿½demo
+
 - c#
 
-```//´ýÍêÉÆ ```
+`//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ `
+
 - java
 
-```//´ýÍêÉÆ ```
+`//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ `
+
 - python
 
-```//´ýÍêÉÆ ```
+`//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ `
+
 - node
 
-```//´ýÍêÉÆ ```
+`//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ `
+
 - c++
 
-```//´ýÍêÉÆ ```
+`//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ `
 
-## ÎÒÒª×ÔÐÐ±àÒë
-ÎÄµµ´ýÍêÉÆ
+## ï¿½ï¿½Òªï¿½ï¿½ï¿½Ð±ï¿½ï¿½ï¿½
 
-## Ð´ÔÚ×îºó
-- Î¢ÈíDFºÃ£¡
-- ¹È¸èDFºÃ£¡
+ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-Ã¿Ò»¶Î´úÂë¶¼²»ÄÜ±£Ö¤Ã»ÓÐbugÏ£Íû´ó¼Ò±ðÂîÄï£¬»¶Ó­Ìá½»issuesÎÒÓÐ¿ÕÊ±»áÈ¥´¦ÀíÐÞ¸´£»
-¹¤¾ßÉú³ÉµÄÄ£ÐÍÊÊºÏÓÚÒ»¶Ô¶àÈËÁ³Ê¶±ð£¬Èç¹ûÄãÊÇÐèÒªÒ»¶ÔÒ»µÄÈËÁ³Æ¥ÅäÈÏÖ¤Õâ¸ö¹¤¾ß²»ÊÊºÏ£»
-LBPHËã·¨Ê¶±ð½á¹ûconfidenceÐ¡ÓÚ50²ÅÄÜ±£Ö¤Ê¶±ðµÄ×¼È·ÐÔ£»
+## Ð´ï¿½ï¿½ï¿½ï¿½ï¿½
+
+<<<<<<< HEAD
+
+- Î¢ï¿½ï¿½DFï¿½Ã£ï¿½
+- # ï¿½È¸ï¿½DFï¿½Ã£ï¿½
+- Î¢ï¿½ï¿½DFï¿½ï¿½ï¿½Ã£ï¿½
+- ï¿½È¸ï¿½DFï¿½ï¿½ï¿½Ã£ï¿½
+  > > > > > > > af73f9616aac9e2861ef405c4505a0c760a04ecc
+
+Ã¿Ò»ï¿½Î´ï¿½ï¿½ë¶¼ï¿½ï¿½ï¿½Ü±ï¿½Ö¤Ã»ï¿½ï¿½bugÏ£ï¿½ï¿½ï¿½ï¿½Ò±ï¿½ï¿½ï¿½ï¿½ï£¬ï¿½ï¿½Ó­ï¿½á½»issuesï¿½ï¿½ï¿½Ð¿ï¿½Ê±ï¿½ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éµï¿½Ä£ï¿½ï¿½ï¿½Êºï¿½ï¿½ï¿½Ò»ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÒªÒ»ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß²ï¿½ï¿½ÊºÏ£ï¿½ LBPHï¿½ã·¨Ê¶ï¿½ï¿½ï¿½ï¿½confidenceÐ¡ï¿½ï¿½50ï¿½ï¿½ï¿½Ü±ï¿½Ö¤Ê¶ï¿½ï¿½ï¿½×¼È·ï¿½Ô£ï¿½
