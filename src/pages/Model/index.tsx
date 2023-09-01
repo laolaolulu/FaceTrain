@@ -1,590 +1,64 @@
-import { colors } from '@/constants';
-import { formatBytes } from '@/utils';
-import { detection } from '@/utils/worker';
-import {
-  FileImageOutlined,
-  LoadingOutlined,
-  PauseOutlined,
-  PieChartOutlined,
-  VideoCameraOutlined,
-} from '@ant-design/icons';
-import {
-  PageContainer,
-  ProColumns,
-  ProForm,
-  ProFormDependency,
-  ProFormInstance,
-  ProFormTreeSelect,
-  ProFormUploadButton,
-  ProTable,
-} from '@ant-design/pro-components';
-import { useIntl } from '@umijs/max';
-import {
-  Image as AntdImage,
-  Badge,
-  Button,
-  Carousel,
-  Col,
-  Divider,
-  Empty,
-  Modal,
-  Row,
-  Segmented,
-  Space,
-  Tag,
-  Typography,
-} from 'antd';
-import { UploadFile } from 'antd/es/upload';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { WorkerPool } from 'workerpool';
-import ProFormFromVideo from './components/FromVideo';
+import { PageContainer } from '@ant-design/pro-components';
+import { Button, Divider } from 'antd';
+import FormDet from './FormDet';
 import './index.less';
 
-const detectionModel = [
-  {
-    value: 'Haarcascade',
-    children: [
-      {
-        value: 'haarcascade_frontalface_alt2.xml',
-      },
-      {
-        value: 'haarcascade_frontalface_default.xml',
-      },
-      {
-        value: 'haarcascade_frontalface_alt.xml',
-      },
-      {
-        value: 'haarcascade_frontalface_alt_tree.xml',
-      },
-    ],
-  },
-  {
-    value: 'SSD',
-    children: [
-      {
-        value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
-      },
-    ],
-  },
-  {
-    value: 'SCRFD',
-    children: [
-      //   {
-      //     //value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
-      //   },
-    ],
-  },
-  {
-    value: 'RetinaFace',
-    children: [
-      //   {
-      //     value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
-      //   },
-    ],
-  },
-  {
-    value: 'BlazeFace',
-    children: [
-      //   {
-      //     value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
-      //   },
-    ],
-  },
-];
-
-const imgs: HTMLCanvasElement[] = [];
-
-type FaceRect = { height: number; width: number; x: number; y: number };
-
-type DetectionDataType = {
-  index: number;
-  name: string;
-  size: number;
-  model: {
-    index: number;
-    time: number;
-    faces: (FaceRect & {
-      face: string;
-    })[];
-  }[];
-};
-
-const getFace = (file: File, rect: FaceRect) =>
-  new Promise<string>((resolve) => {
-    const image = new Image();
-    const reader = new FileReader();
-
-    reader.onload = function (e) {
-      image.src = e.target!.result as string;
-      image.onload = function () {
-        const canvas = document.createElement('canvas');
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        const context = canvas.getContext('2d')!;
-        context.drawImage(
-          image,
-          rect.x,
-          rect.y,
-          rect.width,
-          rect.height,
-          0,
-          0,
-          rect.width,
-          rect.height,
-        );
-        resolve(canvas.toDataURL());
-      };
-    };
-
-    reader.readAsDataURL(file);
-  });
+// const detectionModel = [
+//   {
+//     value: 'Haarcascade',
+//     children: [
+//       {
+//         value: 'haarcascade_frontalface_alt2.xml',
+//       },
+//       {
+//         value: 'haarcascade_frontalface_default.xml',
+//       },
+//       {
+//         value: 'haarcascade_frontalface_alt.xml',
+//       },
+//       {
+//         value: 'haarcascade_frontalface_alt_tree.xml',
+//       },
+//     ],
+//   },
+//   {
+//     value: 'SSD',
+//     children: [
+//       {
+//         value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
+//       },
+//     ],
+//   },
+//   {
+//     value: 'SCRFD',
+//     children: [
+//       //   {
+//       //     //value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
+//       //   },
+//     ],
+//   },
+//   {
+//     value: 'RetinaFace',
+//     children: [
+//       //   {
+//       //     value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
+//       //   },
+//     ],
+//   },
+//   {
+//     value: 'BlazeFace',
+//     children: [
+//       //   {
+//       //     value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
+//       //   },
+//     ],
+//   },
+// ];
 
 export default () => {
-  //人脸检测表单ref
-  const formDetectionRef = useRef<ProFormInstance>();
-  const fromVideoRef = useRef(null);
-  const intl = useIntl();
-  //人脸检测结果数据
-  const [detectionData, setDetectionData] = useState<{
-    mnames: { mname: string; index: number }[];
-    data: DetectionDataType[];
-  }>();
-  //检测第三线程
-  const [detectionPool, setDetectionPool] = useState<WorkerPool[]>([]);
-
-  //识别结果表头数据
-  const detectionDataColumns = useMemo(() => {
-    const columns: ProColumns<DetectionDataType>[] = [
-      {
-        title: '图片',
-        dataIndex: 'imgfile',
-        fixed: 'left',
-        align: 'center',
-        width: 100,
-        render: (_, record: DetectionDataType) => (
-          //   <Spin
-          //     spinning={
-          //       !record.model ||
-          //       !detectionData ||
-          //       record.model.filter((f) => f.faces).length !==
-          //         detectionData.mnames.length
-          //     }
-          //   >
-          <AntdImage
-            key="nameimage"
-            style={{ maxHeight: 100 }}
-            src={imgs[record.index].toDataURL()}
-          />
-        ),
-      },
-      {
-        title: '图片名称',
-        dataIndex: 'name',
-        fixed: 'left',
-        width: 150,
-        render: (_, record: DetectionDataType) => (
-          <div>
-            <Typography.Paragraph
-              ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
-            >
-              {record.name}
-            </Typography.Paragraph>
-            <Tag icon={<PieChartOutlined />} color="cyan">
-              {formatBytes(record.size)}
-            </Tag>
-          </div>
-        ),
-      },
-    ];
-    if (detectionData?.mnames) {
-      detectionData.mnames.forEach((element) => {
-        columns.push({
-          title: () => (
-            <Typography.Paragraph
-              style={{ color: colors[element.index], marginBottom: 'unset' }}
-              ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
-            >
-              {element.mname}
-            </Typography.Paragraph>
-          ),
-          dataIndex: element.mname,
-          render: (_, record: DetectionDataType) => {
-            const model = record.model?.find((f) => f.index === element.index);
-            return (
-              <div style={{ width: 80, margin: '0 auto' }}>
-                {model ? (
-                  <Badge.Ribbon
-                    placement="start"
-                    text={`${(model.time / 1000)?.toFixed(2)} s`}
-                    color={model.faces.length === 0 ? 'red' : 'green'}
-                    style={{ top: 2 }}
-                  >
-                    {model.faces.length === 0 ? (
-                      <Empty
-                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        style={{
-                          backgroundColor: '#fcecec',
-                          margin: 0,
-                          padding: 5,
-                        }}
-                      />
-                    ) : (
-                      <AntdImage.PreviewGroup>
-                        <Carousel
-                          infinite={false}
-                          draggable={true}
-                          // autoplay={true}
-                          dots={{ className: 'dotclass' }}
-                          style={{
-                            display: 'grid',
-                            maxHeight: 100,
-                            maxWidth: 80,
-                            background: '#364d79',
-                          }}
-                        >
-                          {model.faces.map((m, index) => (
-                            <AntdImage
-                              key={`${index}-${element.index}`}
-                              width={80}
-                              height={80}
-                              src={m.face}
-                            />
-                          ))}
-                        </Carousel>
-                      </AntdImage.PreviewGroup>
-                    )}
-
-                    {/* <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-around',
-                  }}
-                >
-                 
-                  <Tag icon={<PictureOutlined />} color="cyan">
-                    {model.faces.length} faces
-                  </Tag>
-                </div> */}
-                  </Badge.Ribbon>
-                ) : (
-                  <LoadingOutlined />
-                )}
-              </div>
-            );
-          },
-        });
-      });
-    }
-    return columns;
-  }, [detectionData?.mnames]);
-
-  //是否正在进行人脸检测
-  const detectioning = useMemo(() => {
-    return detectionPool.filter((f) => f.stats().totalWorkers > 0).length > 0;
-    //   if (!detectionData?.data) {
-    //     return false;
-    //   }
-
-    //   const models = detectionData.data.filter((f) => !f.model);
-    //   if (models.length > 0) {
-    //     return true;
-    //   }
-
-    //   const invalidModelLength = detectionData.data.some(
-    //     (f) => f.model.length !== detectionData?.mnames.length,
-    //   );
-
-    //   return invalidModelLength;
-  }, [detectionData?.data, detectionPool]);
-
-  useEffect(() => {
-    return () => {
-      //清除未结束的线程
-      setDetectionPool((state) => {
-        state.forEach((pool) => {
-          pool.terminate(true);
-        });
-        return [];
-      });
-    };
-  }, []);
   return (
     <>
-      <ProForm
-        formRef={formDetectionRef}
-        // style={{ marginTop: 10 }}
-        initialValues={{ imgfrom: 'files' }}
-        submitter={false}
-        onFinish={async (values) => {
-          //获取选中的model及父级项
-          const models = detectionModel
-            .flatMap((t) =>
-              t.children.map((n) => ({
-                mtype: t.value.toLowerCase(),
-                mname: n.value,
-              })),
-            )
-            .filter((f) => values.model.includes(f.mname));
-          //获取表头数据以及要检测的图片
-          const data = await Promise.all(
-            values.imgs.map(async (m: UploadFile, index: number) => {
-              imgs[index] = await new Promise<HTMLCanvasElement>((resolve) => {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                  const image = new Image();
-                  image.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = image.width;
-                    canvas.height = image.height;
-                    const context = canvas.getContext('2d')!;
-                    context.drawImage(image, 0, 0, image.width, image.height);
-                    resolve(canvas);
-                  };
-                  image.src = e.target?.result as string;
-                };
-                reader.readAsDataURL(m.originFileObj!);
-              });
-              return {
-                index,
-                name: m.name,
-                size: m.size,
-              };
-            }),
-          );
-
-          //配置表头以及需要识别的图片
-          setDetectionData({
-            mnames: models.map(({ mname }, index) => ({ mname, index })),
-            data,
-          });
-
-          //请求人脸检测worker
-          models.forEach((element, index) => {
-            const callback = async (res: {
-              index: number;
-              time: number;
-              faces: FaceRect[];
-            }) => {
-              const context = imgs[res.index].getContext('2d')!;
-              const faces = await Promise.all(
-                res.faces.map(async (m) => {
-                  //将检测到人脸边框绘制到图片上
-                  context.beginPath();
-                  context.rect(m.x, m.y, m.width, m.height); // 参数分别是 x, y, width, height
-                  context.strokeStyle = colors[index]; // 设置边框颜色
-                  context.lineWidth = 1; // 设置边框宽度
-                  context.stroke(); // 绘制矩形边框
-
-                  return {
-                    face: await getFace(
-                      values.imgs[res.index].originFileObj,
-                      m,
-                    ),
-                    ...m,
-                  };
-                }),
-              );
-
-              setDetectionData((state) => {
-                const resstate = [...(state?.data || [])];
-                const model = {
-                  index,
-                  time: res.time,
-                  faces,
-                };
-                const statedata = resstate.find((f) => f.index === res.index);
-                if (statedata?.model) {
-                  statedata.model.push(model);
-                } else {
-                  statedata!.model = [model];
-                }
-
-                return {
-                  ...(state || { mnames: [], data: [] }),
-                  data: resstate,
-                };
-              });
-            };
-            //启动识别
-            setTimeout(async () => {
-              const pool = await detection(
-                element.mtype,
-                element.mname,
-                values.imgs.map((m: any) => m.originFileObj),
-                callback,
-              );
-
-              setDetectionPool((state) => [...state, pool]);
-            }, index * 200);
-          });
-        }}
-      >
-        <PageContainer
-          title="人脸检测测试"
-          style={{ width: '100%' }}
-          extra={[
-            <ProForm.Item name="imgfrom" key="1" noStyle>
-              <Segmented
-                disabled={detectioning}
-                options={[
-                  {
-                    value: 'files',
-                    icon: <FileImageOutlined />,
-                  },
-                  {
-                    value: 'videos',
-                    icon: <VideoCameraOutlined />,
-                  },
-                ]}
-              />
-            </ProForm.Item>,
-            <Space.Compact key="2" block>
-              <Button loading={detectioning} type="primary" htmlType="submit">
-                检测人脸
-              </Button>
-              <Button
-                type="primary"
-                icon={<PauseOutlined />}
-                style={{
-                  display: detectioning ? 'unset' : 'none',
-                }}
-                onClick={() => {
-                  detectionPool.forEach((pool) => {
-                    pool.terminate(true);
-                  });
-                  setDetectionPool([]);
-                }}
-              />
-            </Space.Compact>,
-          ]}
-        >
-          <Row gutter={[16, 0]}>
-            <Col xs={24} md={12}>
-              <ProFormTreeSelect
-                label="检测算法"
-                name="model"
-                placeholder="选择检测模型"
-                rules={[{ required: true }]}
-                fieldProps={{
-                  treeCheckable: true,
-                  treeDefaultExpandAll: true,
-                  fieldNames: {
-                    label: 'value',
-                  },
-                  treeData: detectionModel,
-                }}
-              />
-            </Col>
-            <Col xs={24} md={12}>
-              <ProFormDependency name={['imgfrom']}>
-                {({ imgfrom }) =>
-                  imgfrom === 'videos' ? (
-                    <ProFormFromVideo
-                      ref={fromVideoRef}
-                      label="摄像头"
-                      name="video"
-                      placeholder="选择摄像头"
-                      rules={[{ required: true }]}
-                    />
-                  ) : (
-                    <ProFormUploadButton
-                      label="选择图片"
-                      name="imgs"
-                      listType="picture-card"
-                      className="avatar-uploader"
-                      fieldProps={{
-                        beforeUpload: () => {
-                          return false;
-                        },
-                        multiple: true,
-                        maxCount: 10,
-                        onPreview: (imgfile) => {
-                          const reader = new FileReader();
-                          reader.onload = (e) => {
-                            const img = new Image();
-                            img.onload = () => {
-                              Modal.info({
-                                title: '预览',
-                                width: img.width,
-                                closable: true,
-                                centered: true,
-                                maskClosable: true,
-                                content: (
-                                  <div
-                                    style={{
-                                      marginLeft: -35,
-                                      textAlign: 'center',
-                                    }}
-                                  >
-                                    <img
-                                      style={{
-                                        maxWidth: '100%',
-                                        maxHeight: 'calc(100vh - 140px)',
-                                      }}
-                                      src={e.target?.result?.toString()}
-                                    />
-                                  </div>
-                                ),
-                              });
-                            };
-                            if (e.target?.result) {
-                              img.src = e.target.result.toString();
-                            }
-                          };
-                          reader.readAsDataURL(imgfile.originFileObj!);
-                        },
-                      }}
-                      max={10}
-                      accept={'image/png, image/jpeg'}
-                      rules={[
-                        {
-                          required: true,
-                          message: 'Please select your country!',
-                        },
-                      ]}
-                    />
-                  )
-                }
-              </ProFormDependency>
-            </Col>
-          </Row>
-          {/* <ProForm.Item noStyle shouldUpdate>
-            {(form) => {
-              console.log('xx', form);
-              return (
-                <ProFormSelect
-                  options={[
-                    {
-                      value: 'chapter',
-                      label: '盖章后生效',
-                    },
-                  ]}
-                  width="md"
-                  name="useMode"
-                  label={`与《${form.getFieldValue('name')}》合同约定生效方式`}
-                />
-              );
-            }}
-          </ProForm.Item> */}
-
-          {detectionData ? (
-            <ProTable<DetectionDataType>
-              size="small"
-              headerTitle="检测结果"
-              search={false}
-              pagination={false}
-              columns={detectionDataColumns}
-              dataSource={detectionData.data}
-              rowKey={'index'}
-              scroll={{
-                x: detectionData.mnames.length * 100 + 250,
-                y: 'calc(100vh - 250px)',
-              }}
-            />
-          ) : null}
-        </PageContainer>
-      </ProForm>
+      <FormDet />
       <Divider />
       <PageContainer
         title="相似度计算"
@@ -595,7 +69,7 @@ export default () => {
             key="1"
             type="primary"
             onClick={() => {
-              formDetectionRef.current?.submit();
+              // formDetectionRef.current?.submit();
             }}
           >
             开始计算

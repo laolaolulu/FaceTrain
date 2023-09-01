@@ -23,18 +23,22 @@ export const faceModel = {
         {
           value: 'haarcascade_frontalface_alt2.xml',
           date: '2013-12-19',
+          size: 837462,
         },
         {
           value: 'haarcascade_frontalface_default.xml',
           date: '2013-12-19',
+          size: 1254733,
         },
         {
           value: 'haarcascade_frontalface_alt.xml',
           date: '2013-12-19',
+          size: 919871,
         },
         {
           value: 'haarcascade_frontalface_alt_tree.xml',
           date: '2013-12-19',
+          size: 3644763,
         },
       ],
     },
@@ -44,6 +48,7 @@ export const faceModel = {
         {
           value: 'res10_300x300_ssd_iter_140000_fp16.caffemodel',
           date: '2019-07-30',
+          size: 5351047,
         },
       ],
     },

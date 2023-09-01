@@ -73,7 +73,7 @@ obj['ssd'] = async (
     });
   return pool;
 };
-
+//export const detection=()=>{}
 export const detection = (
   mtype: string,
   mname: string,

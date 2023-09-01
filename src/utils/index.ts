@@ -72,3 +72,33 @@ export function formatBytes(bytes: number, decimals = 2) {
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
+
+export const getFace = (file: File, rect: FaceRect) =>
+  new Promise<string>((resolve) => {
+    const image = new Image();
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      image.src = e.target!.result as string;
+      image.onload = function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        const context = canvas.getContext('2d')!;
+        context.drawImage(
+          image,
+          rect.x,
+          rect.y,
+          rect.width,
+          rect.height,
+          0,
+          0,
+          rect.width,
+          rect.height,
+        );
+        resolve(canvas.toDataURL());
+      };
+    };
+
+    reader.readAsDataURL(file);
+  });
