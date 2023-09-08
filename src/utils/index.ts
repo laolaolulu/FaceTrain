@@ -102,3 +102,31 @@ export const getFace = (file: File, rect: FaceRect) =>
 
     reader.readAsDataURL(file);
   });
+
+/**获取文件字节码 */
+export const getFile = async (url: string): Promise<ArrayBuffer> => {
+  //message.loading({ content: `${url} downloading...`, key: url });
+  const response = await fetch(url);
+  // message.destroy(url);
+  return await response.arrayBuffer();
+};
+/**从imageData生成image对象 */
+export const imageDataToImage = (imageData: ImageData) => {
+  // 创建一个新的空的 <canvas> 元素
+
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d')!;
+
+  // 设置 <canvas> 的宽度和高度与 ImageData 相同
+  canvas.width = imageData.width;
+  canvas.height = imageData.height;
+
+  // 在 <canvas> 上绘制 ImageData
+  context.putImageData(imageData, 0, 0);
+
+  // 从 <canvas> 创建一个新的 Image 对象
+  const image = new Image();
+  image.src = canvas.toDataURL(); // 您可以指定图片格式
+
+  return image;
+};

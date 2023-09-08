@@ -10,16 +10,21 @@ declare global {
 
   type FaceRect = { height: number; width: number; x: number; y: number };
   type DetectionModel = {
-    index: number;
+    modelID: number;
     time: number;
     faces: (FaceRect & {
       face: string;
     })[];
   };
   type DetectionDataType = {
-    index: number;
+    imgID: number;
     name: string;
     size: number;
-    model: DetectionModel[];
+    model?: DetectionModel[];
+  };
+  type DetectionRes = {
+    success: boolean;
+    imgID: number;
+    data: { faces: FaceRect[]; time: number };
   };
 }

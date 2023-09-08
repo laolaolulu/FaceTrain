@@ -40,10 +40,10 @@ export default forwardRef(
       useState<{ value: string; label: string }[]>();
 
     const getImg = () => {
-      if (videoRef.current && vodeoctx) {
-        vodeoctx.drawImage(videoRef.current, 0, 0);
-        let buffer = vodeoctx.getImageData(0, 0, width, height).data.buffer;
-      }
+      const name = `${new Date().getTime()}_${currentStreamRef.current?.getTracks()[0]
+        .label}`;
+      vodeoctx.drawImage(videoRef.current!, 0, 0);
+      return { name, img: vodeoctx.getImageData(0, 0, width, height) };
     };
 
     const strokeRect = (faces: any) => {};

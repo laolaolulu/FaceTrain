@@ -18,8 +18,7 @@ export default ({
 }) => {
   //识别结果表头数据
   const detectionDataColumns = useMemo(() => {
-    console.log('testloadcolumns', detectionData);
-    if (detectionData?.mnames) {
+    if (detectionData.mnames.length > 0) {
       const columns: ProColumns<DetectionDataType>[] = [
         {
           title: '图片',
@@ -39,7 +38,7 @@ export default ({
             <Image
               key="nameimage"
               style={{ maxHeight: 100 }}
-              src={imgs[record.index].toDataURL()}
+              src={imgs[record.imgID]?.toDataURL()}
             />
           ),
         },
@@ -62,31 +61,31 @@ export default ({
           ),
         },
       ];
-      if (detectionData?.mnames) {
-        detectionData.mnames.forEach((element) => {
-          columns.push({
-            title: () => (
-              <Typography.Paragraph
-                style={{ color: colors[element.index], marginBottom: 'unset' }}
-                ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
-              >
-                {element.mname}
-              </Typography.Paragraph>
-            ),
-            dataIndex: element.mname,
-            align: 'center',
-            render: (_, record: DetectionDataType) => (
-              <ResImgsDet
-                model={record.model?.find((f) => f.index === element.index)}
-              />
-            ),
-          });
+
+      detectionData.mnames.forEach((element) => {
+        columns.push({
+          title: () => (
+            <Typography.Paragraph
+              style={{ color: colors[element.index], marginBottom: 'unset' }}
+              ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
+            >
+              {element.mname}
+            </Typography.Paragraph>
+          ),
+          dataIndex: element.mname,
+          align: 'center',
+          render: (_, record: DetectionDataType) => (
+            <ResImgsDet
+              model={record.model?.find((f) => f.modelID === element.index)}
+            />
+          ),
         });
-      }
+      });
+
       return columns;
     }
     return [];
-  }, [detectionData?.mnames]);
+  }, [detectionData.mnames]);
 
   return (
     <ProTable<DetectionDataType>
@@ -96,7 +95,7 @@ export default ({
       pagination={false}
       columns={detectionDataColumns}
       dataSource={detectionData.data}
-      rowKey={'index'}
+      rowKey={'imgID'}
       scroll={{
         x: detectionData.mnames.length * 110 + 250,
         y: 'calc(100vh - 250px)',
