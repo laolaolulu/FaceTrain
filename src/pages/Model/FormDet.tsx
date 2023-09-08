@@ -45,6 +45,7 @@ export default () => {
   const formDetectionRef = useRef<ProFormInstance>();
   const fromVideoRef = useRef<{
     getImg: () => { name: string; img: ImageData };
+    strokeRect: (color: string, faces: FaceRect) => void;
   }>();
 
   //人脸检测结果数据
@@ -144,6 +145,11 @@ export default () => {
 
         if (execres.success) {
           const faces = execres.data.faces.map((m: any) => {
+            //将识别到的人脸框绘制到video上
+            if (fromVideoRef.current) {
+              fromVideoRef.current.strokeRect(colors[modelID], m);
+            }
+
             //#region 将检测到人脸边框绘制到图片上
             const context = imgs[imagem.imgID].getContext('2d')!;
             context.beginPath();

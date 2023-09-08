@@ -16,7 +16,6 @@ const getVideoDevices = async () => {
     .map((m) => ({ label: m.label, value: m.deviceId, selected: true }));
 };
 
-let canvasctx: CanvasRenderingContext2D | null | undefined; //画人脸框以及人脸识别时显示名字
 let vodeoctx: OffscreenCanvasRenderingContext2D; //从video获取图片使用
 let width: number, height: number;
 
@@ -46,7 +45,30 @@ export default forwardRef(
       return { name, img: vodeoctx.getImageData(0, 0, width, height) };
     };
 
-    const strokeRect = (faces: any) => {};
+    const strokeRect = (color: string, faces: FaceRect) => {
+      const canvasctx = canvasRef.current?.getContext('2d');
+      if (canvasctx) {
+        const widthScale = canvasctx.canvas.width / width;
+        const heightScale = canvasctx.canvas.height / height;
+
+        canvasctx.strokeStyle = color; // 设置正方形颜色
+        canvasctx.strokeRect(
+          faces.x * widthScale,
+          faces.y * heightScale,
+          faces.width * widthScale,
+          faces.height * heightScale,
+        ); // 绘制正方形
+
+        setTimeout(() => {
+          canvasctx.clearRect(
+            0,
+            0,
+            canvasctx.canvas.width,
+            canvasctx.canvas.height,
+          );
+        }, 200);
+      }
+    };
 
     useImperativeHandle(ref, () => ({
       getImg,
@@ -89,8 +111,6 @@ export default forwardRef(
       }
     };
     useEffect(() => {
-      //  canvasctx = canvasRef.current?.getContext('2d');
-
       const devicesAsync = getVideoDevices();
 
       //首次加载摄像头
@@ -117,18 +137,26 @@ export default forwardRef(
             options: devices,
           }}
         />
-        <video
-          ref={videoRef}
-          onCanPlay={() => {
-            console.log('onCanPlay');
-            //  sendmsg();
-          }}
-          autoPlay
-          playsInline
-          style={{
-            maxWidth: '100%',
-          }}
-        />
+        <div style={{ position: 'relative' }}>
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            style={{
+              maxWidth: '100%',
+            }}
+          />
+          {/* canvas用来画识别到的脸部框 */}
+          <canvas
+            ref={canvasRef}
+            style={{
+              width: '100%',
+              height: '100%',
+              left: 0,
+              position: 'absolute',
+            }}
+          ></canvas>
+        </div>
       </>
     );
   },
