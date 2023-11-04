@@ -12,3 +12,10 @@
 /.mfsu
 /imgtest
 .swc
+obj
+bin
+.vs
+/csharp/TestResults
+/csharp/Tests/Resource
+
+

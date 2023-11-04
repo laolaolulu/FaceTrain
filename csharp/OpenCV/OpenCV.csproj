@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>FaceTrain.$(AssemblyName)</PackageId>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>FaceSharp</Title>
+    <Description>使用opencv来推理人脸识别神经网络模型</Description>
+    <PackageProjectUrl>https://github.com/laolaolulu/facetrain</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/laolaolulu/facetrain</RepositoryUrl>
+    <PackageTags>scrfd-opencv</PackageTags>
+    <PackageReleaseNotes>发行说明信息</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Version>1.0.0.11</Version>
+    <Copyright>Copyright (c) 2023 laolaolulu</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Authors>laolaolullu</Authors>
+    <Product>人脸识别</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.8.0.20230708" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Helper\Helper.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
