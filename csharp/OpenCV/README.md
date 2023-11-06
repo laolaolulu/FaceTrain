@@ -1,5 +1,5 @@
 # FaceTrain.OpenCV
-仅使用OpenCV库来推理人脸识别神经网络模型
+使用OpenCV库来推理人脸识别神经网络模型
 
 测试代码：
 ```c#

@@ -7,9 +7,9 @@
 		<PackageId>FaceTrain.$(AssemblyName)</PackageId>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>FaceSharp</Title>
-		<Description>使用onnxRuntime来推理人脸识别神经网络模型</Description>
+		<Description>使用onnxRuntime来推理人脸识别神经网络模型；会陆续加入所有流行的人脸识别模型进来</Description>
 		<PackageProjectUrl>https://github.com/laolaolulu/facetrain</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/laolaolulu/facetrain</RepositoryUrl>
+		<RepositoryUrl>https://github.com/laolaolulu/FaceTrain/tree/master/csharp/OnnxRuntime</RepositoryUrl>
 		<PackageTags>scrfd-onnxRuntime</PackageTags>
 		<PackageReleaseNotes>发行说明信息</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
