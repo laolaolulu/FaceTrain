@@ -8,7 +8,7 @@ namespace FaceTrain.Opencv
     public class SCRFD : ISCRFD
     {
         readonly Net net;
-        readonly int inputWidth, inputHeight,  num_anchors = 1;
+        readonly int inputWidth, inputHeight, num_anchors = 1;
         readonly bool use_kps = false;
         readonly int[] feat_stride_fpn = { 8, 16, 32 };
         readonly IEnumerable<string> outBlobNames;
@@ -67,7 +67,7 @@ namespace FaceTrain.Opencv
             using var mat = resizeRes.mat;
             //预处理图片
             using var blob = CvDnn.BlobFromImage(mat, 1 / 128.0, new Size(inputWidth, inputHeight), new Scalar(127.5, 127.5, 127.5), true, false);
-           var ses= blob.AsSpan<float>();
+            var ses = blob.AsSpan<float>();
             //将图片输入到网络中
             net.SetInput(blob);
             //创建返回集合对象
@@ -88,9 +88,10 @@ namespace FaceTrain.Opencv
                 {
                     kps_preds = outputBlobs[idx + feat_stride_fpn.Length * 2];
                 }
-              //  var faces = new List<FaceBox>();
+                //  var faces = new List<FaceBox>();
                 for (int i = 0; i < outputBlobs[idx].Size(1); i++)
                 {
+                    var tesew = outputBlobs.Select(s=>(s.Size(0), s.Size(1), s.Size(2), s.Size(3), s.Size(4)));
                     var score = outputBlobs[idx].At<float>(0, i, 0);
                     if (score >= threshold)
                     {
@@ -123,8 +124,8 @@ namespace FaceTrain.Opencv
                 }
             }
             CvDnn.NMSBoxes(res.Select(s => Rect2d.FromLTRB(s.Left, s.Top, s.Right, s.Bottom)), res.Select(s => s.Score), threshold, 0.4f, out int[] indices);
-           
-            return res.Where((w,index)=> indices.Contains(index)).ToList();
+
+            return res.Where((w, index) => indices.Contains(index)).ToList();
         }
 
         /// <summary>

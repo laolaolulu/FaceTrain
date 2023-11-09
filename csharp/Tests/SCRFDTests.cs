@@ -11,8 +11,8 @@ namespace FaceTrain.Tests
         {
             Stopwatch stopwatch = new();
             using VideoCapture capture = new(0);
-            byte[] modelBytes = File.ReadAllBytes("Resource\\Model\\SCRFD\\scrfd_10g_kps.onnx");
-            using var net = new Opencv.SCRFD(modelBytes);
+            byte[] modelBytes = File.ReadAllBytes("Resource\\Model\\SCRFD\\scrfd_500m_shape640x640.onnx");
+            using var net = new OnnxRuntime.SCRFD(modelBytes);
             while (true)
             {
                 using Mat frame = new();
@@ -44,15 +44,16 @@ namespace FaceTrain.Tests
         public void DetectionTestImages()
         {
             Stopwatch stopwatch = new();
-            byte[] modelBytes = File.ReadAllBytes("Resource\\Model\\SCRFD\\scrfd_500m_kps.onnx");
-            using var net = new Opencv.SCRFD(modelBytes);
+            byte[] modelBytes = File.ReadAllBytes("Resource\\Model\\SCRFD\\scrfd_1g_bnkps_shape640x640.onnx");
+            using var net = new FaceTrain.OnnxRuntime.SCRFD(modelBytes);
             var imgsName = Directory.GetFiles("Resource\\Img");
-            var imgs = imgsName.Select(s => File.ReadAllBytes(s));
-            foreach (var img in imgs)
+            var imgs = imgsName.Select(s =>(name:s,img: File.ReadAllBytes(s)) );
+          // var img = File.ReadAllBytes("Resource\\Img\\test.png");
+            foreach (var item in imgs)
             {
-                using var image = Cv2.ImDecode(img, ImreadModes.Color);
+                using var image = Cv2.ImDecode(item.img, ImreadModes.Color);
                 stopwatch.Restart();
-                var faces = net.Detection(img);
+                var faces = net.Detection(item.img);
                 stopwatch.Stop();
                 DrawTextWithBackground(image, "time:" + stopwatch.Elapsed.TotalSeconds.ToString("0.00"), new Point(30, 50));
                 foreach (var face in faces)
