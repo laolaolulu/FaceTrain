@@ -8,13 +8,13 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>FaceSharp</Title>
     <Description>使用opencv来推理人脸识别神经网络模型；会陆续加入所有流行的人脸识别模型进来</Description>
-    <PackageProjectUrl>https://github.com/laolaolulu/facetrain</PackageProjectUrl>
+    <PackageProjectUrl>https://laolaolulu.github.io/posts/csharp-scrfd-opencv</PackageProjectUrl>
     <RepositoryUrl>https://github.com/laolaolulu/FaceTrain/tree/master/csharp/OpenCV</RepositoryUrl>
     <PackageTags>scrfd-opencv</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>1.0.0.11</Version>
+    <Version>1.0.1</Version>
     <Copyright>Copyright (c) 2023 laolaolulu</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Authors>laolaolullu</Authors>
