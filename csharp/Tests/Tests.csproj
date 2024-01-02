@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Folder Include="Resource\Img\" />
-    <Folder Include="Resource\Model\SCRFD\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,7 +25,7 @@
 
   <ItemGroup>
     <None Update="Resource\Img\0a83969c98ae4a2889cac620f7b4f66b.webp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Img\20230112134436573-0.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -35,10 +34,28 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Img\4b2d6be565774047fed36bddf534a93d.jpeg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\505ebaa3d26c2383561701fbcf8b3193.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\5eff12848698c442cf65d8b361af8dc7.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\76a3b800d5ed174859b5abe98d8b288d.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\a4a160d47bc0129b515f18d2aac6ee88.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Img\createproject.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\fc4e0faa8a976fa4da95e230a2876cc6.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\ff80be00a74444dc58b38e3de788f6f5.jpeg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Img\installef.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -47,16 +64,52 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Img\test.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Img\vsinstall.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\WIN_20221124_11_28_08_Pro.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\WIN_20221124_11_30_54_Pro.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\WIN_20221124_11_31_00_Pro.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\WIN_20221124_11_31_03_Pro.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\WIN_20221124_11_31_05_Pro.jpg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\于敏.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\孙家栋.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\彭士禄.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Img\微信截图_20230713175657 - 副本.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Img\微信截图_20230713175657.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\袁隆平.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\邓稼先.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\钱学森.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Img\黄旭华.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Model\ArcFace\cisia_r50-2021年8月5日.onnx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -137,6 +190,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Model\SCRFD\det.onnx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resource\Model\SCRFD\R18-Glint360K-2021年8月3日.onnx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resource\Model\SCRFD\scrfd_10g_bnkps_shape640x640.onnx">

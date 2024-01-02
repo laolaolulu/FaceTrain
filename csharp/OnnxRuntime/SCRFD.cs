@@ -3,6 +3,9 @@
 using FaceTrain.Helper;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
+using SixLabors.ImageSharp.Formats;
+using System.Collections;
+using System.Diagnostics;
 
 namespace FaceTrain.OnnxRuntime
 {
@@ -16,6 +19,7 @@ namespace FaceTrain.OnnxRuntime
         readonly int[] feat_stride_fpn = { 8, 16, 32 };
         readonly bool use_kps = false;
         readonly Dictionary<int, List<Pointf>> centerPoints = new();
+
         public SCRFD(byte[] model)
         {
             net = new InferenceSession(model);
@@ -62,17 +66,24 @@ namespace FaceTrain.OnnxRuntime
 
         public List<FaceBox> Detection(byte[] img, float threshold = 0.5f)
         {
-            //Stopwatch stopwatch = new();
-            //stopwatch.Start();
+#if DEBUG
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+#endif
+
             using Image<Rgb24> image = Image.Load<Rgb24>(img);
-            //stopwatch.Stop();
-            //Debug.WriteLine("imgLoad:" + stopwatch.Elapsed.TotalMilliseconds);
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine("imgLoad:" + stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+#endif
+
             int width = image.Width, height = image.Height;
             float w_r = dimensions[2] / (float)width, h_r = dimensions[3] / (float)height;
             float ratio = (w_r < h_r) ? w_r : h_r;
             int new_unpad_w = (int)(width * ratio), new_unpad_h = (int)(height * ratio);
             int dw = (dimensions[2] - new_unpad_w) / 2, dh = (dimensions[3] - new_unpad_h) / 2;
-            //stopwatch.Restart();
+
             //输入图片缩放
             image.Mutate(x =>
             {
@@ -82,30 +93,41 @@ namespace FaceTrain.OnnxRuntime
                     Mode = ResizeMode.Pad,
                 });
             });
-            //stopwatch.Stop();
-            //Debug.WriteLine("imgResize:" + stopwatch.Elapsed.TotalMilliseconds);
-            //stopwatch.Restart();
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine("imgResize:" + stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+#endif
+
             //将图片预处理网络输入结构
-            DenseTensor<float> processedImage = new(dimensions);
+            var size = dimensions[2] * dimensions[3];
+            var value = new float[3 * size];
+            int baseIndex, index;
+
             image.ProcessPixelRows(accessor =>
             {
                 for (int y = 0; y < accessor.Height; y++)
                 {
                     Span<Rgb24> pixelSpan = accessor.GetRowSpan(y);
+                    baseIndex = y * accessor.Width;
                     for (int x = 0; x < accessor.Width; x++)
                     {
-                        processedImage[0, 0, y, x] = (pixelSpan[x].R - mean) / stddev;
-                        processedImage[0, 1, y, x] = (pixelSpan[x].G - mean) / stddev;
-                        processedImage[0, 2, y, x] = (pixelSpan[x].B - mean) / stddev;
-                    }
+                        index = baseIndex + x;
+                        value[index] = (pixelSpan[x].B - mean) / stddev;
+                        value[index + size] = (pixelSpan[x].G - mean) / stddev;
+                        value[index + size * 2] = (pixelSpan[x].R - mean) / stddev;
+                    };
+
                 }
             });
-            //stopwatch.Stop();
-            //Debug.WriteLine("pretreatment:" + stopwatch.Elapsed.TotalMilliseconds);
 
-            using var inputOrtValue = OrtValue.CreateTensorValueFromMemory(OrtMemoryInfo.DefaultInstance,
-                                        processedImage.Buffer, new long[] { dimensions[0], dimensions[1], dimensions[2], dimensions[3] });
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine("imgBolb:" + stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+#endif
 
+            using var inputOrtValue = OrtValue.CreateTensorValueFromMemory(value, new long[] { dimensions[0], dimensions[1], dimensions[2], dimensions[3] });
             var inputs = new Dictionary<string, OrtValue>
                 {
                     { input_name, inputOrtValue }
@@ -113,6 +135,11 @@ namespace FaceTrain.OnnxRuntime
 
             //执行推理
             using var results = net.Run(new RunOptions(), inputs, net.OutputNames);
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine("run:" + stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+#endif
             var res = new List<FaceBox>();
             for (int idx = 0; idx < feat_stride_fpn.Length; idx++)
             {
@@ -157,7 +184,12 @@ namespace FaceTrain.OnnxRuntime
                     }
                 }
             }
-            return Core.NMSBoxes(res, 0.4f);
+            res = Core.NMSBoxes(res, 0.4f);
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine("res:" + stopwatch.Elapsed.TotalMilliseconds);
+#endif
+            return res;
         }
 
 

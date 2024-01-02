@@ -25,8 +25,9 @@ namespace FaceTrain.OnnxRuntime.Tests
             foreach (var item in imgs)
             {
                 using var image = Cv2.ImDecode(item.img, ImreadModes.Color);
-             //   stopwatch.Restart();
-               net.Run(item.img);
+                //   stopwatch.Restart();
+                //  net.Run(item.img);
+                
             //    stopwatch.Stop();
            //     DrawTextWithBackground(image, "time:" + stopwatch.Elapsed.TotalSeconds.ToString("0.00"), new Point(30, 50));
                 //foreach (var face in faces)

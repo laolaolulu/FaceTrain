@@ -2,6 +2,7 @@
 using OpenCvSharp;
 using OpenCvSharp.Dnn;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace FaceTrain.Opencv
 {
@@ -20,6 +21,7 @@ namespace FaceTrain.Opencv
             inputHeight = _inputHeight;
             net = CvDnn.ReadNetFromOnnx(model)!;
             outBlobNames = net.GetUnconnectedOutLayersNames()!;
+
             switch (outBlobNames.Count())
             {
                 case 6:
@@ -61,23 +63,44 @@ namespace FaceTrain.Opencv
 
         public List<FaceBox> Detection(byte[] img, float threshold = 0.5f)
         {
+#if DEBUG
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+#endif
             using Mat image = Cv2.ImDecode(img, ImreadModes.Color);
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine("imgLoad:" + stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+#endif
             //缩放图片
             var resizeRes = Resize(image);
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine("imgResize:" + stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+#endif
             using var mat = resizeRes.mat;
             //预处理图片
             using var blob = CvDnn.BlobFromImage(mat, 1 / 128.0, new Size(inputWidth, inputHeight), new Scalar(127.5, 127.5, 127.5), true, false);
-            var ses = blob.AsSpan<float>();
+
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine("imgBolb:" + stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+#endif
             //将图片输入到网络中
             net.SetInput(blob);
             //创建返回集合对象
             var outputBlobs = outBlobNames.Select(s => new Mat()).ToArray();
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
+          
             //推理
             net.Forward(outputBlobs, outBlobNames);
+#if DEBUG
             stopwatch.Stop();
-            Debug.WriteLine("time:" + stopwatch.Elapsed.TotalSeconds.ToString("0.00"));
+            Debug.WriteLine("run:" + stopwatch.Elapsed.TotalMilliseconds);
+            stopwatch.Restart();
+#endif
             var res = new List<FaceBox>();
             for (int idx = 0; idx < feat_stride_fpn.Length; idx++)
             {
@@ -91,7 +114,7 @@ namespace FaceTrain.Opencv
                 //  var faces = new List<FaceBox>();
                 for (int i = 0; i < outputBlobs[idx].Size(1); i++)
                 {
-                    var tesew = outputBlobs.Select(s=>(s.Size(0), s.Size(1), s.Size(2), s.Size(3), s.Size(4)));
+                    var tesew = outputBlobs.Select(s => (s.Size(0), s.Size(1), s.Size(2), s.Size(3), s.Size(4)));
                     var score = outputBlobs[idx].At<float>(0, i, 0);
                     if (score >= threshold)
                     {
@@ -124,7 +147,10 @@ namespace FaceTrain.Opencv
                 }
             }
             CvDnn.NMSBoxes(res.Select(s => Rect2d.FromLTRB(s.Left, s.Top, s.Right, s.Bottom)), res.Select(s => s.Score), threshold, 0.4f, out int[] indices);
-
+#if DEBUG
+            stopwatch.Stop();
+            Debug.WriteLine("res:" + stopwatch.Elapsed.TotalMilliseconds);
+#endif
             return res.Where((w, index) => indices.Contains(index)).ToList();
         }
 
